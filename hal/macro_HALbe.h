@@ -36,6 +36,32 @@
 #define EVERYSECOND_(N, ...) CONCAT(EVERYSECOND_, N)(__VA_ARGS__)
 #define EVERYSECOND(...) EVERYSECOND_( MY_VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__)
 
+#define EVERYSECOND_DROP_LAST_0(...) MYEMPTY(__VA_ARGS__)
+#define EVERYSECOND_DROP_LAST_2(a, b)
+#define EVERYSECOND_DROP_LAST_4(a, b, ...)  b
+#define EVERYSECOND_DROP_LAST_6(a, b, ...)  b, EVERYSECOND_DROP_LAST_4(__VA_ARGS__)
+#define EVERYSECOND_DROP_LAST_8(a, b, ...)  b, EVERYSECOND_DROP_LAST_6(__VA_ARGS__)
+#define EVERYSECOND_DROP_LAST_10(a, b, ...) b, EVERYSECOND_DROP_LAST_8(__VA_ARGS__)
+#define EVERYSECOND_DROP_LAST_12(a, b, ...) b, EVERYSECOND_DROP_LAST_10(__VA_ARGS__)
+#define EVERYSECOND_DROP_LAST_14(a, b, ...) b, EVERYSECOND_DROP_LAST_12(__VA_ARGS__)
+#define EVERYSECOND_DROP_LAST_16(a, b, ...) b, EVERYSECOND_DROP_LAST_14(__VA_ARGS__)
+#define EVERYSECOND_DROP_LAST_18(a, b, ...) b, EVERYSECOND_DROP_LAST_16(__VA_ARGS__)
+#define EVERYSECOND_DROP_LAST_20(a, b, ...) b, EVERYSECOND_DROP_LAST_18(__VA_ARGS__)
+
+#define EVERYSECOND_DROP_LAST_1( a)
+#define EVERYSECOND_DROP_LAST_3( a, b, c) b
+#define EVERYSECOND_DROP_LAST_5( a, b, c, ...) b, EVERYSECOND_DROP_LAST_3( c, __VA_ARGS__)
+#define EVERYSECOND_DROP_LAST_7( a, b, c, ...) b, EVERYSECOND_DROP_LAST_5( c, __VA_ARGS__)
+#define EVERYSECOND_DROP_LAST_9( a, b, c, ...) b, EVERYSECOND_DROP_LAST_7( c, __VA_ARGS__)
+#define EVERYSECOND_DROP_LAST_11(a, b, c, ...) b, EVERYSECOND_DROP_LAST_9( c, __VA_ARGS__)
+#define EVERYSECOND_DROP_LAST_13(a, b, c, ...) b, EVERYSECOND_DROP_LAST_11(c, __VA_ARGS__)
+#define EVERYSECOND_DROP_LAST_15(a, b, c, ...) b, EVERYSECOND_DROP_LAST_13(c, __VA_ARGS__)
+#define EVERYSECOND_DROP_LAST_17(a, b, c, ...) b, EVERYSECOND_DROP_LAST_15(c, __VA_ARGS__)
+#define EVERYSECOND_DROP_LAST_19(a, b, c, ...) b, EVERYSECOND_DROP_LAST_17(c, __VA_ARGS__)
+
+#define EVERYSECOND_DROP_LAST_(N, ...) CONCAT(EVERYSECOND_DROP_LAST_, N)(__VA_ARGS__)
+#define EVERYSECOND_DROP_LAST(...) EVERYSECOND_DROP_LAST_( MY_VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__)
+
 #define EVERYTWO_0(...) MYEMPTY(__VA_ARGS__)
 #define EVERYTWO_2(a, b) a b
 #define EVERYTWO_4(a, b, ...)  a b, EVERYTWO_2(__VA_ARGS__)
@@ -47,6 +73,17 @@
 #define EVERYTWO_16(a, b, ...) a b, EVERYTWO_14(__VA_ARGS__)
 #define EVERYTWO_18(a, b, ...) a b, EVERYTWO_16(__VA_ARGS__)
 #define EVERYTWO_20(a, b, ...) a b, EVERYTWO_18(__VA_ARGS__)
+
+#define EVERYTWO_1(a)
+#define EVERYTWO_3(a, b, c)       a b
+#define EVERYTWO_5(a, b, c, ...)  a b, EVERYTWO_3(c, __VA_ARGS__)
+#define EVERYTWO_7(a, b, c, ...)  a b, EVERYTWO_5(c, __VA_ARGS__)
+#define EVERYTWO_9(a, b, c, ...)  a b, EVERYTWO_7(c, __VA_ARGS__)
+#define EVERYTWO_11(a, b, c, ...) a b, EVERYTWO_9(c, __VA_ARGS__)
+#define EVERYTWO_13(a, b, c, ...) a b, EVERYTWO_11(c, __VA_ARGS__)
+#define EVERYTWO_15(a, b, c, ...) a b, EVERYTWO_13(c, __VA_ARGS__)
+#define EVERYTWO_17(a, b, c, ...) a b, EVERYTWO_15(c, __VA_ARGS__)
+#define EVERYTWO_19(a, b, c, ...) a b, EVERYTWO_17(c, __VA_ARGS__)
 
 #define EVERYTWO_(N, ...) CONCAT(EVERYTWO_, N)(__VA_ARGS__)
 #define EVERYTWO(...) EVERYTWO_( MY_VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__)

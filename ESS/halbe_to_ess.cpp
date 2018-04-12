@@ -32,6 +32,8 @@
 #include "HMF/HWNeuronParameter.h"
 #include "euter/cellparameters.h"
 
+#include "pythonic/zip.h"
+
 #include "systemsim/HALaccess.h"
 #include "systemsim/stage2_virtual_hardware.h"
 
@@ -409,7 +411,6 @@ HICANN::SynapseSwitchRow HAL2ESS::get_syndriver_switch_row(Handle::HICANN const&
 	return returnval;
 }
 
-
 //sets the weights for a row of synapses 
 void HAL2ESS::set_weights_row(Handle::HICANN const& h, Coordinate::SynapseRowOnHICANN const& s, HICANN::WeightRow const& weights)
 {
@@ -430,6 +431,13 @@ void HAL2ESS::set_weights_row(Handle::HICANN const& h, Coordinate::SynapseRowOnH
             LOG4CXX_DEBUG(_logger, "set_weights_row: Weight in column " << i << " set to " << w.to_ulong() );
         }
     }
+}
+
+void HAL2ESS::set_weights_row(std::vector<boost::shared_ptr<Handle::HICANN> > handles, Coordinate::SynapseRowOnHICANN const& s, std::vector<HICANN::WeightRow> const& data)
+{
+	for (auto v: pythonic::zip(handles, data)) {
+		set_weights_row(*(v.first), s, v.second);
+	}
 }
 
 //gets the weights for a row of synapses from the ESS and the HAL2ESS datastructure
@@ -482,6 +490,13 @@ void HAL2ESS::set_decoder_double_row(Handle::HICANN const& h, Coordinate::Synaps
             LOG4CXX_DEBUG(_logger, "set_decoder_double_row: bottom row decoder set to " << (int)data[geometry::bottom][i].value() << " in column " << i );
         std::bitset<4> addr_bot(data[geometry::bottom][i].value());
         hica.set_syn_address(addr_bot, bot, i);
+	}
+}
+
+void HAL2ESS::set_decoder_double_row(std::vector<boost::shared_ptr<Handle::HICANN> > handles, Coordinate::SynapseDriverOnHICANN const& syndrv, std::vector<HICANN::DecoderDoubleRow> const& data)
+{
+	for (auto v: pythonic::zip(handles, data)) {
+		set_decoder_double_row(*(v.first), syndrv, v.second);
 	}
 }
 

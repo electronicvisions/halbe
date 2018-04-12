@@ -123,9 +123,11 @@ public:
 
 	//Synapses and Synapse drivers
 	void set_weights_row(Handle::HICANN const& h, Coordinate::SynapseRowOnHICANN const& s, HICANN::WeightRow const& weights);
+	void set_weights_row(std::vector<boost::shared_ptr<Handle::HICANN> > handles, Coordinate::SynapseRowOnHICANN const& s, std::vector<HICANN::WeightRow> const& data);
 	HICANN::WeightRow get_weights_row(Handle::HICANN const& h, Coordinate::SynapseRowOnHICANN const& s);
 
 	void set_decoder_double_row(Handle::HICANN const& h, Coordinate::SynapseDriverOnHICANN const& s, HICANN::DecoderDoubleRow const& data);
+	void set_decoder_double_row(std::vector<boost::shared_ptr<Handle::HICANN> > handles, Coordinate::SynapseDriverOnHICANN const& syndrv, std::vector<HICANN::DecoderDoubleRow> const& data);
 	HICANN::DecoderDoubleRow get_decoder_double_row(Handle::HICANN const& h, Coordinate::SynapseDriverOnHICANN const& s);
 
 	void set_synapse_driver(Handle::HICANN const& h, Coordinate::SynapseDriverOnHICANN const& s, HICANN::SynapseDriver const& drv_row);

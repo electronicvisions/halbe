@@ -181,10 +181,11 @@ HALBE_SETTER_GUARDED(EventSetupSynapses,
 		});
 }
 
-void set_weights_row(
-	std::vector<boost::shared_ptr<Handle::HICANN> > handles,
-	Coordinate::SynapseRowOnHICANN const& s,
-	std::vector<WeightRow> const& data)
+HALBE_SETTER_GUARDED(EventSetupSynapses,
+	set_weights_row,
+	std::vector<boost::shared_ptr<Handle::HICANN> >, handles,
+	Coordinate::SynapseRowOnHICANN const&, s,
+	std::vector<WeightRow> const&, data)
 {
 	const size_t n_hicanns = handles.size();
 	if (data.size() != n_hicanns)
@@ -295,10 +296,11 @@ HALBE_SETTER_GUARDED(EventSetupSynapses,
 		});
 }
 
-void set_decoder_double_row(
-	std::vector<boost::shared_ptr<Handle::HICANN> > handles,
-	Coordinate::SynapseDriverOnHICANN const& syndrv,
-	std::vector<DecoderDoubleRow> const& data)
+HALBE_SETTER_GUARDED(EventSetupSynapses,
+	set_decoder_double_row,
+	std::vector<boost::shared_ptr<Handle::HICANN> >, handles,
+	Coordinate::SynapseDriverOnHICANN const&, syndrv,
+	std::vector<DecoderDoubleRow> const&, data)
 {
 	const size_t n_hicanns = handles.size();
 	if (data.size() != n_hicanns)

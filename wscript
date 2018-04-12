@@ -21,6 +21,7 @@ def depends(ctx):
     ctx('pythonic')
     ctx('logger')
     ctx('vmodule')
+    ctx('hate')
     # please specify waf setup --project=XYZ --with-ess to enable ESS-build
     # for old build flow: use configure/build/install --with-ess
     if ctx.options.with_ess:
@@ -187,7 +188,7 @@ def build(bld):
         use             = ['halbe_handle', 'halbe_container',
                            'vmodule_objects', 's2hal_obj', 'bitter', 'rcf-boost-only',
                            'BOOST4HALBE', 'halbe_git_version.h',
-                           'git_version.h', 'RT', 'scheriff_obj'],
+                           'git_version.h', 'RT', 'scheriff_obj', 'hate_inc'],
         cxxflags=cxxflags
     )
 
