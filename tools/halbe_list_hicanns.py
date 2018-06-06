@@ -3,7 +3,7 @@
 import sys
 import argparse
 import pylogging
-from convert_coordinate import add_coordinate
+from halbe_convert_coordinate import add_coordinate
 import Coordinate as C
 
 WAFER = C.Wafer()
