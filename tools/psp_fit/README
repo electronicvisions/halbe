@@ -1,0 +1,39 @@
+Tools for fitting of PSPs
+
+Files
+=====
+
+fit.py
+------
+
+Contains main fitting routine, fit.fit
+
+
+psp_shapes.py
+-------------
+
+Definition of PSP functions with associated methods.
+
+class PSPShape
+--------------
+
+Base class for PSP shapes
+
+class AlphaPSP
+--------------
+
+Implementation of a PSP shape for an alpha-shaped psp
+
+
+Demo Files
+==========
+
+The description of each demo file is located in its docstring.
+For a first look, demo_fit_psp_series.py is recommended.
+
+
+TODO
+====
+
+- use a more robust and faster covariance matrix estimation method
+- use (adjustable) boundaries for fitting routine

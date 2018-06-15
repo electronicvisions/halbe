@@ -1,0 +1,27 @@
+# build / waf files
+build/
+.waf*
+/waf*
+.lock-waf*
+/core
+
+# results
+test/results
+
+# binary files
+/bin/*
+/lib/
+include/
+
+# Pyhton
+*.pyc
+
+# vmi
+*.sw[pon]
+
+*.orig
+*.save
+
+# assorted bindings
+/bindings/*
+/pyoneer_bindings/*

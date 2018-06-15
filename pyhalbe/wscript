@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+
+from waflib.extras.gtest import summary
+
+def depends(ctx):
+    ctx('pywrap')
+    ctx('pyublas')
+    ctx('halbe')
+
+
+def options(ctx):
+    pass
+
+
+def configure(cfg):
+    if cfg.options.with_pywrap_bindings == False:
+        cfg.fatal("Don't recurse into pyhalbe when bindings are disabled")
+
+
+def build(bld):
+
+    USES = [ 'halbe', 'BOOST4PYHALBE', 'PYHALBE', 'pyublas', 'pywrap', 'pywrapstdvector' ]
+
+    bld(
+            target         = 'pyhalbe',
+            features       = 'cxx cxxshlib pypp pyembed pyext post_task',
+            script         = 'generate.py',
+            gen_defines    = 'PYPLUSPLUS __STRICT_ANSI__ BOOST_PP_VARIADICS',
+            defines        = 'PYBINDINGS',
+            headers        = 'pyhalbe.h',
+            use            = USES + ['pycellparameters', 'pyhalco_hicann_v2'],
+            post_task      = 'pyhalbe_tests',
+            install_path   = '${PREFIX}/lib',
+            includes       = '.',
+    )
+
+    bld(
+            target         = 'Coordinate',
+            features       = 'use',
+            use            = USES + ['pycellparameters', 'pyhalco_hicann_v2'],
+    )
+
+    bld.install_files(
+            '${PREFIX}/lib',
+            bld.path.ant_glob('pyhalbe_*.py') + [
+                '_pyhalbe_coordinate.py', 'Coordinate.py'],
+            relative_trick=True
+    )
+
+    bld.install_files(
+            '${PREFIX}/lib',
+            [ 'test/HWTest.py', 'test/Test.py'],
+            relative_trick=False
+    )
+
+    bld(
+        name            = "pyhalbe_tests",
+        tests           = bld.path.ant_glob('**/halbe_test_*.py'),
+        features        = 'use pytest',
+        use             = 'pyhalbe',
+        install_path    = '${PREFIX}/bin',
+        pythonpath      = [".", "test"],
+        test_environ    = { 'PYHALBE_API_CHECK' : '1' },
+    )
+
+    bld(
+        name            = "pyhalbe_hwtests",
+        tests           = bld.path.ant_glob('**/halbe_hwtest_*.py'),
+        use             = 'pyhalbe',
+        install_path    = '${PREFIX}/bin',
+        pythonpath      = [".", "test"],
+        test_environ    = { 'PYHALBE_API_CHECK' : '1' },
+    )
+    bld.add_post_fun(summary)
