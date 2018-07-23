@@ -90,6 +90,14 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 			reticle.jtag_p2f->set_fpga_reset(rawip, false, false, false, false, false);
 		}
 
+		// HICANNs seem to send garbage config packets during reset, drop them (issue #2889)
+		size_t const dropped_packets = jtag_p2fa->getHostAL()->getARQStream()->drop_receive_queue();
+		if (dropped_packets != 0) {
+			LOG4CXX_ERROR(
+			    logger, HMF::Coordinate::short_format(f.coordinate())
+			                << "::reset: Dropped " << dropped_packets << " packet(s) (cf. #2889)");
+		}
+
 		{ // Reset HostARQ-based connection FPGA
 			jtag_p2fa->getHostAL()->reset();
 			jtag_p2fa->initHostAL();
