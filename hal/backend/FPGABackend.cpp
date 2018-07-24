@@ -91,7 +91,6 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 		}
 
 		{ // Reset HostARQ-based connection FPGA
-			// FIXME: Has to be moved up as soon as we have JTAG-via-HostARQ...
 			jtag_p2fa->getHostAL()->reset();
 			jtag_p2fa->initHostAL();
 		}
