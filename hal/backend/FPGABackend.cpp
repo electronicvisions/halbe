@@ -100,7 +100,6 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 
 		{ // Reset HostARQ-based connection FPGA
 			jtag_p2fa->getHostAL()->reset();
-			jtag_p2fa->initHostAL();
 		}
 
 		{ // JTAG reset to enable JTAG-based communication with the HICANN
