@@ -179,7 +179,7 @@ Reset::Reset(bool value) :
 	ddr2sodimm(value),
 	arq(value),
 	PLL_frequency(100),
-	enable_tests(true),
+	enable_tests(false),
 	cnt_hicann_init_tests(10)
 {}
 
@@ -191,7 +191,7 @@ Reset::Reset() :
 	ddr2sodimm(true),
 	arq(true),
 	PLL_frequency(100),
-	enable_tests(true),
+	enable_tests(false),
 	cnt_hicann_init_tests(10)
 {}
 
