@@ -44,7 +44,7 @@ struct FPGAHw::FPGAHandlePIMPL {
 	void create_hicanns() {
 		if (on_wafer) {
 			for (auto hicann : Coordinate::iter_all<Coordinate::HICANNOnDNC>()) {
-				if (hicann.id() < available_hicanns.size())
+				if (available_hicanns.count(hicann))
 					fpga.add_hicann(dnc, hicann);
 			}
 		} else { // vertical setup
