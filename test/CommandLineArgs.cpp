@@ -10,7 +10,7 @@ CommandLineArgs g_conn;
 CommandLineArgs::CommandLineArgs() :
 		h(HMF::Coordinate::HICANNOnDNC(geometry::Enum(0))),
 		// vertical setup supports only dnc "1"
-		d(HMF::Coordinate::DNCOnFPGA(geometry::Enum(1))),
+		d(HMF::Coordinate::DNCOnFPGA(geometry::Enum(0))),
 		f(HMF::Coordinate::FPGAGlobal(geometry::Enum(0))),
 		fpga_ip(),
 		pmu_ip(),
