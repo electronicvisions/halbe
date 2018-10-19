@@ -109,6 +109,17 @@ def build(bld):
         use             = ['halbe_coordinate_inc', 's2hal_inc', 'realtime_inc', 'hostfpga_inc'],
     )
 
+    # ECM (2018-10-19) FIXME: marocco depends on coordinate checks (existance of switches)
+    # which are misplaced (i.e. halbe instead of halco)
+    bld.objects(
+        target          = 'halbe_container_emscripten',
+        source          = bld.path.ant_glob('hal/HICANN/Crossbar.cpp') + bld.path.ant_glob('hal/HICANN/SynapseSwitch.cpp'),
+        install_path    = '${PREFIX}/lib',
+        use             = ['halbe_container_inc', 'halbe_coordinate', 'rcf-boost-only',
+                           'bitter', 'pythonic'],
+        cxxflags=cxxflags
+    )
+
     bld.shlib(
         target          = 'halbe_container',
         source          = (bld.path.ant_glob('hal/*.cpp') +
