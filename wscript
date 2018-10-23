@@ -204,6 +204,7 @@ def build(bld):
     )
 
     bld.shlib(
+        features        = 'cxx cxxshlib',
         target          = 'halbe',
         source          = [],
         use             = ['halbe_backend'],
