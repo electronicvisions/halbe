@@ -27,6 +27,8 @@ struct FPGAHw : public FPGAMixin<HICANNHw>
 		std::set<Coordinate::HICANNOnDNC> physically_available_hicanns;
 		// set of HICANNs where highspeed connection is required
 		std::set<Coordinate::HICANNOnDNC> highspeed_hicanns;
+		// set of usable HICANNs
+		std::set<Coordinate::HICANNOnDNC> usable_hicanns;
 		Coordinate::SetupType setup;
 		Coordinate::IPv4 pmu_ip;
 

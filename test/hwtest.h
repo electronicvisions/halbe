@@ -44,8 +44,8 @@ protected:
 	HWTestHandle()
 	    : handle(::HMF::Handle::FPGAHw::HandleParameter{
 	          g_conn.f, g_conn.fpga_ip, g_conn.d, g_conn.available_hicanns,
-	          g_conn.available_hicanns, g_conn.setup, g_conn.pmu_ip})
-	    , hhandle(*handle.get(g_conn.d, g_conn.h))
+	          g_conn.available_hicanns, g_conn.available_hicanns, g_conn.setup, g_conn.pmu_ip}),
+	      hhandle(*handle.get(g_conn.d, g_conn.h))
 	{}
 
 	void InstanceSetUp();

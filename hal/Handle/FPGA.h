@@ -11,6 +11,10 @@
 
 #include "hal/Coordinate/HMFGeometry.h"
 
+#ifndef PYPLUSPLUS
+#include "hal/Coordinate/typed_array.h"
+#endif
+
 // fwd decl
 struct SpinnController;
 struct RealtimeComm;
@@ -133,16 +137,16 @@ private:
 #ifndef PYPLUSPLUS
 	// attached HICANNs
 	// FIXME: this array should be list of actually used hicanns and not all available hicanns
-	std::array<
-		std::array<boost::shared_ptr<HICANN>, hicann_coord_t::enum_type::size>,
-		dnc_coord_t::end>
-		hicanns;
+	Coordinate::typed_array<Coordinate::typed_array<hicann_handle_t, hicann_coord_t>, dnc_coord_t>
+	    hicanns;
 
 	// HICANNs where a high-speed connection is required
-	std::array<
-		std::array<boost::shared_ptr<HICANN>, hicann_coord_t::enum_type::size>,
-		dnc_coord_t::end>
-		highspeed_hicanns;
+	Coordinate::typed_array<Coordinate::typed_array<hicann_handle_t, hicann_coord_t>, dnc_coord_t>
+	    highspeed_hicanns;
+
+	// HICANNs that can be used (e.g. return correct JTAG id)
+	Coordinate::typed_array<Coordinate::typed_array<hicann_handle_t, hicann_coord_t>, dnc_coord_t>
+	    usable_hicanns;
 #endif
 };
 
