@@ -18,18 +18,21 @@ static uint16_t const pulse_port = 1851;
 
 // hide ugly stuff here
 struct FPGAHw::FPGAHandlePIMPL {
-	FPGAHandlePIMPL(FPGAHw & f, Coordinate::DNCOnFPGA const d, bool on_wafer, bool kintex, std::set<Coordinate::HICANNOnDNC> hicanns, Coordinate::IPv4 pmu_ip) :
-		fpga(f),
-		dnc(d),
-		fpga_jtag_port(Coordinate::UDPPort(jtag_base_port + d.value())),
-		on_wafer(on_wafer),
-		kintex(kintex),
-		myPowerBackend(
-		on_wafer
-			? std::unique_ptr<PowerBackend>(new WaferPowerBackend())
-			: std::unique_ptr<PowerBackend>(new VerticalSetupPowerBackend())),
-		available_hicanns(hicanns),
-		pmu_ip(pmu_ip)
+	FPGAHandlePIMPL(
+	    FPGAHw& f,
+	    Coordinate::DNCOnFPGA const d,
+	    bool on_wafer,
+	    bool kintex,
+	    std::set<Coordinate::HICANNOnDNC> physically_available_hicanns,
+	    Coordinate::IPv4 pmu_ip)
+	    : fpga(f),
+	      dnc(d),
+	      fpga_jtag_port(Coordinate::UDPPort(jtag_base_port + d.value())),
+	      on_wafer(on_wafer),
+	      kintex(kintex),
+	      myPowerBackend(std::unique_ptr<PowerBackend>(new PowerBackend())),
+	      physically_available_hicanns(physically_available_hicanns),
+	      pmu_ip(pmu_ip)
 	{
 		if ((!on_wafer) && (!kintex) && fpga_jtag_port.value() != 1701)
 			throw std::runtime_error("Vertical setup supports only DNC 1");
@@ -42,30 +45,15 @@ struct FPGAHw::FPGAHandlePIMPL {
 	}
 
 	void create_hicanns() {
-		if (on_wafer) {
-			for (auto hicann : Coordinate::iter_all<Coordinate::HICANNOnDNC>()) {
-				if (available_hicanns.count(hicann))
-					fpga.add_hicann(dnc, hicann);
-			}
-		} else { // vertical setup
-			// On the vertical setup the hicanns are created in hardware dnc channel ordering.
-			for (auto hicann = available_hicanns.begin(); hicann != available_hicanns.end(); hicann++) {
-				fpga.add_hicann(dnc, *hicann);
-			}
+		for (auto hicann : physically_available_hicanns) {
+			fpga.add_hicann(dnc, hicann);
 		}
-
 	}
 
 	void setup() {
-		if (on_wafer) {
-			dynamic_cast<WaferPowerBackend&>(*myPowerBackend).SetupReticle(
-				fpga.dnc(dnc), fpga, fpga_jtag_port, pmu_ip, highspeed_mode, arq_mode, kintex
-			);
-		} else { // vertical setup
-			dynamic_cast<VerticalSetupPowerBackend&>(*myPowerBackend).SetupReticle(
-				fpga.dnc(dnc), fpga, fpga_jtag_port, available_hicanns, highspeed_mode, arq_mode, kintex
-			);
-		}
+		myPowerBackend->SetupReticle(
+		    fpga.dnc(dnc), fpga, fpga_jtag_port, pmu_ip, physically_available_hicanns, on_wafer,
+		    highspeed_mode, arq_mode, kintex);
 	}
 
 	~FPGAHandlePIMPL() {
@@ -79,7 +67,7 @@ struct FPGAHw::FPGAHandlePIMPL {
 	bool const on_wafer;
 	bool const kintex;
 	std::unique_ptr<HMF::PowerBackend> myPowerBackend;
-	std::set<Coordinate::HICANNOnDNC> available_hicanns;
+	std::set<Coordinate::HICANNOnDNC> physically_available_hicanns;
 	Coordinate::IPv4 pmu_ip;
 
 
@@ -107,14 +95,17 @@ bool FPGAHw::HandleParameter::on_wafer(){
 	return true;
 }
 
-FPGAHw::FPGAHw(HandleParameter handleparam) :
-		FPGA(handleparam.c),
-		Base(handleparam.c),
-		pimpl(new FPGAHandlePIMPL(*this, handleparam.d, handleparam.on_wafer(),
-		                          handleparam.is_kintex(),
-		                          handleparam.available_hicanns,
-		                          handleparam.pmu_ip)),
-		fpga_ip(handleparam.fpga_ip)
+FPGAHw::FPGAHw(HandleParameter handleparam)
+    : FPGA(handleparam.c),
+      Base(handleparam.c),
+      pimpl(new FPGAHandlePIMPL(
+          *this,
+          handleparam.d,
+          handleparam.on_wafer(),
+          handleparam.is_kintex(),
+          handleparam.physically_available_hicanns,
+          handleparam.pmu_ip)),
+      fpga_ip(handleparam.fpga_ip)
 {
 	pimpl->init();
 }

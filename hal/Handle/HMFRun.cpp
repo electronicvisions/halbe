@@ -122,72 +122,17 @@ uint8_t PowerBackend::hicann_jtag_addr(Coordinate::HICANNGlobal const& h) {
 	return hs2jtag_lut[hs_channel];
 }
 
-
-///Implementing the virtual functions for Vertical Setup
-VerticalSetupPowerBackend::VerticalSetupPowerBackend() {}
-
-//this function is ONLY used for vertical setups and ONLY to set up a new reticle directly
-//after the program start.
-void VerticalSetupPowerBackend::SetupReticle(
-	Coordinate::DNCGlobal const d,
-	Coordinate::IPv4 ip,
-	uint16_t /*jtag_port*/,
-	std::set<Coordinate::HICANNOnDNC> available_hicanns,
-	bool highspeed,
-	bool arq_mode,
-	bool kintex)
-{
-	//creation bitset for reticlecontrol, also gets used to keep which hicanns are availabe in hs channel ordering
-	std::bitset<Coordinate::HICANNOnDNC::enum_type::end> hicann_bitset;
-	for (auto hicann = available_hicanns.begin(); hicann != available_hicanns.end(); hicann++) {
-		hicann_bitset.set(hicann_hs_addr(Coordinate::HICANNOnDNC(*hicann)));
-	}
-
-	//create jtag LUT
-	uint16_t jtag_nr = 0;
-	for (int hs_channel = Coordinate::HICANNOnDNC::enum_type::end - 1; hs_channel >= 0 ; hs_channel--) {
-		if (hicann_bitset[hs_channel]) {
-			//use [] not .at() bacause elements are created
-			hs2jtag_lut[hs_channel] = jtag_nr;
-			jtag_nr++;
-		}
-	}
-
-	if (all_reticles.size() > 1) throw runtime_error("Too many reticles instantiated!");
-	else if (all_reticles.size()) return;
-	else {
-		auto bytes = ip.to_bytes();
-		ReticleControl::ip_t ip_(bytes[0], bytes[1], bytes[2], bytes[3]);
-		auto ret = all_reticles.insert(std::make_pair(d,
-			boost::shared_ptr<ReticleControl>(new ReticleControl(highspeed, ip_, hicann_bitset, arq_mode, kintex))));
-		if (!ret.second) throw runtime_error("Could not insert reticle");
-		// set voltages on the IBoard
-		if (!kintex) {
-			get_reticle(d).switchVerticalPower(true);
-		}
-	}
-}
-
-
-uint8_t VerticalSetupPowerBackend::hicann_reticle_addr(Coordinate::HICANNGlobal const& h)
-{
-	return PowerBackend::hicann_reticle_addr(h);
-}
-
-
-///Implementing the virtual functions for Wafer
-WaferPowerBackend::WaferPowerBackend() {}
-
-
 // single reticle usage
-void WaferPowerBackend::SetupReticle(
-	Coordinate::DNCGlobal const d,
-	Coordinate::IPv4 fpga_ip,
-	uint16_t jtag_port,
-	Coordinate::IPv4 pmu_ip,
-	bool highspeed,
-	bool arq_mode,
-	bool kintex)
+void PowerBackend::SetupReticle(
+    Coordinate::DNCGlobal const d,
+    Coordinate::IPv4 fpga_ip,
+    uint16_t jtag_port,
+    Coordinate::IPv4 pmu_ip,
+    std::set<Coordinate::HICANNOnDNC> physically_available_hicanns,
+    bool on_wafer,
+    bool highspeed,
+    bool arq_mode,
+    bool kintex)
 {
 	//creation of LUT
 	for(int hs_channel = Coordinate::HICANNOnDNC::enum_type::end - 1; hs_channel >= 0; hs_channel--) {
@@ -211,13 +156,19 @@ void WaferPowerBackend::SetupReticle(
 			reticle_number = d.toDNCOnWafer().toEnum();
 		else
 			reticle_number = d.toPowerCoordinate().value();
+
+		// creation bitset for reticlecontrol, also gets used to keep which hicanns are availabe in
+		// hs channel ordering
+		std::bitset<Coordinate::HICANNOnDNC::enum_type::end> avail_hicann_bitset;
+		for (auto hicann : physically_available_hicanns) {
+			avail_hicann_bitset.set(hicann_hs_addr(Coordinate::HICANNOnDNC(hicann)));
+		}
 		ReticleControl::ip_t ip_(bytes[0], bytes[1], bytes[2], bytes[3]);
-		auto ret = all_reticles.insert(std::make_pair(d,
-			boost::shared_ptr<ReticleControl>(
-				new ReticleControl(
-					reticle_number,
-					d.toPowerCoordinate().value(), /*power number*/
-					ip_, jtag_port, pmu_ip, highspeed, arq_mode, kintex))));
+		auto ret = all_reticles.insert(std::make_pair(
+		    d, boost::shared_ptr<ReticleControl>(new ReticleControl(
+		           reticle_number, d.toPowerCoordinate().value(), /*power number*/
+		           ip_, jtag_port, pmu_ip, avail_hicann_bitset, highspeed, on_wafer, arq_mode,
+		           kintex))));
 		if (!ret.second) {
 			throw runtime_error("Could not insert reticle");
 		}

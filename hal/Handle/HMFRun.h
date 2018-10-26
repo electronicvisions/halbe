@@ -51,37 +51,37 @@ struct PowerBackend {
 	container_type all_reticles;
 
 	//returns a shared_ptr to the correct reticle
-	virtual boost::shared_ptr<facets::ReticleControl> get_reticle_ptr(Coordinate::DNCGlobal const d);
+	boost::shared_ptr<facets::ReticleControl> get_reticle_ptr(Coordinate::DNCGlobal const d);
 
 	//returns a reference to the correct reticle
-	virtual facets::ReticleControl& get_reticle(Coordinate::DNCGlobal const d);
+	facets::ReticleControl& get_reticle(Coordinate::DNCGlobal const d);
 
 	//returns a reference to the correct reticle
-	virtual facets::ReticleControl& get_reticle(Handle::FPGAHw const & f, Coordinate::DNCOnFPGA const d);
+	facets::ReticleControl& get_reticle(Handle::FPGAHw const& f, Coordinate::DNCOnFPGA const d);
 
 	//returns a reference to one of the reticles that a FPGA f handles
-	virtual facets::ReticleControl& get_some_reticle(Handle::FPGAHw const & f);
+	facets::ReticleControl& get_some_reticle(Handle::FPGAHw const& f);
 
 	//switches reticle off and deletes it. returns true on success
 	//must be implemented later because all HICANNBackends of the reticle
 	//have to be deleted beforehand and this is not yet possible (stateless)
 	// TODO: fix descriptions (ECM)
-	virtual void destroy_reticle(Coordinate::DNCGlobal const d);
+	void destroy_reticle(Coordinate::DNCGlobal const d);
 
 	//converts HICANN coordinate in DNC-relevant reticle-intern HICANN number
-	virtual uint8_t hicann_reticle_addr(Coordinate::HICANNGlobal const& h);
+	uint8_t hicann_reticle_addr(Coordinate::HICANNGlobal const& h);
 
 	//converts HICAN coordinate to HS channel number
-	virtual uint8_t hicann_hs_addr(Coordinate::HICANNOnDNC const& h);
+	uint8_t hicann_hs_addr(Coordinate::HICANNOnDNC const& h);
 
 	//converts HICANN coordinate in JTAG-relevant reticle-intern HICANN number
-	virtual uint8_t hicann_jtag_addr(Coordinate::HICANNGlobal const& h);
+	uint8_t hicann_jtag_addr(Coordinate::HICANNGlobal const& h);
 
 	/// returns a reference to the Host Application Layer for the given FPGA.
 	HostALController& get_host_al(Handle::FPGAHw const& f);
 
 	// as unique_ptr calls it...
-	virtual ~PowerBackend();
+	~PowerBackend();
 
 protected:
 	PowerBackend();
@@ -91,45 +91,18 @@ protected:
 
 private:
 	PowerBackend(PowerBackend const &) = delete;
-};
 
-
-class VerticalSetupPowerBackend PYPP_FINAL : public PowerBackend {
-public:
-	VerticalSetupPowerBackend();
-	~VerticalSetupPowerBackend() PYPP_OVERRIDE {}
-
-	uint8_t hicann_reticle_addr(Coordinate::HICANNGlobal const& h) PYPP_OVERRIDE;
-
-private:
 	friend class ::HMF::Handle::FPGAHw;
 	void SetupReticle(
-		Coordinate::DNCGlobal const d,
-		Coordinate::IPv4 fpga_ip,
-		uint16_t jtag_port,
-		std::set<Coordinate::HICANNOnDNC> available_hicanns,
-		bool highspeed = true,
-		bool arq_mode = false,
-		bool kintex = false
-	);
-};
-
-
-struct WaferPowerBackend PYPP_FINAL : public PowerBackend {
-	WaferPowerBackend();
-	~WaferPowerBackend() PYPP_OVERRIDE{}
-
-private:
-	friend class ::HMF::Handle::FPGAHw;
-	void SetupReticle(
-		Coordinate::DNCGlobal const d,
-		Coordinate::IPv4 fpga_ip,
-		uint16_t jtag_port,
-		Coordinate::IPv4 pmu_ip,
-		bool highspeed = true,
-		bool arq_mode = false,
-		bool kintex = false
-	);
+	    Coordinate::DNCGlobal const d,
+	    Coordinate::IPv4 fpga_ip,
+	    uint16_t jtag_port,
+	    Coordinate::IPv4 pmu_ip,
+	    std::set<Coordinate::HICANNOnDNC> physically_available_hicanns,
+	    bool on_wafer,
+	    bool highspeed = true,
+	    bool arq_mode = true,
+	    bool kintex = true);
 };
 #endif // #ifndef PYPLUSPLUS
 

@@ -24,7 +24,7 @@ struct FPGAHw : public FPGAMixin<HICANNHw>
 		Coordinate::IPv4 fpga_ip;
 		Coordinate::DNCOnFPGA d;
 		//set of hicanns avaiable in JTag chain
-		std::set<Coordinate::HICANNOnDNC> available_hicanns;
+		std::set<Coordinate::HICANNOnDNC> physically_available_hicanns;
 		Coordinate::SetupType setup;
 		Coordinate::IPv4 pmu_ip;
 
