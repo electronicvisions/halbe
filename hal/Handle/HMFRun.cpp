@@ -114,8 +114,8 @@ void PowerBackend::SetupReticle(
     uint16_t jtag_port,
     Coordinate::IPv4 pmu_ip,
     std::set<Coordinate::HICANNOnDNC> physically_available_hicanns,
+    std::set<Coordinate::HICANNOnDNC> highspeed_hicanns,
     bool on_wafer,
-    bool highspeed,
     bool arq_mode,
     bool kintex)
 {
@@ -130,6 +130,7 @@ void PowerBackend::SetupReticle(
 			log(Logger::WARNING) << r.first << " ";
 		}
 		log(Logger::WARNING) << std::endl << Logger::flush;
+
 		return;
 	}
 	if (!kintex) {
@@ -140,10 +141,14 @@ void PowerBackend::SetupReticle(
 	// availabe in hs channel ordering
 	size_t jtag_num = physically_available_hicanns.size();
 	std::bitset<Coordinate::HICANNOnHS::end> avail_hicann_bitset_in_hs_order;
+	std::bitset<Coordinate::HICANNOnDNC::enum_type::end> highspeed_bitset;
 	for (auto const hicann_on_hs : Coordinate::iter_all<Coordinate::HICANNOnHS>()) {
 		if (physically_available_hicanns.count(hicann_on_hs.toHICANNOnDNC())) {
 			avail_hicann_bitset_in_hs_order.set(hicann_on_hs.toEnum());
 			hs2jtag_lut[hicann_on_hs.toEnum()] = --jtag_num;
+		}
+		if (highspeed_hicanns.count(hicann_on_hs.toHICANNOnDNC())) {
+			highspeed_bitset.set(hicann_on_hs.toEnum());
 		}
 	}
 
@@ -153,7 +158,7 @@ void PowerBackend::SetupReticle(
 	auto ret = all_reticles.insert(std::make_pair(
 	    d, boost::shared_ptr<ReticleControl>(new ReticleControl(
 	           reticle_number, d.toPowerCoordinate().value(), /*power number*/
-	           ip_, jtag_port, pmu_ip, avail_hicann_bitset_in_hs_order, highspeed, on_wafer,
+	           ip_, jtag_port, pmu_ip, avail_hicann_bitset_in_hs_order, highspeed_bitset, on_wafer,
 	           arq_mode, kintex))));
 	if (!ret.second) {
 		throw runtime_error("PowerBackend::SetupReticle: Could not insert reticle");

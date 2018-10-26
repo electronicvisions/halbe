@@ -38,6 +38,9 @@ struct FPGA : public Base
 	/// Returns if the given HICANN is active
 	bool hicann_active(dnc_coord_t const d, hicann_coord_t const h) const;
 
+	/// Returns if for a given HICANN the highspeed connection is required
+	bool hicann_highspeed(dnc_coord_t const d, hicann_coord_t const h) const;
+
 	/// Returns if the given DNC is activ
 	bool dnc_active(dnc_coord_t const d) const;
 
@@ -105,7 +108,7 @@ protected:
 	void activate_dnc(const dnc_coord_t & dnc);
 
 	/// Add a HICANN Handle to the FPGAHandle. To construct the handle create_hicann is called
-	void add_hicann(const dnc_coord_t & dnc, const hicann_coord_t & hicann);
+	void add_hicann(const dnc_coord_t & dnc, const hicann_coord_t & hicann, bool request_highspeed = true);
 
 private:
 #ifndef PYPLUSPLUS
@@ -134,6 +137,12 @@ private:
 		std::array<boost::shared_ptr<HICANN>, hicann_coord_t::enum_type::size>,
 		dnc_coord_t::end>
 		hicanns;
+
+	// HICANNs where a high-speed connection is required
+	std::array<
+		std::array<boost::shared_ptr<HICANN>, hicann_coord_t::enum_type::size>,
+		dnc_coord_t::end>
+		highspeed_hicanns;
 #endif
 };
 

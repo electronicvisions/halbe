@@ -44,17 +44,28 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 	Handle::FPGA &, f,
 	Reset const&, r)
 {
-	ReticleControl& reticle = f.getPowerBackend().get_some_reticle(f);
-	auto jtag_p2fa = dynamic_cast<S2C_JtagPhys2FpgaArq*>(reticle.jtag_p2f.get());
-	if (!jtag_p2fa)
-		throw std::runtime_error("Only HICANN-ARQ comm model is currently supported.");
-
 	// generate bool set indicating active hicanns
 	std::bitset<8> hicanns;
-	for (auto dnc : Coordinate::iter_all<HMF::Coordinate::DNCOnFPGA>())
-		for (auto hicann : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>())
-			if (f.hicann_active(dnc, hicann))
+	// generate bool set indicating highspeed-required hicanns
+	std::bitset<8> highspeed_hicanns;
+	for (auto dnc : Coordinate::iter_all<HMF::Coordinate::DNCOnFPGA>()) {
+		for (auto hicann : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>()) {
+			if (f.hicann_active(dnc, hicann)) {
 				hicanns[hicann.toHICANNOnHS()] = true;
+			}
+			if (f.hicann_highspeed(dnc, hicann)) {
+				highspeed_hicanns[hicann.toHICANNOnHS()] = true;
+			}
+		}
+	}
+
+	ReticleControl& reticle = f.getPowerBackend().get_some_reticle(f);
+	auto jtag_p2fa = dynamic_cast<S2C_JtagPhys2FpgaArq*>(reticle.jtag_p2f.get());
+	if (!jtag_p2fa) {
+		throw std::runtime_error(
+		    "HMF::FPGA::reset: Only HICANN-ARQ comm model is currently supported: " +
+		    HMF::Coordinate::short_format(f.coordinate()));
+	}
 
 	if (r.PLL_frequency != ((r.PLL_frequency / 25) * 25))
 		throw std::runtime_error("only 50, 75, 100, 125, 150, 175, 200, 225, 250Mhz supported");
@@ -212,15 +223,17 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 			auto tmp = jtag_p2fa->trans_count;
 			jtag_p2fa->trans_count = r.cnt_hicann_init_tests;
 			for (auto dnc : Coordinate::iter_all<HMF::Coordinate::DNCOnFPGA>()) {
-				if (hicanns.any()) {
-					highspeed_init_successful = f.get_reticle(dnc)->hicannInit(
-					    hicanns, /*silent*/ false, /*return_on_error*/ true);
-				}
+				highspeed_init_successful = f.get_reticle(dnc)->hicannInit(
+				    hicanns, highspeed_hicanns, /*silent*/ false, /*return_on_error*/ true);
+				LOG4CXX_INFO(
+				    logger, HMF::Coordinate::short_format(f.coordinate())
+				                << " completed hicannInit on: " << highspeed_hicanns << " -> "
+				                << highspeed_init_successful);
 				if (max_init_trials-- <= 0) {
 					std::stringstream error_msg;
 					error_msg
 					    << HMF::Coordinate::short_format(f.coordinate())
-					    << "::reset: Initalization of high speed links failed. Stop";
+					    << "::reset: Initalization of high speed links failed. Stop.";
 					throw std::runtime_error(error_msg.str().c_str());
 				}
 				if (f.isKintex())
@@ -421,6 +434,7 @@ HALBE_SETTER_GUARDED(EventSetupL2,
 				"list has to be greater or equal than fpga_hicann_delay*2");
 		last_fpga_time = pe.getTime()/2 - fpga_hicann_delay;
 		uint16_t id =  pe.getLabel();
+		// FIXME: add check for highspeed-capable HICANN here (encoded in id)
 		host_al.addPlaybackPulse(last_fpga_time, /*uint16_t hicann_time*/ pe.getTime(), id);
 	}
 

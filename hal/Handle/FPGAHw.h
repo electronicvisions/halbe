@@ -23,8 +23,10 @@ struct FPGAHw : public FPGAMixin<HICANNHw>
 		Coordinate::FPGAGlobal c;
 		Coordinate::IPv4 fpga_ip;
 		Coordinate::DNCOnFPGA d;
-		//set of hicanns avaiable in JTag chain
+		// set of hicanns avaiable in JTag chain
 		std::set<Coordinate::HICANNOnDNC> physically_available_hicanns;
+		// set of HICANNs where highspeed connection is required
+		std::set<Coordinate::HICANNOnDNC> highspeed_hicanns;
 		Coordinate::SetupType setup;
 		Coordinate::IPv4 pmu_ip;
 
@@ -43,6 +45,7 @@ struct FPGAHw : public FPGAMixin<HICANNHw>
 	///         ignored if on_wafer = true.
 	/// \param force_kintex force to use kintex fpga, otherwise the FPGA is
 	///        determined by the FPGA coordinate
+	/// \note non-highspeed-required HICANNs are not (yet) supported (API change required)
 	FPGAHw(Coordinate::FPGAGlobal const c, Coordinate::IPv4 const ip,
 	       Coordinate::DNCOnFPGA const d, Coordinate::IPv4 const pmu_ip, bool on_wafer = false, size_t num_hicanns = 1,
 	       bool force_kintex = false);

@@ -24,6 +24,7 @@ struct FPGAHw::FPGAHandlePIMPL {
 	    bool on_wafer,
 	    bool kintex,
 	    std::set<Coordinate::HICANNOnDNC> physically_available_hicanns,
+	    std::set<Coordinate::HICANNOnDNC> highspeed_hicanns,
 	    Coordinate::IPv4 pmu_ip)
 	    : fpga(f),
 	      dnc(d),
@@ -32,6 +33,7 @@ struct FPGAHw::FPGAHandlePIMPL {
 	      kintex(kintex),
 	      myPowerBackend(std::unique_ptr<PowerBackend>(new PowerBackend())),
 	      physically_available_hicanns(physically_available_hicanns),
+	      highspeed_hicanns(highspeed_hicanns),
 	      pmu_ip(pmu_ip)
 	{
 		if ((!on_wafer) && (!kintex) && fpga_jtag_port.value() != 1701)
@@ -46,14 +48,15 @@ struct FPGAHw::FPGAHandlePIMPL {
 
 	void create_hicanns() {
 		for (auto hicann : physically_available_hicanns) {
-			fpga.add_hicann(dnc, hicann);
+			bool const needs_highspeed = highspeed_hicanns.count(hicann);
+			fpga.add_hicann(dnc, hicann, needs_highspeed);
 		}
 	}
 
 	void setup() {
 		myPowerBackend->SetupReticle(
-		    fpga.dnc(dnc), fpga, fpga_jtag_port, pmu_ip, physically_available_hicanns, on_wafer,
-		    highspeed_mode, arq_mode, kintex);
+		    fpga.dnc(dnc), fpga, fpga_jtag_port, pmu_ip, physically_available_hicanns,
+		    highspeed_hicanns, on_wafer, arq_mode, kintex);
 	}
 
 	~FPGAHandlePIMPL() {
@@ -68,6 +71,7 @@ struct FPGAHw::FPGAHandlePIMPL {
 	bool const kintex;
 	std::unique_ptr<HMF::PowerBackend> myPowerBackend;
 	std::set<Coordinate::HICANNOnDNC> physically_available_hicanns;
+	std::set<Coordinate::HICANNOnDNC> highspeed_hicanns;
 	Coordinate::IPv4 pmu_ip;
 
 
@@ -104,6 +108,7 @@ FPGAHw::FPGAHw(HandleParameter handleparam)
           handleparam.on_wafer(),
           handleparam.is_kintex(),
           handleparam.physically_available_hicanns,
+          handleparam.highspeed_hicanns,
           handleparam.pmu_ip)),
       fpga_ip(handleparam.fpga_ip)
 {
@@ -123,9 +128,10 @@ FPGAHw::FPGAHw(Coordinate::FPGAGlobal const c, Coordinate::IPv4 const fpga_ip,
 		if (hicann.id()<num_hicanns)
 			avail_hicanns.insert(HMF::Coordinate::HICANNOnDNC(hicann));
 	}
+	// FIXME: does not support non-highspeed hicanns
 	std::unique_ptr<FPGAHandlePIMPL> tempptr(new FPGAHandlePIMPL(*this, d, on_wafer,
                              (on_wafer ? is_kintex(c, force_kintex) : force_kintex),
-                             avail_hicanns, pmu_ip));
+                             avail_hicanns, avail_hicanns, pmu_ip));
 	pimpl = std::move(tempptr);
 	pimpl->init();
 }

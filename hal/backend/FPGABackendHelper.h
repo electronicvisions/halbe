@@ -81,7 +81,7 @@ void switchramtest_arq(Handle::FPGAHw& f, ReticleControl& reticle)
 	size_t const datawidth = 16;
 	for (auto d : Coordinate::iter_all<HMF::Coordinate::DNCOnFPGA>()) {
 		for (auto h : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>()) {
-			if (f.hicann_active(d, h)) {
+			if (f.hicann_highspeed(d, h)) {
 				// Now HICANN-ARQ-based access...
 				L1SwitchControl* lc =
 				    &reticle.hicann[f.get(d, h)->jtag_addr()]->getLC(HicannCtrl::L1SWITCH_TOP_LEFT);
@@ -114,6 +114,9 @@ void switchramtest_arq(Handle::FPGAHw& f, ReticleControl& reticle)
 						throw std::runtime_error(error_msg.str().c_str());
 					}
 				}
+			} else {
+				LOG4CXX_INFO(logger, "HMF::FPGA::reset(): Skipping HICANN-ARQ-based switch RAM test on "
+					<< HMF::Coordinate::short_format(f.coordinate()) << "/" << d << "/" << h << ".");
 			}
 		}
 

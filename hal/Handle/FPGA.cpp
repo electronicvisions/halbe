@@ -49,6 +49,12 @@ bool FPGA::hicann_active(dnc_coord_t const dnc, hicann_coord_t const hicann) con
 	return hicanns[dnc][hicann.id()].get() != nullptr;
 }
 
+/// Returns if the given HICANN needs a working highspeed connection
+bool FPGA::hicann_highspeed(dnc_coord_t const dnc, hicann_coord_t const hicann) const
+{
+	return highspeed_hicanns[dnc][hicann.id()].get() != nullptr;
+}
+
 /// Returns if the given DNC is activ
 bool FPGA::dnc_active(dnc_coord_t const d) const
 {
@@ -82,11 +88,14 @@ void FPGA::activate_dnc(const dnc_coord_t & dnc)
 	active_dncs.set(dnc);
 }
 
-void FPGA::add_hicann(const dnc_coord_t & dnc, const hicann_coord_t & h)
+void FPGA::add_hicann(const dnc_coord_t & dnc, const hicann_coord_t & h, bool const request_highspeed)
 {
 	if (!dnc_active(dnc))
 		throw std::runtime_error("Attempted to add a HICANN to an inactive DNC");
 	hicanns[dnc][h.id()] = create_hicann(hicann(dnc, h));
+
+	if (request_highspeed)
+		highspeed_hicanns[dnc][h.id()] = hicanns[dnc][h.id()];
 }
 
 } // namespace Handle
