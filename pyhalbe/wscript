@@ -28,7 +28,7 @@ def build(bld):
             gen_defines    = 'PYPLUSPLUS __STRICT_ANSI__ BOOST_PP_VARIADICS',
             defines        = 'PYBINDINGS',
             headers        = 'pyhalbe.h',
-            use            = USES + ['pycellparameters', 'pyhalco_hicann_v2'],
+            use            = USES + ['pycellparameters', 'pyhalco_hicann_v2', 'pyhalco_common_files'],
             post_task      = 'pyhalbe_tests',
             install_path   = '${PREFIX}/lib',
             includes       = '.',
