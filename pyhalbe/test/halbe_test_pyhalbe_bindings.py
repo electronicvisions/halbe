@@ -205,5 +205,15 @@ class Test_PyhalbeBindings(PyhalbeTest):
             loaded = cPickle.loads(cPickle.dumps(v))
             self.assertIs(loaded, v)
 
+    @parametrize(['shared_parameter', 'neuron_parameter'])
+    def test_parameter_to_string(self, param):
+        from pyhalbe import HICANN
+        enum = getattr(HICANN, param)
+
+        for name, parameter in enum.names.iteritems():
+            if '__' not in name:
+                self.assertEqual(name,
+                                 HICANN.to_string(parameter))
+
 if __name__ == '__main__':
     PyhalbeTest.main()

@@ -93,6 +93,9 @@ bool isVoltageParameter(neuron_parameter p);
 /// Check if the given parameter is a voltage
 bool isVoltageParameter(shared_parameter p);
 
+std::string to_string(neuron_parameter p);
+std::string to_string(shared_parameter p);
+
 struct FGBlock
 {
 	static size_t const fg_blocks = 4;

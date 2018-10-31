@@ -2,6 +2,7 @@
 #include "pythonic/enumerate.h"
 
 #include <bitter/bitter.h>
+#include <string>
 
 using namespace HMF::Coordinate;
 
@@ -189,6 +190,72 @@ bool isCurrentParameter(shared_parameter p)
 		case V_tlow: return false;
 		case int_op_bias: return true;
 		default: throw std::out_of_range("Not a parameter.");
+	}
+}
+
+std::string to_string(neuron_parameter p)
+{
+	switch(p) {
+		case E_l: return "E_l";
+		case E_syni: return "E_syni";
+		case E_synx: return "E_synx";
+		case I_bexp: return "I_bexp";
+		case I_convi: return "I_convi";
+		case I_convx: return "I_convx";
+		case I_fire: return "I_fire";
+		case I_gl: return "I_gl";
+		case I_gladapt: return "I_gladapt";
+		case I_intbbi: return "I_intbbi";
+		case I_intbbx: return "I_intbbx";
+		case I_pl: return "I_pl";
+		case I_radapt: return "I_radapt";
+		case I_rexp: return "I_rexp";
+		case I_spikeamp: return "I_spikeamp";
+		case V_exp: return "V_exp";
+		case V_syni: return "V_syni";
+		case V_syntci: return "V_syntci";
+		case V_syntcx: return "V_syntcx";
+		case V_synx: return "V_synx";
+		case V_t: return "V_t";
+		case V_convoffi: return "V_convoffi";
+		case V_convoffx: return "V_convoffx";
+		default: {
+			throw std::out_of_range(
+			    "to_string: not a neuron parameter " + std::to_string(static_cast<int>(p)));
+		}
+	}
+}
+
+std::string to_string(shared_parameter p)
+{
+	switch(p) {
+		case I_breset: return "I_breset";
+		case I_bstim: return "I_bstim";
+		case V_bexp: return "V_bexp";
+		case V_bout: return "V_bout";
+		case V_br: return "V_br";
+		case V_bstdf: return "V_bstdf";
+		case V_ccas: return "V_ccas";
+		case V_clra: return "V_clra";
+		case V_clrc: return "V_clrc";
+		case V_dep: return "V_dep";
+		case V_dllres: return "V_dllres";
+		case V_dtc: return "V_dtc";
+		case V_fac: return "V_fac";
+		case V_gmax0: return "V_gmax0";
+		case V_gmax1: return "V_gmax1";
+		case V_gmax2: return "V_gmax2";
+		case V_gmax3: return "V_gmax3";
+		case V_m: return "V_m";
+		case V_reset: return "V_reset";
+		case V_stdf: return "V_stdf";
+		case V_thigh: return "V_thigh";
+		case V_tlow: return "V_tlow";
+		case int_op_bias: return "int_op_bias";
+		default: {
+			throw std::out_of_range(
+			    "to_string: not a shared parameter " + std::to_string(static_cast<int>(p)));
+		}
 	}
 }
 
