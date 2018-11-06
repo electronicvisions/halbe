@@ -68,12 +68,6 @@ struct PowerBackend {
 	// TODO: fix descriptions (ECM)
 	void destroy_reticle(Coordinate::DNCGlobal const d);
 
-	//converts HICANN coordinate in DNC-relevant reticle-intern HICANN number
-	uint8_t hicann_reticle_addr(Coordinate::HICANNGlobal const& h);
-
-	//converts HICAN coordinate to HS channel number
-	uint8_t hicann_hs_addr(Coordinate::HICANNOnDNC const& h);
-
 	//converts HICANN coordinate in JTAG-relevant reticle-intern HICANN number
 	uint8_t hicann_jtag_addr(Coordinate::HICANNGlobal const& h);
 

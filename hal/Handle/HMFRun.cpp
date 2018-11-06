@@ -6,6 +6,7 @@
 #include "hal/Handle/FPGAHw.h"
 
 #include "hal/Coordinate/HMFGrid.h"
+#include "hal/Coordinate/iter_all.h"
 
 #include "reticle_control.h"
 
@@ -99,25 +100,9 @@ void PowerBackend::destroy_reticle(Coordinate::DNCGlobal const d) {
 	}
 }
 
-
-uint8_t PowerBackend::hicann_reticle_addr(Coordinate::HICANNGlobal const& h)
-{
-	return (h.y()%2)
-		? (h.x()%4)*2 + 1 /*odd*/
-		: (h.x()%4)*2     /*even*/;
-}
-
-uint8_t PowerBackend::hicann_hs_addr(Coordinate::HICANNOnDNC const& h)
-{
-	return (h.y())
-		? (h.x())*2 + 1 /*odd*/
-		: (h.x())*2     /*even*/;
-}
-
-
 uint8_t PowerBackend::hicann_jtag_addr(Coordinate::HICANNGlobal const& h) {
 	//look up in ReticleControl how many HICANNs it has
-	uint8_t hs_channel = hicann_hs_addr(h.toHICANNOnDNC());
+	uint8_t hs_channel = h.toHICANNOnDNC().toHICANNOnHS().toEnum();
 	assert (hs2jtag_lut.count(hs_channel) > 0);
 	return hs2jtag_lut[hs_channel];
 }
@@ -134,13 +119,10 @@ void PowerBackend::SetupReticle(
     bool arq_mode,
     bool kintex)
 {
-	//creation of LUT
-	for(int hs_channel = Coordinate::HICANNOnDNC::enum_type::end - 1; hs_channel >= 0; hs_channel--) {
-		//use [] not .at() bacause elements are created
-		hs2jtag_lut[hs_channel] = Coordinate::HICANNOnDNC::enum_type::end - 1 - hs_channel;
+	if (all_reticles.size() > 1) {
+		throw runtime_error("PowerBackend::SetupReticle: Too many reticles instantiated!");
 	}
-	if (all_reticles.size() > 1) throw runtime_error("Too many reticles instantiated!");
-	else if (all_reticles.size()) {
+	if (all_reticles.size()) {
 		Logger & log = Logger::instance();
 		log(Logger::WARNING) << "Ignoring request to create another reticle instance.\n";
 		log(Logger::WARNING) << "Reticles in use: ";
@@ -149,29 +131,32 @@ void PowerBackend::SetupReticle(
 		}
 		log(Logger::WARNING) << std::endl << Logger::flush;
 		return;
-	} else {
-		auto bytes = fpga_ip.to_bytes();
-		unsigned int reticle_number;
-		if (kintex)
-			reticle_number = d.toDNCOnWafer().toEnum();
-		else
-			reticle_number = d.toPowerCoordinate().value();
+	}
+	if (!kintex) {
+		throw runtime_error("PowerBackend::SetupReticle: Virtex FPGAs not supported anymore");
+	}
 
-		// creation bitset for reticlecontrol, also gets used to keep which hicanns are availabe in
-		// hs channel ordering
-		std::bitset<Coordinate::HICANNOnDNC::enum_type::end> avail_hicann_bitset;
-		for (auto hicann : physically_available_hicanns) {
-			avail_hicann_bitset.set(hicann_hs_addr(Coordinate::HICANNOnDNC(hicann)));
+	// creation of array and bitset for reticlecontrol, also gets used to keep which hicanns are
+	// availabe in hs channel ordering
+	size_t jtag_num = physically_available_hicanns.size();
+	std::bitset<Coordinate::HICANNOnHS::end> avail_hicann_bitset_in_hs_order;
+	for (auto const hicann_on_hs : Coordinate::iter_all<Coordinate::HICANNOnHS>()) {
+		if (physically_available_hicanns.count(hicann_on_hs.toHICANNOnDNC())) {
+			avail_hicann_bitset_in_hs_order.set(hicann_on_hs.toEnum());
+			hs2jtag_lut[hicann_on_hs.toEnum()] = --jtag_num;
 		}
-		ReticleControl::ip_t ip_(bytes[0], bytes[1], bytes[2], bytes[3]);
-		auto ret = all_reticles.insert(std::make_pair(
-		    d, boost::shared_ptr<ReticleControl>(new ReticleControl(
-		           reticle_number, d.toPowerCoordinate().value(), /*power number*/
-		           ip_, jtag_port, pmu_ip, avail_hicann_bitset, highspeed, on_wafer, arq_mode,
-		           kintex))));
-		if (!ret.second) {
-			throw runtime_error("Could not insert reticle");
-		}
+	}
+
+	auto const bytes = fpga_ip.to_bytes();
+	ReticleControl::ip_t ip_(bytes[0], bytes[1], bytes[2], bytes[3]);
+	unsigned int const reticle_number = d.toDNCOnWafer().toEnum();
+	auto ret = all_reticles.insert(std::make_pair(
+	    d, boost::shared_ptr<ReticleControl>(new ReticleControl(
+	           reticle_number, d.toPowerCoordinate().value(), /*power number*/
+	           ip_, jtag_port, pmu_ip, avail_hicann_bitset_in_hs_order, highspeed, on_wafer,
+	           arq_mode, kintex))));
+	if (!ret.second) {
+		throw runtime_error("PowerBackend::SetupReticle: Could not insert reticle");
 	}
 }
 

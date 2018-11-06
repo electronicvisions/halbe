@@ -54,7 +54,7 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 	for (auto dnc : Coordinate::iter_all<HMF::Coordinate::DNCOnFPGA>())
 		for (auto hicann : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>())
 			if (f.hicann_active(dnc, hicann))
-				hicanns[f.getPowerBackend().hicann_reticle_addr(f.get(dnc, hicann)->coordinate())] = true;
+				hicanns[hicann.toHICANNOnHS()] = true;
 
 	if (r.PLL_frequency != ((r.PLL_frequency / 25) * 25))
 		throw std::runtime_error("only 50, 75, 100, 125, 150, 175, 200, 225, 250Mhz supported");
