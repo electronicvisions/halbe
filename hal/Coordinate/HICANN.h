@@ -7,6 +7,7 @@ namespace Coordinate {
 
 using halco::hicann::v2::HICANNOnWafer;
 using halco::hicann::v2::HICANNOnDNC;
+using halco::hicann::v2::HICANNOnHS;
 using halco::hicann::v2::HICANNGlobal;
 
 } // Coordinate
