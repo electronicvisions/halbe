@@ -434,7 +434,7 @@ HALBE_SETTER_GUARDED(EventSetupL2,
 				"list has to be greater or equal than fpga_hicann_delay*2");
 		last_fpga_time = pe.getTime()/2 - fpga_hicann_delay;
 		uint16_t id =  pe.getLabel();
-		// FIXME: add check for highspeed-capable HICANN here (encoded in id)
+		// FIXME: add check for highspeed-capable HICANN here (encoded in id) issue #2995
 		host_al.addPlaybackPulse(last_fpga_time, /*uint16_t hicann_time*/ pe.getTime(), id);
 	}
 
