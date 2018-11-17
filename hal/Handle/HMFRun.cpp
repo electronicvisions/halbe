@@ -82,7 +82,7 @@ void PowerBackend::destroy_reticle(Coordinate::DNCGlobal const d) {
 	if (it == all_reticles.end()) {
 		std::stringstream ss;
 		ss << "Cannot destroy reticle because it doesn't exist: ";
-		ss << d << "\n";
+		ss << d << " (" << d.toFPGAGlobal() << ")\n";
 		ss << "Existing reticles: ";
 		for (auto & r: all_reticles)
 			ss << r.first << "\n";
@@ -93,7 +93,8 @@ void PowerBackend::destroy_reticle(Coordinate::DNCGlobal const d) {
 		{
 			std::stringstream ss;
 			ss << "Cannot destroy reticle '"
-			   << d << "', because it is still used somewhere" << std::endl;
+			   << d << " (" << d.toFPGAGlobal()
+			   << ")', because it is still used somewhere" << std::endl;
 			throw std::runtime_error(ss.str());
 		}
 		all_reticles.erase(it);
