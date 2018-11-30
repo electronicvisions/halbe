@@ -158,8 +158,8 @@ void PowerBackend::SetupReticle(
 	unsigned int const reticle_number = d.toDNCOnWafer().toEnum();
 	auto ret = all_reticles.insert(std::make_pair(
 	    d, boost::shared_ptr<ReticleControl>(new ReticleControl(
-	           reticle_number, d.toPowerCoordinate().value(), /*power number*/
-	           ip_, jtag_port, pmu_ip, avail_hicann_bitset_in_hs_order, highspeed_bitset, on_wafer,
+	           reticle_number, ip_, jtag_port, pmu_ip, avail_hicann_bitset_in_hs_order,
+	           highspeed_bitset, on_wafer,
 	           arq_mode, kintex))));
 	if (!ret.second) {
 		throw runtime_error("PowerBackend::SetupReticle: Could not insert reticle");
