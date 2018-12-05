@@ -1079,7 +1079,7 @@ HICANN::FGErrorResultQuadRow HAL2ESS::set_fg_row_values(Handle::HICANN & h, Coor
                 }
             }
         }
-        catch (std::out_of_range)
+        catch (std::out_of_range&)
         {}
         
         //get the neuron parameter
@@ -1097,7 +1097,7 @@ HICANN::FGErrorResultQuadRow HAL2ESS::set_fg_row_values(Handle::HICANN & h, Coor
                 nrn_params.setParam(nrn_param_type, param);
             }
         }
-        catch (std::out_of_range)
+        catch (std::out_of_range&)
         {
             continue;
         }
@@ -1156,7 +1156,7 @@ HICANN::FGErrorResultQuadRow HAL2ESS::set_fg_row_values(Handle::HICANN & h, Coor
 			}
 		}
 	}
-	catch (std::out_of_range)
+	catch (std::out_of_range&)
 	{}
 
 	//get the neuron parameter
@@ -1174,7 +1174,7 @@ HICANN::FGErrorResultQuadRow HAL2ESS::set_fg_row_values(Handle::HICANN & h, Coor
 			nrn_params.setParam(nrn_param_type, param);
 		}
 	}
-	catch (std::out_of_range)
+	catch (std::out_of_range&)
 	{}
 
 	// return empty error vectors to indicate that writing was successful

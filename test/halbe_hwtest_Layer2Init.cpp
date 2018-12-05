@@ -43,7 +43,7 @@ TEST_F(Layer2InitTest, FPGAResetInitHWTest) {
 	for (unsigned int nrep=0; nrep<rep_count; ++nrep) {
 		try {
 			::HMF::FPGA::reset(f);
-		} catch(std::runtime_error) {
+		} catch(std::runtime_error&) {
 			continue;
 		}
 
