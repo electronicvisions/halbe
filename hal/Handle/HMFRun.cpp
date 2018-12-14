@@ -103,7 +103,7 @@ void PowerBackend::destroy_reticle(Coordinate::DNCGlobal const d) {
 
 uint8_t PowerBackend::hicann_jtag_addr(Coordinate::HICANNGlobal const& h) {
 	//look up in ReticleControl how many HICANNs it has
-	uint8_t hs_channel = h.toHICANNOnDNC().toHICANNOnHS().toEnum();
+	uint8_t hs_channel = h.toHICANNOnDNC().toHighspeedLinkOnDNC().toEnum();
 	assert (hs2jtag_lut.count(hs_channel) > 0);
 	return hs2jtag_lut[hs_channel];
 }
@@ -141,15 +141,15 @@ void PowerBackend::SetupReticle(
 	// creation of array and bitset for reticlecontrol, also gets used to keep which hicanns are
 	// availabe in hs channel ordering
 	size_t jtag_num = physically_available_hicanns.size();
-	std::bitset<Coordinate::HICANNOnHS::end> avail_hicann_bitset_in_hs_order;
+	std::bitset<Coordinate::HighspeedLinkOnDNC::end> avail_hicann_bitset_in_hs_order;
 	std::bitset<Coordinate::HICANNOnDNC::enum_type::end> highspeed_bitset;
-	for (auto const hicann_on_hs : Coordinate::iter_all<Coordinate::HICANNOnHS>()) {
-		if (physically_available_hicanns.count(hicann_on_hs.toHICANNOnDNC())) {
-			avail_hicann_bitset_in_hs_order.set(hicann_on_hs.toEnum());
-			hs2jtag_lut[hicann_on_hs.toEnum()] = --jtag_num;
+	for (auto const hs_link : Coordinate::iter_all<Coordinate::HighspeedLinkOnDNC>()) {
+		if (physically_available_hicanns.count(hs_link.toHICANNOnDNC())) {
+			avail_hicann_bitset_in_hs_order.set(hs_link.toEnum());
+			hs2jtag_lut[hs_link.toEnum()] = --jtag_num;
 		}
-		if (highspeed_hicanns.count(hicann_on_hs.toHICANNOnDNC())) {
-			highspeed_bitset.set(hicann_on_hs.toEnum());
+		if (highspeed_hicanns.count(hs_link.toHICANNOnDNC())) {
+			highspeed_bitset.set(hs_link.toEnum());
 		}
 	}
 

@@ -45,16 +45,16 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 	Reset const&, r)
 {
 	// generate bool set indicating active hicanns
-	std::bitset<8> hicanns;
+	std::bitset<8> hicann_in_hs_order;
 	// generate bool set indicating highspeed-required hicanns
-	std::bitset<8> highspeed_hicanns;
+	std::bitset<8> highspeed_hicanns_in_hs_order;
 	for (auto dnc : Coordinate::iter_all<HMF::Coordinate::DNCOnFPGA>()) {
 		for (auto hicann : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>()) {
 			if (f.hicann_active(dnc, hicann)) {
-				hicanns[hicann.toHICANNOnHS()] = true;
+				hicann_in_hs_order[hicann.toHighspeedLinkOnDNC()] = true;
 			}
 			if (f.hicann_highspeed(dnc, hicann)) {
-				highspeed_hicanns[hicann.toHICANNOnHS()] = true;
+				highspeed_hicanns_in_hs_order[hicann.toHighspeedLinkOnDNC()] = true;
 			}
 		}
 	}
@@ -224,10 +224,10 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 			jtag_p2fa->trans_count = r.cnt_hicann_init_tests;
 			for (auto dnc : Coordinate::iter_all<HMF::Coordinate::DNCOnFPGA>()) {
 				highspeed_init_successful = f.get_reticle(dnc)->hicannInit(
-				    hicanns, highspeed_hicanns, /*silent*/ false, /*return_on_error*/ true);
+				    hicann_in_hs_order, highspeed_hicanns_in_hs_order, /*silent*/ false, /*return_on_error*/ true);
 				LOG4CXX_INFO(
 				    logger, HMF::Coordinate::short_format(f.coordinate())
-				                << " completed hicannInit on: " << highspeed_hicanns << " -> "
+				                << " completed hicannInit on: " << highspeed_hicanns_in_hs_order << " -> "
 				                << highspeed_init_successful);
 				if (max_init_trials-- <= 0) {
 					std::stringstream error_msg;

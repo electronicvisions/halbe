@@ -40,7 +40,7 @@ HALBE_GETTER(Status, get_dnc_status,
 
 	reticle.jtag->read_id(id, reticle.jtag->pos_dnc);
 
-	uint8_t reticle_addr = f.hicann(d,h).toHICANNOnHS().toEnum();
+	uint8_t reticle_addr = f.hicann(d,h).toHighspeedLinkOnDNC().toEnum();
 	reticle.jtag->DNC_set_channel(reticle_addr);
 	reticle.jtag->DNC_read_crc_count(crc);
 	//TODO: not sure about this reset if this is really the HICANN-number
