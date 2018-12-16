@@ -19,8 +19,6 @@ def f_fpga(coord):
     for dnc_f in C.iter_all(C.DNCOnFPGA):
         dnc = dnc_f.toDNCOnWafer(gcoord)
         result += hicanns_on_dnc(dnc)
-        if WAFER.isKintex():
-            break
     return result
 
 def f_dnc(dnc):

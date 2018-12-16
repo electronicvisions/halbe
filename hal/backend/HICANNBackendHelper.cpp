@@ -810,15 +810,8 @@ void set_PLL_multiplier(
 	reticle.jtag->set_hicann_pos(0);
 }
 
-void hicann_init(facets::HicannCtrl& hc, facets::DNCControl& dc, bool const isKintex,
-                 bool const zero_synapses)
+void hicann_init(facets::HicannCtrl& hc, bool const zero_synapses)
 {
-	if (!isKintex) {
-		// set DNC link direction registers to zero
-		dc.setTimeStampCtrl(0);
-		dc.setDirection(0);
-	}
-
 	// SRAM controller timing (used for all controllers)
 	size_t const read_delay      = 64;
 	size_t const setup_precharge = 8;

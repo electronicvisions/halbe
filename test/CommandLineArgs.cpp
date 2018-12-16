@@ -28,7 +28,7 @@ CommandLineArgs CommandLineArgs::parse(int argc, char *argv[])
 	std::vector< geometry::Enum> ah;
 	size_t ll;
 	std::string lf;
-	bool ld, scheriff, kintex;
+	bool ld, scheriff;
 	std::set< ::HMF::Coordinate::HICANNOnDNC> available_hicanns;
 	std::vector<geometry::Enum> default_hicanns;
 	for(auto hicann_coord : HMF::Coordinate::iter_all< HMF::Coordinate::HICANNOnDNC>()) {
@@ -56,8 +56,6 @@ CommandLineArgs CommandLineArgs::parse(int argc, char *argv[])
 			"used to determine on-wafer position of the FPGA (which is selected by the IP)")
 		("wafer,w",     po::value<geometry::Enum>(&w)->default_value(geometry::Enum(0)),
 			"specify Wafer (global enum);\n")
-		("kintex,k",    po::value<bool>(&kintex)->default_value(false),
-			 "Kintex mode (otherwise: Virtex)?")
 		("scheriff",    po::value<bool>(&scheriff)->default_value(true),
 			"call the scheriff")
 		("loglevel",    po::value<size_t>(&ll)->default_value(1),
@@ -90,15 +88,9 @@ CommandLineArgs CommandLineArgs::parse(int argc, char *argv[])
 		HMF::Coordinate::FPGAOnWafer(f), HMF::Coordinate::Wafer(w));
 	if((on.at(0) == 'w' || on.at(0) == 'W') || (w > 0)) {
 		//on wafer
-		if (kintex)
-			conn.setup = HMF::Coordinate::SetupType::BSSWafer;
-		else
-			conn.setup = HMF::Coordinate::SetupType::FACETSWafer;
+		conn.setup = HMF::Coordinate::SetupType::BSSWafer;
 	} else {
-		if (kintex)
-			conn.setup = HMF::Coordinate::SetupType::CubeSetup;
-		else
-			conn.setup = HMF::Coordinate::SetupType::VSetup;
+		conn.setup = HMF::Coordinate::SetupType::CubeSetup;
 	}
 
 	for (auto hicann = ah.begin(); hicann != ah.end(); hicann++) {

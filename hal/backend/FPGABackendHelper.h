@@ -68,9 +68,6 @@ void switchramtest_jtag(Handle::FPGAHw& f, ReticleControl& reticle)
 				}
 			}
 		}
-
-		if (f.isKintex())
-			break; // there's no other "DNC" on Kintex-7
 	}
 }
 
@@ -119,9 +116,6 @@ void switchramtest_arq(Handle::FPGAHw& f, ReticleControl& reticle)
 					<< HMF::Coordinate::short_format(f.coordinate()) << "/" << d << "/" << h << ".");
 			}
 		}
-
-		if (f.isKintex())
-			break; // there's no other "DNC" on Kintex-7
 	}
 }
 

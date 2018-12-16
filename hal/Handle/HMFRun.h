@@ -95,8 +95,7 @@ private:
 	    std::set<Coordinate::HICANNOnDNC> physically_available_hicanns,
 	    std::set<Coordinate::HICANNOnDNC> highspeed_hicanns,
 	    bool on_wafer,
-	    bool arq_mode = true,
-	    bool kintex = true);
+	    bool arq_mode = true);
 };
 #endif // #ifndef PYPLUSPLUS
 

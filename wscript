@@ -5,8 +5,7 @@ from waflib.extras.gtest import summary
 import os
 
 def depends(ctx):
-    ctx('hicann-system', 'units/hostfpga',
-        branch=('master' if ctx.options.with_kintex else 'virtex5'))
+    ctx('hicann-system', 'units/hostfpga')
     ctx('hicann-system', 'units/hicann_test')
     ctx('hicann-system', 'units/stage2_hal')
     ctx('hicann-system', 'units/communication')
@@ -39,8 +38,6 @@ def options(opt):
     hopts = opt.add_option_group('HALbe Options')
     hopts.add_withoption('ess', default=False, # StHALpeitsche!
                          help='Enable/Disable the generation and build of the ess interface')
-    hopts.add_withoption('kintex', default=True,
-                         help='Enable/Disable Kintex-mode (disabled == old Virtex-mode)')
 
 def configure(cfg):
     # publish option to other contexts

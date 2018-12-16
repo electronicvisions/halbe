@@ -6,22 +6,16 @@ namespace HMF
 
 using namespace geometry;
 
-ESSTest::ESSTest() :
-	fpga_c{Coordinate::FPGAGlobal{Coordinate::Enum{5}}},
-	hicann_c{createHICANNs()},
-	ess{new Handle::Ess(fpga_c.toWafer())},
-	fpga{fpga_c, ess, hicann_c},
-	h(*fpga.get(Coordinate::HICANNGlobal{hicann_c[0]}))
-{
-	ess->enableSpikeDebugging(true);
+namespace {
+static const Coordinate::HICANNGlobal hicann_c(Coordinate::Enum(0));
 }
 
-std::vector<Coordinate::HICANNOnWafer> ESSTest::createHICANNs()
+ESSTest::ESSTest() :
+	ess(new Handle::Ess(hicann_c.toWafer())),
+	fpga(hicann_c.toFPGAGlobal(), ess, std::vector<Coordinate::HICANNOnWafer>{{hicann_c}}),
+	h(*fpga.get(hicann_c))
 {
-	std::vector<Coordinate::HICANNOnWafer> hicanns;
-	Coordinate::HICANNOnWafer coord{Coordinate::Enum{0}};
-	hicanns.push_back(coord);
-	return hicanns;
+	ess->enableSpikeDebugging(true);
 }
 
 ESSTest::~ESSTest() {}

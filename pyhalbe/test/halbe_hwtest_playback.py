@@ -86,21 +86,15 @@ class PlaybackTraceHWTest(HWTest):
     """
 
     # expected loop back delays in DNC clokcs for PLL = 100 MHz, cf. #1310 and #1820
-    exp_delay_kintex = 71
-    exp_delay_virtex = 102
+    exp_delay = 71
 
     # FPGA HICANN delay in FPGA clocks (8ns)
-    fpga_hicann_delay_kintex = 25
-    fpga_hicann_delay_virtex = 40
+    fpga_hicann_delay = 25
 
     extra_time_in_us = 1.e4 # 10 ms
 
     def getFpgaHicannDelay(self):
-        if self.fpga.isKintex():
-            return self.fpga_hicann_delay_kintex
-        else:
-            return self.fpga_hicann_delay_virtex
-
+        return self.fpga_hicann_delay
 
     def comparePulseListsAddress(self, expected, actual, flip_channel=False):
         """
@@ -144,10 +138,7 @@ class PlaybackTraceHWTest(HWTest):
         else:
             f_h_delay = self.getFpgaHicannDelay()
 
-        if self.fpga.isKintex():
-            loopback_delay = self.exp_delay_kintex
-        else:
-            loopback_delay = self.exp_delay_virtex
+        loopback_delay = self.exp_delay
 
         exp_delay = loopback_delay - 2*f_h_delay # factor 2: convert fpga to dnc clocks
 
@@ -278,10 +269,7 @@ class PlaybackTraceHWTest(HWTest):
 
         delays = self.computeDelays(pc,received_data)
 
-        if self.fpga.isKintex():
-            exp_delay = self.exp_delay_kintex
-        else:
-            exp_delay = self.exp_delay_virtex
+        exp_delay = self.exp_delay
         acc_dev = 20 # acceptable deviation of 20 clock cycles.
         self.assertTrue( exp_delay - acc_dev  < delays.min() and delays.max() < exp_delay + acc_dev, "Loopback delays are out of range")
 

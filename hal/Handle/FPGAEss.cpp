@@ -24,12 +24,15 @@ FPGAEss::FPGAEss(Coordinate::FPGAGlobal const c, boost::shared_ptr<Ess> ess, con
 	for( auto hicann_local : hicanns )
 	{
 		Coordinate::HICANNGlobal hicann(hicann_local, wafer());
-		if (hicann.toFPGAOnWafer() == coordinate())
+		if (hicann.toFPGAOnWafer() != coordinate())
 		{
-			add_hicann(hicann.toDNCOnFPGA(),
-			           hicann.toHICANNOnDNC());
-			ess->add_hicann(hicann);
+			std::stringstream ss;
+			ss << "HICANN: " << hicann << " does not correspond to FPGA: " << coordinate();
+			throw std::runtime_error(ss.str());
 		}
+		add_hicann(hicann.toDNCOnFPGA(),
+		           hicann.toHICANNOnDNC());
+		ess->add_hicann(hicann);
     }
 }
 

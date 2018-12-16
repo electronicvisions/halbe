@@ -113,7 +113,7 @@ const int HAL2ESS::num_wafer;
 //Constructor
 HAL2ESS::HAL2ESS(Coordinate::Wafer wafer, std::string filepath)
     : mWafer{wafer}
-    , mNumFPGAs(wafer.isKintex() ? 48 : 12)
+    , mNumFPGAs(Coordinate::FPGAOnWafer::end)
     , mrun{false}
     , mfilepath(create_tmp_directory_if_necessary(filepath))
     , mhal_access{new HALaccess(wafer.value(), mfilepath)}

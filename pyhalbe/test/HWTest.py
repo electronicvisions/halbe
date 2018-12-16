@@ -38,7 +38,7 @@ class HWTest(PyhalbeTest):
         self.hicann = Coordinate.HICANNOnDNC(Enum(self.HICANN))
         self.f = Coordinate.FPGAGlobal(Enum(self.FPGA), Coordinate.Wafer(Enum(self.WAFER)))
 
-        self.fpga = Handle.createFPGAHw(self.f, fpga_ip, self.dnc, self.ON_WAFER, hicann_num, self.KINTEX, pmu_ip)
+        self.fpga = Handle.createFPGAHw(self.f, fpga_ip, self.dnc, self.ON_WAFER, hicann_num, pmu_ip)
         if self.USE_SCHERIFF:
             self.fpga.enableScheriff()
         self.addCleanup(Handle.freeFPGAHw, self.fpga)
@@ -114,9 +114,6 @@ class HWTest(PyhalbeTest):
         parser.add_argument('--w', '--wafer', action='store', required = False,
                 type=int, default=0, dest='w',
                 help='specify Wafer (global enum)')
-        parser.add_argument('--kintex', action='store', required = False,
-                type=int, default=0, dest='kintex',
-                help='Kintex mode (otherwise Virtex)?')
         parser.add_argument('--loglevel', action='store', required = False,
                 type=int, default=-1,
                 help='specify loglevel [0-ERROR,1-WARNING(default),2-INFO,3-DEBUG0,4-DEBUG1,5-DEBUG2,6-DEBUG3]')
@@ -136,7 +133,6 @@ class HWTest(PyhalbeTest):
         HWTest.ON_WAFER = (args.on == 'WAFER') or args.w > 0
         HWTest.WAFER    = args.w
         HWTest.USE_SCHERIFF = not args.kill_scheriff
-        HWTest.KINTEX   = args.kintex
         test_runner = None
         if args.xml_output_dir:
             from xmlrunner import XMLTestRunner

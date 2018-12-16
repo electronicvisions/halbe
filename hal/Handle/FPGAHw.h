@@ -38,19 +38,15 @@ struct FPGAHw : public FPGAMixin<HICANNHw>
 			// to be called check() by FPGAHw ctor or so
 		}
 
-		bool is_kintex();
 		bool on_wafer();
 	};
 
 	FPGAHw(HandleParameter handleparam);
 	/// \param num_hicanns number of hicanns on the vertical setup.
 	///         ignored if on_wafer = true.
-	/// \param force_kintex force to use kintex fpga, otherwise the FPGA is
-	///        determined by the FPGA coordinate
 	/// \note non-highspeed-required HICANNs are not (yet) supported (API change required)
 	FPGAHw(Coordinate::FPGAGlobal const c, Coordinate::IPv4 const ip,
-	       Coordinate::DNCOnFPGA const d, Coordinate::IPv4 const pmu_ip, bool on_wafer = false, size_t num_hicanns = 1,
-	       bool force_kintex = false);
+	       Coordinate::DNCOnFPGA const d, Coordinate::IPv4 const pmu_ip, bool on_wafer = false, size_t num_hicanns = 1);
 
 	/// Dummy destructor needed by unique_ptr member.
 	~FPGAHw();
@@ -64,8 +60,6 @@ struct FPGAHw : public FPGAMixin<HICANNHw>
 	operator Coordinate::IPv4 const & () const {
 		return ip();
 	}
-
-	bool isKintex() const;
 
 #ifndef PYPLUSPLUS
 	// FIXME: vanish!
@@ -94,7 +88,7 @@ private:
 // FIXME holy ugliness! looks like a failed attempt to workaround ownership/lifetime issues
 boost::shared_ptr<FPGAHw> createFPGAHw(Coordinate::FPGAGlobal const c,
 		Coordinate::IPv4 const ip, Coordinate::DNCOnFPGA const d, Coordinate::IPv4 const pmu_ip,
-		bool on_wafer=false, size_t num_hicanns=1, bool force_kintex = false);
+		bool on_wafer=false, size_t num_hicanns=1);
 void freeFPGAHw(boost::shared_ptr<FPGAHw> & handle);
 
 } // namespace Handle

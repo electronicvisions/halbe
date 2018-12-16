@@ -117,8 +117,7 @@ void PowerBackend::SetupReticle(
     std::set<Coordinate::HICANNOnDNC> physically_available_hicanns,
     std::set<Coordinate::HICANNOnDNC> highspeed_hicanns,
     bool on_wafer,
-    bool arq_mode,
-    bool kintex)
+    bool arq_mode)
 {
 	if (all_reticles.size() > 1) {
 		throw runtime_error("PowerBackend::SetupReticle: Too many reticles instantiated!");
@@ -133,9 +132,6 @@ void PowerBackend::SetupReticle(
 		log(Logger::WARNING) << std::endl << Logger::flush;
 
 		return;
-	}
-	if (!kintex) {
-		throw runtime_error("PowerBackend::SetupReticle: Virtex FPGAs not supported anymore");
 	}
 
 	// creation of array and bitset for reticlecontrol, also gets used to keep which hicanns are
@@ -160,7 +156,7 @@ void PowerBackend::SetupReticle(
 	    d, boost::shared_ptr<ReticleControl>(new ReticleControl(
 	           reticle_number, ip_, jtag_port, pmu_ip, avail_hicann_bitset_in_hs_order,
 	           highspeed_bitset, on_wafer,
-	           arq_mode, kintex))));
+	           arq_mode))));
 	if (!ret.second) {
 		throw runtime_error("PowerBackend::SetupReticle: Could not insert reticle");
 	}

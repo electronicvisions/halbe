@@ -22,7 +22,6 @@ struct FPGAHw::FPGAHandlePIMPL {
 	    FPGAHw& f,
 	    Coordinate::DNCOnFPGA const d,
 	    bool on_wafer,
-	    bool kintex,
 	    std::set<Coordinate::HICANNOnDNC> physically_available_hicanns,
 	    std::set<Coordinate::HICANNOnDNC> highspeed_hicanns,
 	    std::set<Coordinate::HICANNOnDNC> usable_hicanns,
@@ -31,16 +30,12 @@ struct FPGAHw::FPGAHandlePIMPL {
 	      dnc(d),
 	      fpga_jtag_port(Coordinate::UDPPort(jtag_base_port + d.value())),
 	      on_wafer(on_wafer),
-	      kintex(kintex),
 	      myPowerBackend(std::unique_ptr<PowerBackend>(new PowerBackend())),
 	      physically_available_hicanns(physically_available_hicanns),
 	      highspeed_hicanns(highspeed_hicanns),
 	      usable_hicanns(usable_hicanns),
 	      pmu_ip(pmu_ip)
-	{
-		if ((!on_wafer) && (!kintex) && fpga_jtag_port.value() != 1701)
-			throw std::runtime_error("Vertical setup supports only DNC 1");
-	}
+	{}
 
 	void init() {
 		setup();
@@ -58,7 +53,7 @@ struct FPGAHw::FPGAHandlePIMPL {
 	void setup() {
 		myPowerBackend->SetupReticle(
 		    fpga.dnc(dnc), fpga, fpga_jtag_port, pmu_ip, physically_available_hicanns,
-		    highspeed_hicanns, on_wafer, arq_mode, kintex);
+		    highspeed_hicanns, on_wafer, arq_mode);
 	}
 
 	~FPGAHandlePIMPL() {
@@ -70,7 +65,6 @@ struct FPGAHw::FPGAHandlePIMPL {
 	Coordinate::DNCOnFPGA const dnc;
 	Coordinate::UDPPort const fpga_jtag_port;
 	bool const on_wafer;
-	bool const kintex;
 	std::unique_ptr<HMF::PowerBackend> myPowerBackend;
 	std::set<Coordinate::HICANNOnDNC> physically_available_hicanns;
 	std::set<Coordinate::HICANNOnDNC> highspeed_hicanns;
@@ -85,17 +79,6 @@ struct FPGAHw::FPGAHandlePIMPL {
 };
 // end of ugly PIMPLed stuff
 
-
-static bool is_kintex(Coordinate::FPGAGlobal w, bool force_kintex) {
-	return force_kintex || w.toWafer().isKintex();
-}
-
-bool FPGAHw::HandleParameter::is_kintex(){
-	if (setup == Coordinate::SetupType::VSetup || setup == Coordinate::SetupType::FACETSWafer)
-		return false;
-	return true;
-}
-
 bool FPGAHw::HandleParameter::on_wafer(){
 	if (setup == Coordinate::SetupType::VSetup || setup == Coordinate::SetupType::CubeSetup)
 		return false;
@@ -109,7 +92,6 @@ FPGAHw::FPGAHw(HandleParameter handleparam)
           *this,
           handleparam.d,
           handleparam.on_wafer(),
-          handleparam.is_kintex(),
           handleparam.physically_available_hicanns,
           handleparam.highspeed_hicanns,
           handleparam.usable_hicanns,
@@ -120,8 +102,7 @@ FPGAHw::FPGAHw(HandleParameter handleparam)
 }
 
 FPGAHw::FPGAHw(Coordinate::FPGAGlobal const c, Coordinate::IPv4 const fpga_ip,
-               Coordinate::DNCOnFPGA const d, Coordinate::IPv4 const pmu_ip, bool on_wafer, size_t num_hicanns,
-               bool force_kintex) :
+               Coordinate::DNCOnFPGA const d, Coordinate::IPv4 const pmu_ip, bool on_wafer, size_t num_hicanns) :
 		FPGA(c),
 		Base(c),
 		fpga_ip(fpga_ip)
@@ -134,18 +115,13 @@ FPGAHw::FPGAHw(Coordinate::FPGAGlobal const c, Coordinate::IPv4 const fpga_ip,
 	}
 	// FIXME: does not support non-highspeed hicanns
 	std::unique_ptr<FPGAHandlePIMPL> tempptr(new FPGAHandlePIMPL(
-	    *this, d, on_wafer, (on_wafer ? is_kintex(c, force_kintex) : force_kintex), avail_hicanns,
+	    *this, d, on_wafer, avail_hicanns,
 	    avail_hicanns, avail_hicanns, pmu_ip));
 	pimpl = std::move(tempptr);
 	pimpl->init();
 }
 
 FPGAHw::~FPGAHw() {}
-
-bool FPGAHw::isKintex() const
-{
-	return pimpl->kintex;
-}
 
 PowerBackend & FPGAHw::getPowerBackend() const {
 	return *pimpl->myPowerBackend;
@@ -194,8 +170,7 @@ auto FPGAHw::create_hicann(Coordinate::HICANNGlobal const& h) -> hicann_handle_t
 	}
 
 	uint8_t jtag_addr =  getPowerBackend().hicann_jtag_addr(h);
-	return boost::make_shared<HICANNHw>(
-		h, getPowerBackend().get_reticle_ptr(dnc), jtag_addr, isKintex());
+	return boost::make_shared<HICANNHw>(h, getPowerBackend().get_reticle_ptr(dnc), jtag_addr);
 }
 
 boost::shared_ptr<facets::ReticleControl> FPGAHw::get_reticle(const Coordinate::DNCOnFPGA & d)
@@ -207,9 +182,9 @@ boost::shared_ptr<facets::ReticleControl> FPGAHw::get_reticle(const Coordinate::
 
 boost::shared_ptr<FPGAHw> createFPGAHw(Coordinate::FPGAGlobal const c,
 		Coordinate::IPv4 const fpga_ip, Coordinate::DNCOnFPGA const d, Coordinate::IPv4 const pmu_ip,
-		bool on_wafer, size_t num_hicanns, bool force_kintex)
+		bool on_wafer, size_t num_hicanns)
 {
-	boost::shared_ptr<FPGAHw> ptr{new FPGAHw(c, fpga_ip, d, pmu_ip, on_wafer, num_hicanns, force_kintex)};
+	boost::shared_ptr<FPGAHw> ptr{new FPGAHw(c, fpga_ip, d, pmu_ip, on_wafer, num_hicanns)};
 	return ptr;
 }
 

@@ -137,8 +137,6 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 						}
 					}
 				}
-				if (f.isKintex())
-					break; // there's no other "DNC" on Kintex-7
 			}
 			auto const read_fpga_id = reticle.jtag->read_id(reticle.jtag->pos_fpga);
 			if (read_fpga_id != FPGA_JTAG_ID) {
@@ -152,9 +150,6 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 		}
 
 		{ // Enable HICANN/chip design reset
-			if (!f.isKintex())
-				throw std::runtime_error("FPGA::reset: This implementation does not support old, "
-				                         "Virtex-5 based setups...");
 			// HICANNs (and DNCs) are resetted with r.fpgadnc (on VSetup and Kintex)
 			// Keep FPGA's HICANN-ARQ off... (until end of high-speed init...)
 			reticle.jtag_p2f->set_fpga_reset(
@@ -173,15 +168,10 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 						HICANN::set_PLL_multiplier(*f.get(d, h), PLL_divisior, PLL_multiplier);
 					}
 				}
-				if (f.isKintex())
-					break; // there's no other "DNC" on Kintex-7
 			}
 		}
 
 		{ // Disable HICANN/chip design reset
-			if (!f.isKintex())
-				throw std::runtime_error("FPGA::reset: This implementation does not support old, "
-				                         "Virtex-5-based setups...");
 			// FPGA's HICANN-ARQ still in reset (until end of high-speed init...)
 			reticle.jtag_p2f->set_fpga_reset(
 			    rawip,
@@ -214,8 +204,6 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 														   // by JTAG-based comm class Init)
 					}
 				}
-				if (f.isKintex())
-					break; // there's no other "DNC" on Kintex-7
 			}
 		}
 
@@ -236,8 +224,6 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 					    << "::reset: Initalization of high speed links failed. Stop.";
 					throw std::runtime_error(error_msg.str().c_str());
 				}
-				if (f.isKintex())
-					break; // there's no other "DNC" on Kintex-7
 			}
 			jtag_p2fa->trans_count = tmp;
 		}
@@ -260,16 +246,13 @@ HALBE_SETTER_GUARDED(EventStartExperiment,
 		for (auto h : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>()) {
 			if (f.hicann_active(d, h)) {
 				HicannCtrl& hc = *reticle.hicann[f.get(d, h)->jtag_addr()];
-				DNCControl& dc = *reticle.dc;
 				LOG4CXX_INFO(logger,
 				             HMF::Coordinate::short_format(f.coordinate())
 				                 << " init: "
 				                 << h.toHICANNOnWafer(d.toDNCOnWafer(f.coordinate())));
-				HMF::HICANN::hicann_init(hc, dc, f.isKintex(), zero_synapses);
+				HMF::HICANN::hicann_init(hc, zero_synapses);
 			}
 		}
-		if (f.isKintex())
-			break; // there's no other "DNC" on Kintex-7
 	}
 }
 

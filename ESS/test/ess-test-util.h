@@ -61,17 +61,10 @@ protected:
 //	virtual void SetUp();
 	// brauche TearDown()??
 
-	Coordinate::FPGAGlobal fpga_c;
-	std::vector<Coordinate::HICANNOnWafer> hicann_c;
-
 	boost::shared_ptr<Handle::Ess> ess;
 
 	Handle::FPGAEss fpga;
 	Handle::HICANNEss & h;
-
-	static std::vector<Coordinate::HICANNOnWafer> createHICANNs();
-	//HALaccess const & getAccess() const
-	//{return ess.getAccess();}
 };
 
 //functions to load specific neuron parameter configurations

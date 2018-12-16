@@ -88,8 +88,6 @@ def f_fpga(coord):
         dnc = dnc_f.toDNCOnWafer(gcoord)
         out += "\t{} ({}, {}):\n".format(dnc, dnc.id(), dnc.toPowerCoordinate())
         out += print_hicanns_on_dnc(dnc, "\t\t")
-        if WAFER.isKintex():
-            break
     return out
 
 def f_dnc(dnc):

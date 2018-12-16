@@ -18,15 +18,6 @@ namespace DNC {
 void reset(Handle::FPGA & f, Coordinate::DNCOnFPGA const & d);
 
 /**
- * Reads out DNC status register, CRC error register and other status-relevant
- * stuff. Also resets the CRC-counter. Needs both DNC AND HICANN coordinates
- * because it checks only one DNC-channel going to that particluar HICANN.
- *
- * @return DNC status object
- */
-Status get_dnc_status(Handle::FPGA & f, const Coordinate::DNCOnFPGA& d, Coordinate::HICANNOnDNC const& h);
-
-/**
  * Sets correct directions for DNC<->HICANN communication in the DNC.
  * DNCControl. Not gettable(TODO:really?)
  *

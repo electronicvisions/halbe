@@ -1991,9 +1991,8 @@ HALBE_SETTER_GUARDED(EventResetWarm,
 {
 	ReticleControl& reticle = *h.get_reticle();
 	HicannCtrl& hc = *reticle.hicann[h.jtag_addr()];
-	DNCControl& dc = *reticle.dc;
 
-	hicann_init(hc, dc, h.isKintex(), zero_synapses);
+	hicann_init(hc, zero_synapses);
 }
 
 

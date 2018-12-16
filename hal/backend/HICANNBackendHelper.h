@@ -308,8 +308,7 @@ void set_PLL_multiplier(
 	rant::integral_range<uint32_t, 10, 1> const divider,
 	rant::integral_range<uint32_t, 63, 1> const multiplier);
 
-void hicann_init(facets::HicannCtrl& hc, facets::DNCControl& dc, bool const isKintex,
-                 bool const zero_synapses);
+void hicann_init(facets::HicannCtrl& hc, bool const zero_synapses);
 
 } // HICANN
 } // HMF

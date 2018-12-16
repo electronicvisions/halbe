@@ -23,39 +23,6 @@ HALBE_SETTER(reset,
 	reticle.jtag->FPGA_set_fpga_ctrl(0x1);
 }
 
-HALBE_GETTER(Status, get_dnc_status,
-	Handle::FPGA &, f,
-	const Coordinate::DNCOnFPGA &, d,
-	Coordinate::HICANNOnDNC const&, h)
-{
-	if (dynamic_cast<Handle::FPGAHw&>(f).isKintex())
-		throw std::runtime_error("DNC not available on Kintex");
-
-	ReticleControl& reticle = *f.get_reticle(d);
-
-	Status returnvalue = Status();
-
-	uint8_t crc = 0, status = 0;
-	uint64_t id = 0;
-
-	reticle.jtag->read_id(id, reticle.jtag->pos_dnc);
-
-	uint8_t reticle_addr = f.hicann(d,h).toHighspeedLinkOnDNC().toEnum();
-	reticle.jtag->DNC_set_channel(reticle_addr);
-	reticle.jtag->DNC_read_crc_count(crc);
-	//TODO: not sure about this reset if this is really the HICANN-number
-	reticle.jtag->DNC_reset_crc_count(reticle_addr);
-
-	reticle.jtag->DNC_read_channel_sts(reticle_addr, status);
-
-	returnvalue.setCRCCount(crc);
-	returnvalue.setStatusReg(status);
-	returnvalue.setHardwareId(id);
-
-	return returnvalue;
-}
-
-
 HALBE_SETTER(set_hicann_directions,
 	Handle::FPGA &, f,
 	const Coordinate::DNCOnFPGA &, d,

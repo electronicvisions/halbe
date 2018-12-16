@@ -236,7 +236,6 @@ public:
 
 //functions of DNCBackend, ESS_DUMMY implemented
     void reset(Handle::FPGA &, Coordinate::DNCOnFPGA const&){ESS_DUMMY()};
-	DNC::Status get_dnc_status(Handle::FPGA &, Coordinate::DNCOnFPGA const&, Coordinate::HICANNOnDNC const&){ESS_DUMMY();return DNC::Status{};}
 	void set_hicann_directions(Handle::FPGA &, Coordinate::DNCOnFPGA const&, DNC::GbitReticle const&);
 	void set_loopback(Handle::FPGA &, Coordinate::DNCOnFPGA const&, DNC::Loopback const&){ESS_NOT_IMPLEMENTED();}
 

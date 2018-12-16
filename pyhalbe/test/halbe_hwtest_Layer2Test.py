@@ -128,56 +128,6 @@ class Layer2HWTests(HWTest):
         ##########################
         return received_data
 
-    def test_PlaybackTraceSimpleHWTest(self):
-        if self.fpga.isKintex():
-            self.skipTest("DNC loopback not supported in Kintex")
-
-        self.dnc_loopback()
-        hicann_on_dnc = self.h.to_HICANNOnDNC()
-
-        pulse_events = []
-        pulse_address = FPGA.PulseAddress(self.dnc, hicann_on_dnc, Coordinate.GbitLinkOnHICANN(3),HICANN.Neuron.address_t(63))
-        #  5000 Pulses with ISI = 500 clks (2000 ns)
-        isi = 50 # every 500 cycles
-        start_offset = 500
-        num_pulses = 5000
-        for np in range(num_pulses):
-            pulse_events.append(FPGA.PulseEvent(pulse_address, isi*(np)+start_offset))
-
-        run_time_in_us = pulse_events[len(pulse_events)-1].getTime() / FPGA.DNC_frequency_in_MHz
-        received_data = self.run_playback_and_trace_experiment(FPGA.PulseEventContainer(pulse_events),run_time_in_us)
-
-        # sent and received pulses should be exactly equal - including timestamps!
-        self.comparePulseLists(FPGA.PulseEventContainer(pulse_events),received_data)
-
-        # switch off loopbak to not interfere other tests
-        DNC.set_loopback(self.fpga, self.dnc, DNC.Loopback() )
-
-    def test_PulseFifoDNCLoopbackTest(self):
-        if self.fpga.isKintex():
-            self.skipTest("DNC loopback not supported in Kintex")
-
-        self.dnc_loopback()
-        hicann_on_dnc = self.h.to_HICANNOnDNC()
-
-        pulse_events = []
-        pulse_address = FPGA.PulseAddress(self.dnc, hicann_on_dnc, Coordinate.GbitLinkOnHICANN(3),HICANN.Neuron.address_t(63))
-        #  5000 Pulses with ISI = 500 clks (2000 ns)
-        isi = 50 # every 500 cycles
-        start_offset = 500
-        num_pulses = 500
-        for np in range(num_pulses):
-            pulse_events.append(FPGA.PulseEvent(pulse_address, isi*(np)+start_offset))
-
-        run_time_in_us = pulse_events[len(pulse_events)-1].getTime() / FPGA.DNC_frequency_in_MHz
-        received_data = FPGA.send_and_receive(self.fpga, self.dnc, FPGA.PulseEventContainer(pulse_events), False, int(run_time_in_us))
-
-        # sent and received pulses should be exactly equal - including timestamps!
-        self.comparePulseLists(FPGA.PulseEventContainer(pulse_events),received_data)
-
-        # switch off loopbak to not interfere other tests
-        DNC.set_loopback(self.fpga, self.dnc, DNC.Loopback() )
-
     def test_PulseFifoHICANNLoopbackTest(self):
         self.hicann_loopback()
         hicann_on_dnc = self.h.to_HICANNOnDNC()
