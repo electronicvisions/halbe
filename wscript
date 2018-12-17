@@ -26,7 +26,7 @@ def depends(ctx):
     # for old build flow: use configure/build/install --with-ess
     if ctx.options.with_ess:
         ctx('euter')
-        ctx('calibtic', 'HMF')
+        ctx('calibtic')
         ctx('systemsim-stage2', branch='halbe_ess')
         ctx('hicann-system', 'units/hicann_cfg')
 

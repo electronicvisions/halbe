@@ -26,10 +26,10 @@
 #include "hal/Coordinate/Merger2OnHICANN.h"
 #include "hal/Coordinate/Merger3OnHICANN.h"
 
-#include "HMF/NeuronCalibration.h"
+#include "calibtic/HMF/NeuronCalibration.h"
 
 //Includes for Parameter Transformations
-#include "HMF/HWNeuronParameter.h"
+#include "calibtic/HMF/HWNeuronParameter.h"
 #include "euter/cellparameters.h"
 
 #include "pythonic/zip.h"
