@@ -13,6 +13,7 @@ namespace Coordinate {
 
 using halco::hicann::v2::GbitLinkOnHICANN;
 using halco::hicann::v2::HighspeedLinkOnDNC;
+using halco::hicann::v2::HighspeedLinkOnWafer;
 using halco::hicann::v2::DNCOnWafer;
 using halco::hicann::v2::DNCOnFPGA;
 using halco::hicann::v2::PowerCoordinate;
