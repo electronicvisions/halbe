@@ -121,13 +121,13 @@ void set_fpga_background_generator(
  * @param runtime            Experiment runtime in dnc cycles
  * @param fpga_hicann_delay  number of FPGA clk cycles (8ns), by which pulses 
  * are released in the FPGA BEFORE the time specified in the FPGAPulseEvents in
- * the pulse list (A good default 40, cf. Measurements in #1310)
+ * the pulse list
  */
 void write_playback_pulses(
 	Handle::FPGA & f,
 	PulseEventContainer const& st,
 	PulseEvent::spiketime_t runtime,
-	uint16_t fpga_hicann_delay = 40
+	uint16_t fpga_hicann_delay
 	);
 
 /**
