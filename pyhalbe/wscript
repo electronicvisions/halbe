@@ -23,6 +23,7 @@ def build(bld):
 
     bld(
             target         = 'pyhalbe',
+            name           = 'pyhalbe_bindings',
             features       = 'cxx cxxshlib pypp pyembed pyext',
             script         = 'generate.py',
             gen_defines    = 'PYPLUSPLUS __STRICT_ANSI__ BOOST_PP_VARIADICS',
@@ -39,11 +40,14 @@ def build(bld):
             use            = USES + ['pycellparameters', 'pyhalco_hicann_v2'],
     )
 
-    bld.install_files(
-            '${PREFIX}/lib',
-            bld.path.ant_glob('pyhalbe_*.py') + [
-                '_pyhalbe_coordinate.py', 'Coordinate.py'],
-            relative_trick=True
+    bld(
+        name='pyhalbe',
+        features='py use',
+        source = bld.path.ant_glob('pyhalbe_*.py') + [
+        '_pyhalbe_coordinate.py', 'Coordinate.py'],
+        relative_trick=True,
+        use='pyhalbe_bindings',
+        install_path='${PREFIX}/lib'
     )
 
     bld.install_files(
@@ -58,16 +62,16 @@ def build(bld):
         features        = 'use pytest',
         use             = 'pyhalbe',
         install_path    = '${PREFIX}/bin',
-        pythonpath      = [".", "test"],
         test_environ    = { 'PYHALBE_API_CHECK' : '1' },
     )
 
     bld(
         name            = "pyhalbe_hwtests",
         tests           = bld.path.ant_glob('**/halbe_hwtest_*.py'),
+        features        = 'use pytest',
         use             = 'pyhalbe',
         install_path    = '${PREFIX}/bin',
-        pythonpath      = [".", "test"],
         test_environ    = { 'PYHALBE_API_CHECK' : '1' },
+        skip_run        = True,
     )
     bld.add_post_fun(summary)
