@@ -12,7 +12,7 @@ def depends(ctx):
     ctx('hicann-system', 'units/communication')
     ctx('halbe', 'scheriff')
     ctx('halco')
-    ctx('lib-rcf', branch='v2')
+    ctx('lib-rcf')
     ctx('ztl')
     ctx('bitter')
     ctx('rant')
