@@ -34,7 +34,7 @@ def options(opt):
     opt.load('compiler_cxx')
     opt.load('boost')
     opt.load('gtest')
-    opt.load('documentation')
+    opt.load('doxygen')
 
     hopts = opt.add_option_group('HALbe Options')
     hopts.add_withoption('ess', default=False, # StHALpeitsche!
@@ -49,7 +49,7 @@ def configure(cfg):
     cfg.load('compiler_cxx')
     cfg.load('boost')
     cfg.load('gtest')
-    cfg.load('documentation')
+    cfg.load('doxygen')
 
     cfg.check_boost(lib='serialization iostreams filesystem system thread',
             uselib_store='BOOST4HALBE')
@@ -287,6 +287,7 @@ def doc(dcx):
             doxyfile    = 'doc/doxyfile',           # a doxyfile, use doxygen -g to generate a template
             pars        = {
                 'STRIP_FROM_PATH'   : dcx.path.get_src().abspath(),
+                'INPUT'   : dcx.path.get_src().abspath() + '/hal',
             },                                      # a dict of doxy-pars: overrides doxyfile pars
 
             #doxyinput   = "hal",                    # overrides doxy-par: INPUT (list of paths)
