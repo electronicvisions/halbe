@@ -49,7 +49,6 @@ def configure(cfg):
     cfg.load('compiler_cxx')
     cfg.load('boost')
     cfg.load('gtest')
-    cfg.load('symap2ic_doxygen')
     cfg.load('documentation')
 
     cfg.check_boost(lib='serialization iostreams filesystem system thread',
