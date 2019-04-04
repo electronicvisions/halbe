@@ -558,7 +558,7 @@ HALBE_GETTER(AlmostSortedPulseEvents, read_trace_pulses,
 							          << current_packet.pdu[(ii / 2) + 1] << std::dec
 							          << "\n";
 							LOG4CXX_ERROR(logger, debug_msg.str());
-							// FIXME: we should throw std::runtime_error(debug_msg.str()); here
+							std::runtime_error(debug_msg.str());
 						}
 						// packet handling done, bail out
 						received_eot = true;
