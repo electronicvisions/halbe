@@ -232,7 +232,8 @@ def build(bld):
         source       = sw_test_srcs,
         use          = ['hwtest_obj', 'pythonic'],
         install_path = '${PREFIX}/bin',
-        cxxflags     = cxxflags
+        cxxflags     = cxxflags,
+        test_environ = dict(BASEDIR_NMPM_SOFTWARE=bld.env.PREFIX)
     )
 
     bld(
