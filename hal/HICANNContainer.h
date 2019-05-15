@@ -850,7 +850,9 @@ STRONG_TYPEDEF_CONSTEXPR(TestEvent_3,
 
 #define HMF_ANALOG_ACCESS(NAME) \
 	bool get_ ## NAME (Coordinate::AnalogOnHICANN const side) const { \
-		assert(config.count() <= 4); \
+		if(config.count() > 4) { \
+			throw std::logic_error("config.count > 4 not allowed"); \
+		} \
 		return config[mult(side) * 10 + NAME]; \
 	} \
 	void set_ ## NAME (Coordinate::AnalogOnHICANN const side) { \
