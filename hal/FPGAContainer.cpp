@@ -289,6 +289,14 @@ void PulseEventContainer::sort(bool const is_almost_sorted)
 	}
 }
 
+bool PulseEventContainer::operator==(PulseEventContainer const& other) const {
+	return m_events == other.m_events;
+}
+
+bool PulseEventContainer::operator!=(PulseEventContainer const& other) const {
+	return !((*this) == other);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // SpinnakerEventContainer
 

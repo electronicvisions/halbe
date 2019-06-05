@@ -471,6 +471,9 @@ public:
 
 	container_type const& data() const { return m_events; }
 
+	bool operator==(const PulseEventContainer& other) const;
+
+	bool operator!=(const PulseEventContainer& other) const;
 private:
 	void sort(bool is_almost_sorted);
 
