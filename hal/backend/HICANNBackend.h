@@ -366,19 +366,144 @@ RepeaterBlock get_repeater_block(
 	Handle::HICANN & h,
 	Coordinate::RepeaterBlockOnHICANN const& addr);
 
+/**
+ * Writes STDP look up tables (LUT) to the according registers (LUT) on hardware.
+ *
+ * @param h HICANN Handle.
+ * @param synarray Synapse array on HICANN.
+ * @param lut STDP LUT which should be written to hardware.
+ */
+void set_stdp_lut(
+	Handle::HICANN& h,
+	Coordinate::SynapseArrayOnHICANN const& synarray,
+	HICANN::STDPLUT const& lut);
 
 /**
- * Pull the DLL and Synapse driver reset in the repeater block
+ * Reads STDP look up tables (LUT) from hardware (register: LUT).
  *
- * @warning use the same data that was put into set_repeater_block
- * @param addr Block coordinate
- * @param rbc  Configuration data
+ * @param h HICANN Handle.
+ * @param synarray Synapse array on HICANN.
+ *
+ * @return STDP LUT.
  */
-void lock_repeater_and_synapse_driver(
-	Handle::HICANN & h,
-	Coordinate::RepeaterBlockOnHICANN const& block,
-	HICANN::RepeaterBlock rbc);
+HICANN::STDPLUT get_stdp_lut(Handle::HICANN& h, Coordinate::SynapseArrayOnHICANN const& synarray);
 
+/**
+ * Writes reset pattern to according register (SYNNRST)
+ * on hardware.
+ * Via one hot encoding the pattern specifies which columns
+ * in a column set are to be reset.
+ *
+ * @param h HICANN Handle.
+ * @param synarray Synapse array on HICANN.
+ * @param syn_rst Reset pattern which should be written
+ *                  hardware.
+ */
+void set_syn_rst(
+	Handle::HICANN& h,
+	Coordinate::SynapseArrayOnHICANN const& synarray,
+	HICANN::SynapseController::syn_rst_t const& syn_rst);
+
+/**
+ * Reads reset pattern from hardware (register: SYNRST).
+ * Via one hot encoding the pattern specifies which columns
+ * in a column set are to be reset.
+ *
+ * @param h HICANN Handle.
+ * @param synarray Synapse array on HICANN.
+ *
+ * @return Reset pattern.
+ */
+HICANN::SynapseController::syn_rst_t get_syn_rst(
+	Handle::HICANN& h, Coordinate::SynapseArrayOnHICANN const& synarray);
+
+/**
+ * Writes synapse control statement to the according register
+ * (CREG) on hardware.
+ *
+ * @param h HICANN Handle.
+ * @param synarray Synapse array on HICANN.
+ * @param ctrl_reg Synapse control statement.
+ */
+void set_syn_ctrl(
+	Handle::HICANN& h,
+	Coordinate::SynapseArrayOnHICANN const& synarray,
+	HICANN::SynapseControlRegister const& ctrl_reg);
+
+/**
+ * Reads synapse control statement from hardware (register: CREG).
+ *
+ * @param h HICANN Handle.
+ * @param synarray Synapse array on HICANN.
+ *
+ * @return Synapse control statement.
+ */
+HICANN::SynapseControlRegister get_syn_ctrl(
+	Handle::HICANN& h, Coordinate::SynapseArrayOnHICANN const& synarray);
+
+/**
+ * Writes synapse configuration statement to the according register
+ * (CFGREG) on hardware.
+ *
+ * @param h HICANN Handle.
+ * @param synarray Synapse array on HICANN.
+ * @param cnfg_reg Synapse configuration statement.
+ */
+void set_syn_cnfg(
+	Handle::HICANN& h,
+	Coordinate::SynapseArrayOnHICANN const& synarray,
+	HICANN::SynapseConfigurationRegister const& cnfg_reg);
+
+/**
+ * Reads synapse configuration statement from hardware
+ * (register: CFGREG).
+ *
+ * @param h HICANN Handle.
+ * @param synarray Synapse array on HICANN.
+ *
+ * @return Synapse configuration statement.
+ */
+HICANN::SynapseConfigurationRegister get_syn_cnfg(
+	Handle::HICANN& h, Coordinate::SynapseArrayOnHICANN const& synarray);
+
+/**
+ * Reads status registers (STATUS) from hardware.
+ *
+ * @param h HICANN Handle.
+ * @param synarray Synapse array on HICANN.
+ *
+ * @return Status register.
+ *
+ */
+HICANN::SynapseStatusRegister get_syn_status(
+	Handle::HICANN& h, Coordinate::SynapseArrayOnHICANN const& synarray);
+
+/**
+ * Sets synapse control, configuration, STDP LUT and
+ * reset registers as well as the synapse driver
+ * timings.
+ *
+ * @param h HICANN Handle.
+ * @param synarray Synapse array on HICANN.
+ * @param synapse_controller Synapse controller.
+ */
+void set_synapse_controller(
+	Handle::HICANN& h,
+	Coordinate::SynapseArrayOnHICANN const& synarray,
+	HICANN::SynapseController const& synapse_controller);
+
+/**
+ * Reads synapse control, configuration, status, STDP LUT,
+ * correlation and reset registers as well as synapse driver
+ * timings.
+ *
+ * @param h HICANN Handle.
+ * @param synarray Synapse array on HICANN.
+ *
+ * @return Synapse controller.
+ */
+HICANN::SynapseController get_synapse_controller(
+	Handle::HICANN& h, Coordinate::SynapseArrayOnHICANN const& synarray);
 
 // Merger Tree
 
@@ -465,82 +590,6 @@ BackgroundGeneratorArray get_background_generator(Handle::HICANN & h);
  */
 void set_analog(Handle::HICANN & h, Analog const& a);
 Analog get_analog(Handle::HICANN & h);
-
-
-
-// STDP
-
-/**
- * Starts automated processing of STDP for array of synapses
- *
- * @param y Side of HICANN: there is one STDP controller per side
- * @param c Configuration struct containing STDP parameters such as:
- * continuous/single update flag, first and last synapse rows, reset bit
- */
-void start_stdp(
-	Handle::HICANN & h,
-	Coordinate::SideVertical const& y,
-	STDPControl const& c);
-
-void wait_stdp(Handle::HICANN & h, Coordinate::SideVertical y, STDPControl c);
-
-
-/**
- * Stops automated processing of STDP for array of synapses
- *
- * @param y Side of HICANN: there is one STDP controller per side
- * @param c Configuration struct, necessary only for the consistency of
- * the getter functionality
- */
-void stop_stdp(
-	Handle::HICANN & h,
-	Coordinate::SideVertical const& y,
-	STDPControl const& c);
-
-
-/**
- * Resets STDP capacitors of a single synapse line
- *
- * @param y Side of HICANN: there is one STDP controller per side
- * @param s SynapseDriver address
- * @param line Within one driver: either 0 (top) or 1 (bottom) GEOMETRICALLY
- * @param r reset configuration of the synapse row
- */
-void stdp_reset_capacitors(
-	Handle::HICANN & h,
-	Coordinate::SynapseRowOnHICANN const& s,
-	STDPControl::corr_row const& r);
-
-
-/**
- * Reads out the correlation bits of the synapses
- *
- * @param y Side of HICANN: there is one STDP controller per side
- * @param s SynapseDriver address
- * @param line Within one driver: either 0 (top) or 1 (bottom) GEOMETRICALLY
- * @return results of correlation evaluation for the synapse row
- */
-STDPControl::corr_row stdp_read_correlation(
-	Handle::HICANN & h,
-	Coordinate::SynapseRowOnHICANN const& s);
-
-
-/**
- * Sets digital parameters for STDP: LUT, evaluation bits, reset registers
- * Does not set analog patameters (V_m, V_clr, V_cla, V_thigh, V_tlow, V_br)
- * as they are written to floating gates with all other analog parameters
- *
- * @param y Side of HICANN: there is one STDP controller per side
- * @param c Configuration struct
- */
-void set_stdp_config(
-	Handle::HICANN & h,
-	Coordinate::SideVertical const& y,
-	STDPControl const& c);
-STDPControl get_stdp_config(
-	Handle::HICANN & h,
-	Coordinate::SideVertical const& y);
-
 
 /**
  * Reads out HICANN status register, CRC error register and other status-

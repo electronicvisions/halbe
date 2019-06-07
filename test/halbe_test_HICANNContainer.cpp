@@ -4,7 +4,6 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/filesystem.hpp>
 #include "hal/HICANNContainer.h"
-#include "hal/HICANNContainer.h"
 
 using namespace HMF::Coordinate;
 using namespace HMF::HICANN;
@@ -19,7 +18,11 @@ typedef ::testing::Types<
 	HICANN::L1Address,
 	SynapseWeight,
 	SynapseDecoder,
-	DriverDecoder
+	DriverDecoder,
+	SynapseCmd,
+	SynapseSel,
+	SynapseGen,
+	SynapseDllresetb
 	// TODO add more
 > RangedTypes;
 
@@ -132,6 +135,104 @@ TEST(RepeaterBlock, RepeaterBlockSerialization)
 	ASSERT_EQ(repeater_block_v1.timings, HMF::HICANN::SRAMControllerTimings(
 	    HMF::HICANN::SRAMReadDelay(3), HMF::HICANN::SRAMSetupPrecharge(2),
 	    HMF::HICANN::SRAMWriteDelay(1)));
+}
+
+TEST(SynapseControlRegister, ConstructionRowAndLastRow)
+{
+	// Assert that constructor initilaises row to the first row of the corresponding
+	// synapse array and last_row to the last
+	typedef Coordinate::SynapseRowOnHICANN row_t;
+	Coordinate::SynapseArrayOnHICANN top_array(0);
+	Coordinate::SynapseArrayOnHICANN bottom_array(1);
+	HMF::HICANN::SynapseControlRegister ctrl_top(top_array);
+	HMF::HICANN::SynapseControlRegister ctrl_bottom(bottom_array);
+
+	ASSERT_EQ(ctrl_top.get_row(), row_t(0));
+	ASSERT_EQ(ctrl_top.get_last_row(), row_t(223));
+
+	ASSERT_EQ(ctrl_bottom.get_row(), row_t(224));
+	ASSERT_EQ(ctrl_bottom.get_last_row(), row_t(447));
+}
+
+TEST(SynapseControlRegister, SetGetRow)
+{
+	typedef Coordinate::SynapseRowOnHICANN syn_row_t;
+	HMF::HICANN::SynapseControlRegister ctrl_reg_top;
+	HMF::HICANN::SynapseControlRegister ctrl_reg_bottom(Coordinate::SynapseArrayOnHICANN(1));
+
+	syn_row_t row(4);
+	ctrl_reg_top.set_row(row);
+	ASSERT_EQ(ctrl_reg_top.get_row(), row);
+
+	// last row may not exceed maximal value for top array
+	row = syn_row_t(224);
+	ASSERT_ANY_THROW(ctrl_reg_top.set_row(row));
+
+	// possible to set and get maximal values
+	row = syn_row_t(223);
+	ctrl_reg_top.set_row(row);
+	ASSERT_EQ(ctrl_reg_top.get_row(), row);
+	row = syn_row_t(syn_row_t::max);
+	ctrl_reg_bottom.set_row(row);
+	ASSERT_EQ(ctrl_reg_bottom.get_row(), row);
+
+	// row has to be on specified synapse array
+	row = syn_row_t(1);
+	ASSERT_ANY_THROW(ctrl_reg_bottom.set_row(row));
+}
+
+TEST(SynapseControlRegister, SetGetLastRow)
+{
+	typedef Coordinate::SynapseRowOnHICANN syn_row_t;
+	HMF::HICANN::SynapseControlRegister ctrl_reg_top;
+	HMF::HICANN::SynapseControlRegister ctrl_reg_bottom(Coordinate::SynapseArrayOnHICANN(1));
+
+	syn_row_t row(4);
+	ctrl_reg_top.set_last_row(row);
+	ASSERT_EQ(ctrl_reg_top.get_last_row(), row);
+
+	// last row may not exceed maximal value for top array
+	row = syn_row_t(224);
+	ASSERT_ANY_THROW(ctrl_reg_top.set_last_row(row));
+
+	// possible to set and get maximal values
+	row = syn_row_t(223);
+	ctrl_reg_top.set_last_row(row);
+	ASSERT_EQ(ctrl_reg_top.get_last_row(), row);
+	row = syn_row_t(syn_row_t::max);
+	ctrl_reg_bottom.set_last_row(row);
+	ASSERT_EQ(ctrl_reg_bottom.get_last_row(), row);
+
+	// row has to be on specified synapse array
+	row = syn_row_t(1);
+	ASSERT_ANY_THROW(ctrl_reg_bottom.set_last_row(row));
+}
+
+TEST(SynapseControlRegister, Comparison)
+{
+	HMF::HICANN::SynapseControlRegister ctrl_reg1;
+	HMF::HICANN::SynapseControlRegister ctrl_reg2;
+	HMF::HICANN::SynapseControlRegister ctrl_reg3;
+	ctrl_reg3.newcmd = true;
+
+	// comparison with two undefined values (idle of ctrl_regx)
+	ASSERT_TRUE(ctrl_reg1 == ctrl_reg2);
+	ASSERT_FALSE(ctrl_reg1 == ctrl_reg3);
+
+	// comparison with one undefined value (idle of ctrl_reg1)
+	ctrl_reg2.idle = true;
+	ctrl_reg3.idle = true;
+	ASSERT_TRUE(ctrl_reg1 == ctrl_reg2);
+	ASSERT_FALSE(ctrl_reg1 == ctrl_reg3);
+
+	// comparison with all values defined
+	ctrl_reg1.idle = true;
+	ASSERT_TRUE(ctrl_reg1 == ctrl_reg2);
+	ASSERT_FALSE(ctrl_reg1 == ctrl_reg3);
+
+	ctrl_reg1.idle = false;
+	ASSERT_FALSE(ctrl_reg1 == ctrl_reg2);
+	ASSERT_FALSE(ctrl_reg1 == ctrl_reg3);
 }
 
 } // HMF

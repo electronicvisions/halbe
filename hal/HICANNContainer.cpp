@@ -1,8 +1,14 @@
 #include "HICANNContainer.h"
 
-#include <bitter/bitter.h>
 #include <map>
 #include <ostream>
+#include <iterator>
+#include <boost/optional/optional_io.hpp>
+#include <boost/serialization/export.hpp>
+#include <boost/serialization/serialization.hpp>
+#include <bitter/bitter.h>
+
+#include "hate/optional.h"
 
 using namespace HMF::Coordinate;
 
@@ -434,6 +440,38 @@ std::ostream& operator<<(std::ostream& os, SRAMControllerTimings const& o)
 	return os;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// STDPEvaluationPattern
+
+bool STDPEvaluationPattern::operator==(const STDPEvaluationPattern& p) const
+{
+	return (aa == p.aa &&
+	        ac == p.ac &&
+	        ca == p.ca &&
+	        cc == p.cc);
+}
+
+bool STDPEvaluationPattern::operator!=(const STDPEvaluationPattern& p) const
+{
+	return !(*this == p);
+}
+
+template <typename Archiver>
+void STDPEvaluationPattern::serialize(Archiver& ar, unsigned const int)
+{
+	ar & boost::serialization::make_nvp("aa", aa)
+	   & boost::serialization::make_nvp("ac", ca)
+	   & boost::serialization::make_nvp("ca", ac)
+	   & boost::serialization::make_nvp("cc", cc);
+}
+
+std::ostream& operator<<(std::ostream& os, STDPEvaluationPattern const& p)
+{
+	os << "STDPEvaluationPattern: "
+	   << "cc: " << p.cc << ", aa: " << p.aa << ", ac: " << p.ac << ", ca: " << p.ca;
+	return os;
+}
+
 std::ostream& operator<<(std::ostream& os, SynapseControllerTimings const& o)
 {
 	os << "write delay: " << o.write_delay.value() << ", "
@@ -442,6 +480,379 @@ std::ostream& operator<<(std::ostream& os, SynapseControllerTimings const& o)
 	   << "enable delay: " << o.enable_delay.value();
 	return os;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// SynapseControlRegister
+
+SynapseControlRegister::SynapseControlRegister() :
+    SynapseControlRegister(Coordinate::SynapseArrayOnHICANN(Coordinate::top))
+{}
+
+SynapseControlRegister::SynapseControlRegister(Coordinate::SynapseArrayOnHICANN synarray) :
+    synapse_array(synarray)
+{
+	// set row to lowest possible row in array
+	row = SynapseRowOnHICANN(syn_row_on_array_t(syn_row_on_array_t::min), synarray);
+
+	// set last_row to highest possible row in array
+	last_row = SynapseRowOnHICANN(syn_row_on_array_t(syn_row_on_array_t::max), synarray);
+}
+
+SynapseCmd const SynapseControlRegister::Opcodes::IDLE = SynapseCmd(0);
+SynapseCmd const SynapseControlRegister::Opcodes::START_READ = SynapseCmd(7);
+SynapseCmd const SynapseControlRegister::Opcodes::READ = SynapseCmd(1);
+SynapseCmd const SynapseControlRegister::Opcodes::WRITE = SynapseCmd(3);
+SynapseCmd const SynapseControlRegister::Opcodes::RST_CORR = SynapseCmd(10);
+SynapseCmd const SynapseControlRegister::Opcodes::START_RDEC = SynapseCmd(2);
+SynapseCmd const SynapseControlRegister::Opcodes::RDEC = SynapseCmd(6);
+SynapseCmd const SynapseControlRegister::Opcodes::WDEC = SynapseCmd(5);
+SynapseCmd const SynapseControlRegister::Opcodes::AUTO = SynapseCmd(4);
+SynapseCmd const SynapseControlRegister::Opcodes::CLOSE_ROW = SynapseCmd(9);
+// note: no command number 8
+
+void SynapseControlRegister::set_row(SynapseRowOnHICANN const& r)
+{
+	if (synapse_array != r.toSynapseArrayOnHICANN()) {
+		throw std::runtime_error(
+		    "SynapseControlRegister::set_row: row does not match vertical side");
+	}
+	row = r;
+}
+
+void SynapseControlRegister::set_last_row(SynapseRowOnHICANN const& r)
+{
+	if (synapse_array != r.toSynapseArrayOnHICANN()) {
+		throw std::runtime_error(
+		    "SynapseControlRegister::set_last_row: row does not match vertical side");
+	}
+	last_row = r;
+}
+
+SynapseRowOnHICANN SynapseControlRegister::get_row() const
+{
+	return row;
+}
+
+SynapseRowOnHICANN SynapseControlRegister::get_last_row() const
+{
+	return last_row;
+}
+
+bool SynapseControlRegister::operator==(SynapseControlRegister const& reg) const
+{
+	return (hate::compare_optional_equal(idle, reg.idle, true) &&
+	        sca == reg.sca &&
+	        scc == reg.scc &&
+	        without_reset == reg.without_reset &&
+	        sel == reg.sel &&
+	        get_last_row() == reg.get_last_row() &&
+	        get_row() == reg.get_row() &&
+	        newcmd == reg.newcmd &&
+	        continuous == reg.continuous &&
+	        encr == reg.encr &&
+	        cmd == reg.cmd &&
+	        toSynapseArrayOnHICANN() == reg.toSynapseArrayOnHICANN());
+}
+
+bool SynapseControlRegister::operator!=(SynapseControlRegister const& reg) const
+{
+	return !(*this == reg);
+}
+
+Coordinate::SynapseArrayOnHICANN SynapseControlRegister::toSynapseArrayOnHICANN() const
+{
+	return synapse_array;
+}
+
+std::ostream& operator<<(std::ostream& os, SynapseControlRegister const& reg)
+{
+	os << reg.toSynapseArrayOnHICANN() << '\n';
+	os << "idle: " << reg.idle << '\n';
+	os << "sca: " << reg.sca << '\n';
+	os << "scc: " << reg.scc << '\n';
+	os << "without reset: " << reg.without_reset << '\n';
+	os << "sel: " << reg.sel << '\n';
+	os << "last row: " << reg.get_last_row() << '\n';
+	os << "row: " << reg.get_row() << '\n';
+	os << "newcmd: " << reg.newcmd << '\n';
+	os << "continuous: " << reg.continuous << '\n';
+	os << "encr: " << reg.encr << '\n';
+	os << "cmd: " << reg.cmd << '\n';
+	return os;
+}
+
+template <typename Archiver>
+void SynapseControlRegister::serialize(Archiver& ar, unsigned const int)
+{
+	using boost::serialization::make_nvp;
+	ar & make_nvp("synapse_array", synapse_array)
+	   & make_nvp("idle", idle)
+	   & make_nvp("sca", sca)
+	   & make_nvp("scc", scc)
+	   & make_nvp("without_reset", without_reset)
+	   & make_nvp("sel", sel)
+	   & make_nvp("last_row", last_row)
+	   & make_nvp("row", row)
+	   & make_nvp("newcmd", newcmd)
+	   & make_nvp("continuous", continuous)
+	   & make_nvp("encr", encr)
+	   & make_nvp("cmd", cmd);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// SynapseConfigurationRegister
+
+void SynapseConfigurationRegister::enable_dllreset()
+{
+	dllresetb = SynapseDllresetb(SynapseDllresetb::min);
+}
+
+void SynapseConfigurationRegister::disable_dllreset()
+{
+	dllresetb = SynapseDllresetb(SynapseDllresetb::max);
+}
+
+bool SynapseConfigurationRegister::operator==(SynapseConfigurationRegister const& reg) const
+{
+	return (synarray_timings == reg.synarray_timings &&
+	        dllresetb == reg.dllresetb &&
+	        gen == reg.gen &&
+	        pattern0 == reg.pattern0 &&
+	        pattern1 == reg.pattern1);
+}
+
+bool SynapseConfigurationRegister::operator!=(SynapseConfigurationRegister const& reg) const
+{
+	return !(*this == reg);
+}
+
+std::ostream& operator<<(std::ostream& os, SynapseConfigurationRegister const& reg)
+{
+	os << reg.synarray_timings << '\n';
+	os << "dllresetb: " << reg.dllresetb << '\n';
+	os << "gen" << reg.gen << '\n';
+	os << "pattern0: " << reg.pattern0 << '\n';
+	os << "pattern1: " << reg.pattern1 << '\n';
+	return os;
+}
+
+template <typename Archiver>
+void SynapseConfigurationRegister::serialize(Archiver& ar, unsigned const int)
+{
+	using boost::serialization::make_nvp;
+	ar & make_nvp("synarray_timings", synarray_timings)
+	   & make_nvp("dllresetb", dllresetb)
+	   & make_nvp("gen", gen)
+	   & make_nvp("pattern0", pattern0)
+	   & make_nvp("pattern1", pattern1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// SynapseStatusRegister
+
+bool SynapseStatusRegister::operator==(SynapseStatusRegister const& reg) const
+{
+	return (auto_busy == reg.auto_busy &&
+	        slice_busy == reg.slice_busy &&
+	        syndrv_busy == reg.syndrv_busy);
+}
+
+bool SynapseStatusRegister::operator!=(SynapseStatusRegister const& reg) const
+{
+	return !(*this == reg);
+}
+
+std::ostream& operator<<(std::ostream& os, SynapseStatusRegister const& reg)
+{
+	os << "auto_busy: " << reg.auto_busy << '\n';
+	os << "slice_busy: " << reg.slice_busy << '\n';
+	os << "syndrv_busy: " << reg.syndrv_busy << '\n';
+	return os;
+}
+
+template <typename Archiver>
+void SynapseStatusRegister::serialize(Archiver& ar, unsigned const int)
+{
+	using boost::serialization::make_nvp;
+	ar & make_nvp("auto_busy", auto_busy)
+	   & make_nvp("slice_busy", slice_busy)
+	   & make_nvp("syndrv_busy", syndrv_busy);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// SynapseController
+
+SynapseController::SynapseController() :
+    SynapseController(Coordinate::SynapseArrayOnHICANN(Coordinate::top))
+{}
+
+SynapseController::SynapseController(Coordinate::SynapseArrayOnHICANN synarray) :
+    ctrl_reg(synarray)
+{}
+
+bool SynapseController::operator==(SynapseController const& s) const
+{
+	return (hate::compare_optional_equal(syn_in, s.syn_in, true) &&
+	        hate::compare_optional_equal(syn_out, s.syn_out, true) &&
+	        syn_rst == s.syn_rst &&
+	        hate::compare_optional_equal(syn_corr, s.syn_corr, true) &&
+	        ctrl_reg == s.ctrl_reg &&
+	        cnfg_reg == s.cnfg_reg &&
+	        hate::compare_optional_equal(status_reg, s.status_reg, true) &&
+	        lut == s.lut &&
+	        syndrv_timings == s.syndrv_timings &&
+	        toSynapseArrayOnHICANN() == s.toSynapseArrayOnHICANN());
+}
+
+bool SynapseController::operator!=(SynapseController const& s) const
+{
+	return !(*this == s);
+}
+
+Coordinate::SynapseArrayOnHICANN SynapseController::toSynapseArrayOnHICANN() const
+{
+	return ctrl_reg.toSynapseArrayOnHICANN();
+}
+
+template <typename Archiver>
+void SynapseController::serialize(Archiver& ar, unsigned const int)
+{
+	using boost::serialization::make_nvp;
+	ar & make_nvp("syn_in", syn_in)
+	   & make_nvp("syn_out", syn_out)
+	   & make_nvp("syn_rst", syn_rst)
+	   & make_nvp("syn_corr", syn_corr)
+	   & make_nvp("ctrl_reg", ctrl_reg)
+	   & make_nvp("cnfg_reg", cnfg_reg)
+	   & make_nvp("status_reg", status_reg)
+	   & make_nvp("lut", lut)
+	   & make_nvp("syndrv_timings", syndrv_timings);
+}
+
+std::ostream& operator<<(std::ostream& os, SynapseController const& s)
+{
+	os << "Synapse Controller:\n";
+	os << s.ctrl_reg << '\n';
+	os << s.cnfg_reg << '\n';
+
+	if (static_cast<bool>(s.status_reg)) {
+		os << s.status_reg << '\n';
+	} else {
+		os << "Status Register: --" << '\n';
+	}
+
+	os << "SYN_CORR:\n";
+	if ( static_cast<bool>(s.syn_corr) ) {
+		os << '\t' << (*s.syn_corr)[0] << '\n';
+		os << '\t' << (*s.syn_corr)[1] << '\n';
+	} else {
+		os << "--\n";
+	}
+
+	os << "SYN_IN:\n";
+	if ( static_cast<bool>(s.syn_in) ) {
+		for(auto& single_reg:(*s.syn_in)) {
+			os << '\t';
+			copy(single_reg.cbegin(),
+			     single_reg.cend(),
+			     std::ostream_iterator<std::bitset<4>>(os, " "));
+			os << '\n';
+		}
+	} else {
+		os << "--\n";
+	}
+
+	os << "SYN_OUT:\n";
+	if ( static_cast<bool>(s.syn_out) ) {
+		for(auto& single_reg:(*s.syn_out)) {
+			os << '\t';
+			copy(single_reg.cbegin(),
+			     single_reg.cend(),
+			     std::ostream_iterator<std::bitset<4>>(os, " "));
+			os << '\n';
+		}
+	} else {
+		os << "--\n";
+	}
+
+	os << "SYN_RST:\n\t" << s.syn_rst << '\n';
+	os << s.lut << '\n';
+	os << s.syndrv_timings << '\n';
+	return os;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// STDPLUT
+
+STDPLUT::STDPLUT()
+{
+	// use "additive" learning rule as default
+	for (int i = SynapseWeight::min; i < SynapseWeight::end; i++) {
+		causal[SynapseWeight(i)] = SynapseWeight(std::min(i + 1, 15));
+		acausal[SynapseWeight(i)] = SynapseWeight(std::max(0, i - 1));
+
+		combined[SynapseWeight(i)] = SynapseWeight(i);
+	}
+}
+
+bool STDPLUT::operator==(STDPLUT const& b) const
+{
+	return (b.causal == causal &&
+	        b.acausal == acausal &&
+	        b.combined == combined
+	);
+}
+
+bool STDPLUT::operator!=(STDPLUT const& other) const
+{
+	return !(*this == other);
+}
+
+template <typename Archiver>
+void STDPLUT::serialize(Archiver& ar, unsigned int const)
+{
+	ar & boost::serialization::make_nvp("causal", causal)
+	   & boost::serialization::make_nvp("acausal", acausal)
+	   & boost::serialization::make_nvp("combined", combined);
+}
+
+std::ostream& operator<<(std::ostream& os, STDPLUT::LUT const& lut)
+{
+	os << "LUT( ";
+	for (auto val : lut) {
+		os << static_cast<size_t>(val) << " ";
+	}
+	os << ")";
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, STDPLUT const& o)
+{
+	os << "STDPLUT(";
+	os << "causal = " << o.causal << ", ";
+	os << "acausal = " << o.acausal << ", ";
+	os << "combined = " << o.combined << ")";
+	return os;
+}
+
+
 } // namespace HICANN
 } // namespace HMF
 
+BOOST_CLASS_EXPORT_IMPLEMENT(HMF::HICANN::STDPEvaluationPattern)
+BOOST_CLASS_EXPORT_IMPLEMENT(HMF::HICANN::SynapseControlRegister)
+BOOST_CLASS_EXPORT_IMPLEMENT(HMF::HICANN::SynapseConfigurationRegister)
+BOOST_CLASS_EXPORT_IMPLEMENT(HMF::HICANN::SynapseStatusRegister)
+BOOST_CLASS_EXPORT_IMPLEMENT(HMF::HICANN::STDPLUT)
+BOOST_CLASS_EXPORT_IMPLEMENT(HMF::HICANN::STDPLUT::LUT)
+BOOST_CLASS_EXPORT_IMPLEMENT(HMF::HICANN::SynapseController)
+
+#include "boost/serialization/serialization_helper.tcc"
+
+EXPLICIT_INSTANTIATE_BOOST_SERIALIZE(HMF::HICANN::STDPEvaluationPattern)
+EXPLICIT_INSTANTIATE_BOOST_SERIALIZE(HMF::HICANN::STDPLUT)
+EXPLICIT_INSTANTIATE_BOOST_SERIALIZE_FREE(HMF::HICANN::STDPLUT::LUT)
+EXPLICIT_INSTANTIATE_BOOST_SERIALIZE(HMF::HICANN::SynapseControlRegister)
+EXPLICIT_INSTANTIATE_BOOST_SERIALIZE(HMF::HICANN::SynapseConfigurationRegister)
+EXPLICIT_INSTANTIATE_BOOST_SERIALIZE(HMF::HICANN::SynapseStatusRegister)
+EXPLICIT_INSTANTIATE_BOOST_SERIALIZE(HMF::HICANN::SynapseController)

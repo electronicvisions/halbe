@@ -120,11 +120,12 @@ for c in ['Analog', 'BackgroundGenerator', 'BackgroundGeneratorArray',
           'FGConfig', 'FGControl', 'FGInstruction', 'FGStimulus', 'GbitLink',
           'HorizontalRepeater', 'L1Address', 'Merger', 'MergerTree', 'Neuron',
           'NeuronConfig', 'NeuronQuad', 'Repeater', 'RepeaterBlock',
-          'RowConfig', 'STDPAnalog', 'STDPControl', 'STDPEval', 'STDPLUT',
-          'STDPTiming', 'Status', 'SynapseDecoder', 'SynapseDriver',
-          'SynapseSwitch', 'SynapseSwitchRow', 'SynapseWeight', 'TestEvent_3',
-          'VerticalRepeater', 'WeightRow', 'FGErrorResult', 'FGErrorResultRow',
-          'FGErrorResultQuadRow', 'FGRow']:
+          'RowConfig', 'Status', 'STDPEvaluationPattern', 'STDPLUT', 'SynapseCmd',
+          'SynapseConfigurationRegister', 'SynapseController','SynapseControlRegister',
+          'SynapseDecoder', 'SynapseDllresetb', 'SynapseDriver', 'SynapseGen', 'SynapseSel',
+          'SynapseStatusRegister', 'SynapseSwitch', 'SynapseSwitchRow', 'SynapseWeight',
+          'TestEvent_3', 'VerticalRepeater', 'WeightRow', 'FGErrorResult',
+          'FGErrorResultRow', 'FGErrorResultQuadRow', 'FGRow']:
     cls = ns_hmf.class_('::HMF::HICANN::' + c)
     classes.add_pickle_suite(cls)
 
@@ -136,6 +137,9 @@ c.add_registration_code('def(bp::self == bp::self)')
 c.include_files.append('pywrap/print_helper.hpp')
 c.add_registration_code('def(pywrap::PrintNice())')
 classes.add_pickle_suite(c)
+
+c = mb.typedef('::HMF::HICANN::STDPLUT::LUT').type.declaration
+c.include()
 
 # HMF::Handle stuff & special handling (ECM)
 for c in ns_hmf.namespace('Handle').classes(allow_empty=True):

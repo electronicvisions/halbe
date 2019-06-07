@@ -784,6 +784,178 @@ size_t translate_neuron_merger(size_t const merger)
 	return _lut[merger];
 }
 
+uint8_t SynapseRowOnHICANN_to_AddrOnHW(Coordinate::SynapseRowOnHICANN const& row)
+{
+	if (row < Coordinate::SynapseRowOnArray::end) {
+		return Coordinate::SynapseRowOnArray::max - row;
+	} else {
+		return row - Coordinate::SynapseRowOnArray::end;
+	}
+}
+
+Coordinate::SynapseRowOnHICANN AddrOnHW_to_SynapseRowOnHICANN(
+    uint8_t const& addr, Coordinate::SynapseArrayOnHICANN const& synarray)
+{
+	if (synarray.isTop()) {
+		return Coordinate::SynapseRowOnHICANN(Coordinate::SynapseRowOnArray::max - addr);
+	} else {
+		return Coordinate::SynapseRowOnHICANN(addr + Coordinate::SynapseRowOnArray::end);
+	}
+}
+
+void synapse_ctrl_formater(HICANN::SynapseControlRegister const& reg, std::bitset<32>& returnvalue)
+{
+	// bit 31: reserverd
+	returnvalue[30] = static_cast<bool>(reg.idle) ? *reg.idle : false;
+
+	returnvalue[29] = reg.sca;
+	returnvalue[28] = reg.scc;
+	returnvalue[27] = reg.without_reset;
+
+	returnvalue[26] = reg.sel.to_bitset<3>()[2];
+	returnvalue[25] = reg.sel.to_bitset<3>()[1];
+	returnvalue[24] = reg.sel.to_bitset<3>()[0];
+
+	std::bitset<8> const last_addr = SynapseRowOnHICANN_to_AddrOnHW(reg.get_last_row());
+	returnvalue[23] = last_addr[7];
+	returnvalue[22] = last_addr[6];
+	returnvalue[21] = last_addr[5];
+	returnvalue[20] = last_addr[4];
+	returnvalue[19] = last_addr[3];
+	returnvalue[18] = last_addr[2];
+	returnvalue[17] = last_addr[1];
+	returnvalue[16] = last_addr[0];
+
+	std::bitset<8> const addr = SynapseRowOnHICANN_to_AddrOnHW(reg.get_row());
+	returnvalue[15] = addr[7];
+	returnvalue[14] = addr[6];
+	returnvalue[13] = addr[5];
+	returnvalue[12] = addr[4];
+	returnvalue[11] = addr[3];
+	returnvalue[10] = addr[2];
+	returnvalue[9] = addr[1];
+	returnvalue[8] = addr[0];
+
+	// bit 7: reserved
+
+	returnvalue[6] = reg.newcmd;
+	returnvalue[5] = reg.continuous;
+	returnvalue[4] = reg.encr;
+
+	returnvalue[3] = reg.cmd.to_bitset<4>()[3];
+	returnvalue[2] = reg.cmd.to_bitset<4>()[2];
+	returnvalue[1] = reg.cmd.to_bitset<4>()[1];
+	returnvalue[0] = reg.cmd.to_bitset<4>()[0];
+}
+
+void synapse_cnfg_formater(
+	HICANN::SynapseConfigurationRegister const& reg, std::bitset<32>& returnvalue)
+{
+	// bits 31-28: reserved
+
+	returnvalue[27] = reg.synarray_timings.write_delay.to_bitset<2>()[1];
+	returnvalue[26] = reg.synarray_timings.write_delay.to_bitset<2>()[0];
+
+	returnvalue[25] = reg.synarray_timings.output_delay.to_bitset<4>()[3];
+	returnvalue[24] = reg.synarray_timings.output_delay.to_bitset<4>()[2];
+	returnvalue[23] = reg.synarray_timings.output_delay.to_bitset<4>()[1];
+	returnvalue[22] = reg.synarray_timings.output_delay.to_bitset<4>()[0];
+
+	returnvalue[21] = reg.dllresetb.to_bitset<2>()[1];
+	returnvalue[20] = reg.dllresetb.to_bitset<2>()[0];
+
+	returnvalue[19] = reg.gen.to_bitset<4>()[3];
+	returnvalue[18] = reg.gen.to_bitset<4>()[2];
+	returnvalue[17] = reg.gen.to_bitset<4>()[1];
+	returnvalue[16] = reg.gen.to_bitset<4>()[0];
+
+	returnvalue[15] = reg.synarray_timings.setup_precharge.to_bitset<4>()[3];
+	returnvalue[14] = reg.synarray_timings.setup_precharge.to_bitset<4>()[2];
+	returnvalue[13] = reg.synarray_timings.setup_precharge.to_bitset<4>()[1];
+	returnvalue[12] = reg.synarray_timings.setup_precharge.to_bitset<4>()[0];
+
+	returnvalue[11] = reg.synarray_timings.enable_delay.to_bitset<4>()[3];
+	returnvalue[10] = reg.synarray_timings.enable_delay.to_bitset<4>()[2];
+	returnvalue[9] = reg.synarray_timings.enable_delay.to_bitset<4>()[1];
+	returnvalue[8] = reg.synarray_timings.enable_delay.to_bitset<4>()[0];
+
+	returnvalue[7] = reg.pattern0.cc;
+	returnvalue[6] = reg.pattern1.cc;
+	returnvalue[5] = reg.pattern0.ca;
+	returnvalue[4] = reg.pattern1.ca;
+	returnvalue[3] = reg.pattern0.ac;
+	returnvalue[2] = reg.pattern1.ac;
+	returnvalue[1] = reg.pattern0.aa;
+	returnvalue[0] = reg.pattern1.aa;
+}
+
+void synapse_set_lut_low(HICANN::STDPLUT::LUT& lut, std::bitset<32> const& pattern)
+{
+	lut[SynapseWeight(0)]  =
+		SynapseWeight(bit::reverse(bit::crop<4>(pattern, 7 * 4)).to_ulong());
+	lut[SynapseWeight(8)]  =
+		SynapseWeight(bit::reverse(bit::crop<4>(pattern, 6 * 4)).to_ulong());
+	lut[SynapseWeight(4)]  =
+		SynapseWeight(bit::reverse(bit::crop<4>(pattern, 5 * 4)).to_ulong());
+	lut[SynapseWeight(12)] =
+		SynapseWeight(bit::reverse(bit::crop<4>(pattern, 4 * 4)).to_ulong());
+	lut[SynapseWeight(2)]  =
+		SynapseWeight(bit::reverse(bit::crop<4>(pattern, 3 * 4)).to_ulong());
+	lut[SynapseWeight(10)] =
+		SynapseWeight(bit::reverse(bit::crop<4>(pattern, 2 * 4)).to_ulong());
+	lut[SynapseWeight(6)]  =
+		SynapseWeight(bit::reverse(bit::crop<4>(pattern, 1 * 4)).to_ulong());
+	lut[SynapseWeight(14)] =
+		SynapseWeight(bit::reverse(bit::crop<4>(pattern, 0 * 4)).to_ulong());
+}
+
+
+std::bitset<32> synapse_get_lut_low(HICANN::STDPLUT::LUT const& lut)
+{
+	return bit::concat(
+		bit::reverse(std::bitset<4>(lut[SynapseWeight(0)])),
+		bit::reverse(std::bitset<4>(lut[SynapseWeight(8)])),
+		bit::reverse(std::bitset<4>(lut[SynapseWeight(4)])),
+		bit::reverse(std::bitset<4>(lut[SynapseWeight(12)])),
+		bit::reverse(std::bitset<4>(lut[SynapseWeight(2)])),
+		bit::reverse(std::bitset<4>(lut[SynapseWeight(10)])),
+		bit::reverse(std::bitset<4>(lut[SynapseWeight(6)])),
+		bit::reverse(std::bitset<4>(lut[SynapseWeight(14)])));
+}
+
+void synapse_set_lut_high(HICANN::STDPLUT::LUT& lut, std::bitset<32> const& pattern)
+{
+	lut[SynapseWeight(0  + 1)] =
+		SynapseWeight(bit::reverse(bit::crop<4>(pattern, 7 * 4)).to_ulong());
+	lut[SynapseWeight(8  + 1)] =
+		SynapseWeight(bit::reverse(bit::crop<4>(pattern, 6 * 4)).to_ulong());
+	lut[SynapseWeight(4  + 1)] =
+		SynapseWeight(bit::reverse(bit::crop<4>(pattern, 5 * 4)).to_ulong());
+	lut[SynapseWeight(12 + 1)] =
+		SynapseWeight(bit::reverse(bit::crop<4>(pattern, 4 * 4)).to_ulong());
+	lut[SynapseWeight(2  + 1)] =
+		SynapseWeight(bit::reverse(bit::crop<4>(pattern, 3 * 4)).to_ulong());
+	lut[SynapseWeight(10 + 1)] =
+		SynapseWeight(bit::reverse(bit::crop<4>(pattern, 2 * 4)).to_ulong());
+	lut[SynapseWeight(6  + 1)] =
+		SynapseWeight(bit::reverse(bit::crop<4>(pattern, 1 * 4)).to_ulong());
+	lut[SynapseWeight(14 + 1)] =
+		SynapseWeight(bit::reverse(bit::crop<4>(pattern, 0 * 4)).to_ulong());
+}
+
+std::bitset<32> synapse_get_lut_high(HICANN::STDPLUT::LUT const& lut)
+{
+	return bit::concat(
+		bit::reverse(std::bitset<4>(lut[SynapseWeight(0  + 1)])),
+		bit::reverse(std::bitset<4>(lut[SynapseWeight(8  + 1)])),
+		bit::reverse(std::bitset<4>(lut[SynapseWeight(4  + 1)])),
+		bit::reverse(std::bitset<4>(lut[SynapseWeight(12 + 1)])),
+		bit::reverse(std::bitset<4>(lut[SynapseWeight(2  + 1)])),
+		bit::reverse(std::bitset<4>(lut[SynapseWeight(10 + 1)])),
+		bit::reverse(std::bitset<4>(lut[SynapseWeight(6  + 1)])),
+		bit::reverse(std::bitset<4>(lut[SynapseWeight(14 + 1)])));
+}
+
 void set_PLL_multiplier(
 	Handle::HICANNHw & h,
 	rant::integral_range<uint32_t, 10, 1> const divider,

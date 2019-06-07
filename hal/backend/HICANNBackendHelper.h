@@ -211,6 +211,104 @@ size_t translate_dnc_merger(size_t const merger);
 
 size_t translate_neuron_merger(size_t const merger);
 
+/**
+ * Converts the software coordinates of a synapse row
+ * on a HICANN chip to a hardware address.
+ *
+ * @param row Software coordinate on a HICANN chip
+ *              of synapse row.
+ *
+ * @returns Hardware address of synapse row.
+ */
+uint8_t SynapseRowOnHICANN_to_AddrOnHW(Coordinate::SynapseRowOnHICANN const& row);
+
+/**
+ * Converts the hardware address of a synapse row
+ * to software coordinates on a HICANN chip.
+ *
+ * @param addr Hardware address of synapse row.
+ * @param synarray Synapse array on which the synapse
+ *                  row is located.
+ *
+ * @returns Software address of synapse row on HICANN
+ *              chip.
+ */
+Coordinate::SynapseRowOnHICANN AddrOnHW_to_SynapseRowOnHICANN(
+	uint8_t const& addr, Coordinate::SynapseArrayOnHICANN const& synarray);
+
+/**
+ * Changes a passed in bitset such that it represents
+ * the passed in synapse control register variable.
+ *
+ * @param reg Synapse control register to copy into
+ *              supplied bitset.
+ * @param returnvalue To be alternated bitset.
+ *
+ */
+void synapse_ctrl_formater(HICANN::SynapseControlRegister const& reg, std::bitset<32>& returnvalue);
+
+/**
+ * Changes a passed in bitset such that it represents
+ * the passed in synapse configuration register variable.
+ *
+ * @param reg Synapse configuration register to copy into
+ *              supplied bitset.
+ * @param returnvalue To be alternated bitset.
+ *
+ */
+void synapse_cnfg_formater(
+	HICANN::SynapseConfigurationRegister const& reg, std::bitset<32>& returnvalue);
+
+/**
+ * Alters the lower part values of a single synapse STDP LUT
+ * according to the 32 bit pattern provided.
+ *
+ * @param lut LUT object to be altered.
+ * @param pattern 32 bit pattern representing the lower bits of the
+ *                LUT register.
+ *
+ */
+void synapse_set_lut_low(HICANN::STDPLUT::LUT& lut, std::bitset<32> const& pattern);
+
+
+/**
+ * Extracts the values representing the lower part of a single
+ * LUT register and returns a 32 bit pattern which can be written
+ * to the hardware registers.
+ *
+ * @param lut LUT object to be converted in a bit pattern.
+ *
+ * @returns 32 bit pattern representing the lower bits of the
+ *          LUT register.
+ *
+ */
+std::bitset<32> synapse_get_lut_low(HICANN::STDPLUT::LUT const& lut);
+
+/**
+ * Alters the higher part values of a single synapse STDP LUT
+ * according to the 32 bit pattern provided.
+ *
+ * @param lut LUT object to be altered.
+ * @param pattern 32 bit pattern representing the higher bits of the
+ *                LUT register.
+ *
+ */
+void synapse_set_lut_high(HICANN::STDPLUT::LUT& lut, std::bitset<32> const& pattern);
+
+
+/**
+ * Extracts the values representing the higher part of a single
+ * LUT register and returns a 32 bit pattern which can be written
+ * to the hardware registers.
+ *
+ * @param lut LUT object to be converted in a bit pattern.
+ *
+ * @returns 32 bit pattern representing the higher bits of the
+ *          LUT register.
+ *
+ */
+std::bitset<32> synapse_get_lut_high(HICANN::STDPLUT::LUT const& lut);
+
 } // HICANN
 } // HMF
 

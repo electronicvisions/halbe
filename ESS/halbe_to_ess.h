@@ -19,7 +19,6 @@
 #include "hal/HICANN/FGBlock.h"
 #include "hal/HICANN/FGErrorResult.h"
 #include "hal/HICANN/FGStimulus.h"
-#include "hal/HICANN/STDPControl.h"
 
 #include "hal/ADC/Config.h"
 #include "hal/ADC/Status.h"
@@ -180,7 +179,80 @@ public:
 	void set_repeater_block(Handle::HICANN const&, Coordinate::RepeaterBlockOnHICANN, HICANN::RepeaterBlock const&){ESS_DUMMY();}
 	HICANN::RepeaterBlock get_repeater_block(Handle::HICANN const&, Coordinate::RepeaterBlockOnHICANN){ESS_DUMMY();return HICANN::RepeaterBlock{};}
 
-    void lock_repeater_and_synapse_driver(Handle::HICANN const&, Coordinate::RepeaterBlockOnHICANN const&, HICANN::RepeaterBlock){ESS_DUMMY();}
+	// SynapseController
+
+	void set_stdp_lut(
+	    Handle::HICANN&, Coordinate::SynapseArrayOnHICANN const&, HICANN::STDPLUT const&)
+	{
+		ESS_DUMMY();
+	}
+	HICANN::STDPLUT get_stdp_lut(Handle::HICANN&, Coordinate::SynapseArrayOnHICANN const&)
+	{
+		ESS_DUMMY();
+		return HICANN::STDPLUT{};
+	}
+
+	void set_syn_rst(
+	    Handle::HICANN&,
+	    Coordinate::SynapseArrayOnHICANN const&,
+	    HICANN::SynapseController::syn_rst_t const&)
+	{
+		ESS_DUMMY();
+	}
+	HICANN::SynapseController::syn_rst_t get_syn_rst(
+	    Handle::HICANN&, Coordinate::SynapseArrayOnHICANN const&)
+	{
+		ESS_DUMMY();
+		return HICANN::SynapseController::syn_rst_t{};
+	}
+
+	void set_syn_ctrl(
+	    Handle::HICANN&,
+	    Coordinate::SynapseArrayOnHICANN const&,
+	    HICANN::SynapseControlRegister const&)
+	{
+		ESS_DUMMY();
+	}
+	HICANN::SynapseControlRegister get_syn_ctrl(
+	    Handle::HICANN&, Coordinate::SynapseArrayOnHICANN const&)
+	{
+		ESS_DUMMY();
+		return HICANN::SynapseControlRegister{};
+	}
+
+	void set_syn_cnfg(
+	    Handle::HICANN&,
+	    Coordinate::SynapseArrayOnHICANN const&,
+	    HICANN::SynapseConfigurationRegister const&)
+	{
+		ESS_DUMMY();
+	}
+	HICANN::SynapseConfigurationRegister get_syn_cnfg(
+	    Handle::HICANN&, Coordinate::SynapseArrayOnHICANN const&)
+	{
+		ESS_DUMMY();
+		return HICANN::SynapseConfigurationRegister();
+	}
+
+	HICANN::SynapseStatusRegister get_syn_status(
+	    Handle::HICANN&, Coordinate::SynapseArrayOnHICANN const&)
+	{
+		ESS_DUMMY();
+		return HICANN::SynapseStatusRegister{};
+	}
+
+	void set_synapse_controller(
+	    Handle::HICANN&, Coordinate::SynapseArrayOnHICANN const&, HICANN::SynapseController const&)
+	{
+		ESS_DUMMY();
+	}
+	HICANN::SynapseController get_synapse_controller(
+	    Handle::HICANN&, Coordinate::SynapseArrayOnHICANN const&)
+	{
+		ESS_DUMMY();
+		return HICANN::SynapseController{};
+	}
+
 	//Merger Tree
 	void set_merger_tree(Handle::HICANN const& h, HICANN::MergerTree const& m);
 	HICANN::MergerTree get_merger_tree(Handle::HICANN const& h);
@@ -203,27 +275,10 @@ public:
     void set_analog(Handle::HICANN const& h, HICANN::Analog const& a);
 	HICANN::Analog get_analog(Handle::HICANN const& h);
 
-	//STDP, not properly supported afaik -> ESS_NOT_IMPLEMENTED implemented
-	void start_stdp(Handle::HICANN const&, geometry::SideVertical, HICANN::STDPControl){ESS_NOT_IMPLEMENTED();}
-    
-    void wait_stdp(Handle::HICANN const&, Coordinate::SideVertical, HICANN::STDPControl){ESS_NOT_IMPLEMENTED();}
-
-	void stop_stdp(Handle::HICANN const&, geometry::SideVertical, HICANN::STDPControl){ESS_NOT_IMPLEMENTED();}
-
-	void stdp_reset_capacitors(Handle::HICANN const&, Coordinate::SynapseRowOnHICANN const&, HICANN::STDPControl::corr_row){ESS_NOT_IMPLEMENTED();}
-
-    HICANN::STDPControl::corr_row stdp_read_correlation(Handle::HICANN const&, Coordinate::SynapseRowOnHICANN const&)
-	{
-		ESS_NOT_IMPLEMENTED(); return HICANN::STDPControl::corr_row();
-	}
-
-	void set_stdp_config(Handle::HICANN const&, geometry::SideVertical, HICANN::STDPControl){ESS_NOT_IMPLEMENTED();}
-    HICANN::STDPControl get_stdp_config(Handle::HICANN const&, geometry::SideVertical){ESS_NOT_IMPLEMENTED();return HICANN::STDPControl{};}
-
 	//misc. stuff
 	void init(Handle::HICANN const& h, bool zero_synapses = true);
 
-    void flush(Handle::HICANN const&){ESS_DUMMY();}
+    void flush(Handle::HICANN const&) { ESS_DUMMY(); }
 
     void instantiate_hicann(Coordinate::HICANNOnWafer const& h);
 

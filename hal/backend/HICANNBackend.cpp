@@ -428,17 +428,6 @@ HALBE_SETTER_GUARDED(EventSetupL1,
 	}
 	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
 
-	//put together necessary commands
-	uint32_t idle_command = 1 << facets::SynapseControl::sc_newcmd_p | facets::SynapseControl::sc_cmd_idle;
-
-	uint32_t dllreset_command = 0 << facets::SynapseControl::sc_cfg_dllresetb_p | //reset active
-							0xf << facets::SynapseControl::sc_cfg_predel_p |
-							0xf << facets::SynapseControl::sc_cfg_endel_p |
-							0xf << facets::SynapseControl::sc_cfg_oedel_p |
-							0x2 << facets::SynapseControl::sc_cfg_wrdel_p;
-
-	uint32_t config_command = 0x3 << facets::SynapseControl::sc_cfg_dllresetb_p | dllreset_command;
-
 	//convert data to hardware format
 	const std::bitset<8> zeropad = 0;
 	std::array<std::bitset<16>, 2> gmaxfrac;
@@ -486,12 +475,6 @@ HALBE_SETTER_GUARDED(EventSetupL1,
 		}
 	}
 
-	//set DLL-reset active
-	while(sc.driverbusy()) {} //wait until controller not busy
-	// FIXME: should be done directly before experiment (for all dll-reset stuff)!
-	sc.write_data(facets::SynapseControl::sc_cnfgreg, dllreset_command);
-	while(sc.driverbusy()) {}
-	sc.write_data(facets::SynapseControl::sc_ctrlreg, idle_command);
 	//write gmax divisors
 	while(sc.driverbusy()) {}
 	sc.write_data(facets::SynapseControl::sc_engmax+addr[BOT], gmaxfrac[BOT].to_ulong());
@@ -507,11 +490,7 @@ HALBE_SETTER_GUARDED(EventSetupL1,
 	sc.write_data(facets::SynapseControl::sc_encfg+addr[BOT], hwconfig[BOT].to_ulong());
 	while(sc.driverbusy()) {}
 	sc.write_data(facets::SynapseControl::sc_encfg+addr[TOP], hwconfig[TOP].to_ulong());
-	//write the timings for the drivers and remove DLL reset
-	while(sc.driverbusy()) {}
-	sc.write_data(facets::SynapseControl::sc_cnfgreg, config_command);
-	while(sc.driverbusy()) {}
-	sc.write_data(facets::SynapseControl::sc_ctrlreg, idle_command);
+	while (sc.driverbusy()) {}
 }
 
 
@@ -541,20 +520,18 @@ HALBE_GETTER(SynapseDriver, get_synapse_driver,
 	}
 	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
 
+	if (sc.busy()) {
+		throw std::runtime_error("get_synapse_driver: synapse controller must not be busy");
+	}
+
 	//read out the hardware registers
 	std::array<std::bitset<16>, 2> cnfg, pdrv, gmax;
 	for (size_t i = std::min(TOP, BOT); i <= std::max(TOP, BOT); i++) { //TOP/BOT
-		while(sc.driverbusy()) {} // TODO ECM: SF says => not necessary; only after next command
 		sc.read_data(facets::SynapseControl::sc_encfg+addr[i]);           // trigger read cycle
-		while(sc.driverbusy()) {}
 		cnfg[i] = sc.read_data(facets::SynapseControl::sc_encfg+addr[i]); // retrieve read data
-		while(sc.driverbusy()) {} // TODO ECM: SF says => not necessary; only after next command
 		sc.read_data(facets::SynapseControl::sc_endrv+addr[i]);           // trigger
-		while(sc.driverbusy()) {}
 		pdrv[i] = sc.read_data(facets::SynapseControl::sc_endrv+addr[i]); // retrieve
-		while(sc.driverbusy()) {} // TODO ECM: SF says => not necessary; only after next command
 		sc.read_data(facets::SynapseControl::sc_engmax+addr[i]);          // trigger
-		while(sc.driverbusy()) {}
 		gmax[i] = sc.read_data(facets::SynapseControl::sc_engmax+addr[i]); // retrieve
 	}
 
@@ -1197,37 +1174,6 @@ HALBE_SETTER_GUARDED(EventSetupL1,
 	rc.write_data(facets::RepeaterControl::rc_config, config.to_ulong());
 }
 
-
-HALBE_SETTER_GUARDED(EventSetupL1DLL,
-	lock_repeater_and_synapse_driver,
-	Handle::HICANN &, h,
-	RepeaterBlockOnHICANN const&, block,
-	HICANN::RepeaterBlock, rbc)
-{
-	ReticleControl& reticle = *h.get_reticle();
-
-	size_t address = block.id();
-	HicannCtrl::Repeater index = static_cast<HicannCtrl::Repeater>(address);
-	facets::RepeaterControl& rc = reticle.hicann[h.jtag_addr()]->getRC(index);
-
-	if (!rbc.dllresetb)
-	{
-		throw std::runtime_error("Disable the dllresetb");
-	}
-
-	std::bitset<8> config;
-
-	rbc.drvresetb = true;
-	rbc.dllresetb = false;
-	repeater_config_formater(rbc, config);
-	rc.write_data(facets::RepeaterControl::rc_config, config.to_ulong());
-
-	rbc.dllresetb = rbc.drvresetb = true;
-	repeater_config_formater(rbc, config);
-	rc.write_data(facets::RepeaterControl::rc_config, config.to_ulong());
-}
-
-
 HALBE_GETTER(HICANN::RepeaterBlock, get_repeater_block,
 	Handle::HICANN &, h,
 	RepeaterBlockOnHICANN const&, block)
@@ -1598,361 +1544,252 @@ HALBE_GETTER(Analog, get_analog,
 	return returnvalue;
 }
 
-
-HALBE_SETTER_GUARDED(EventStartExperiment,
-	start_stdp,
-	Handle::HICANN &, h,
-	SideVertical const&, y,
-	STDPControl const&, c)
+HALBE_SETTER_GUARDED(EventSetupSynapses, set_stdp_lut,
+	Handle::HICANN&, h,
+	SynapseArrayOnHICANN const&, synarray,
+	HICANN::STDPLUT const&, lut)
 {
-	ReticleControl& reticle = *h.get_reticle();
-
-	//choose synapse block
-	HicannCtrl::Synapse index = (y == top)? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
+	ReticleControl const& reticle = *h.get_reticle();
+	HicannCtrl::Synapse const index =
+		synarray.isTop() ? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
 	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
 
-	//format data
-	std::bitset<30> config_data = bit::concat(
-	std::bitset<1>(c.read_acausal),
-	std::bitset<1>(c.read_causal),
-	std::bitset<1>(c.without_reset),
-	std::bitset<3>(0), //column set not required, process works row-wise
-	c.last_row_bits(),
-	c.first_row_bits(),
-	std::bitset<1>(0),
-	std::bitset<1>(1), //newcmd = 1
-	std::bitset<1>(c.continuous_autoupdate),
-	std::bitset<1>(1), //enable correlation readout
-	std::bitset<4>(facets::SynapseControl::sc_cmd_auto)); //start autoupdate command
-
-	//write control register
-	sc.write_data(facets::SynapseControl::sc_ctrlreg, config_data.to_ulong());
+	/// write lookup-table
+	// registers 0 and 1: acausal
+	sc.write_data(facets::SynapseControl::sc_lut, synapse_get_lut_low(lut.acausal).to_ulong());
+	sc.write_data(facets::SynapseControl::sc_lut + 1, synapse_get_lut_high(lut.acausal).to_ulong());
+	// registers 2 and 3: causal
+	sc.write_data(facets::SynapseControl::sc_lut + 2, synapse_get_lut_low(lut.causal).to_ulong());
+	sc.write_data(facets::SynapseControl::sc_lut + 3, synapse_get_lut_high(lut.causal).to_ulong());
+	// registers 4 and 5: combined
+	sc.write_data(facets::SynapseControl::sc_lut + 4, synapse_get_lut_low(lut.combined).to_ulong());
+	sc.write_data(
+	    facets::SynapseControl::sc_lut + 5, synapse_get_lut_high(lut.combined).to_ulong());
 }
 
-
-HALBE_SETTER_GUARDED(EventStartExperiment,
-	wait_stdp,
-	Handle::HICANN &, h,
-	SideVertical, y,
-	STDPControl, c)
+HALBE_GETTER(STDPLUT, get_stdp_lut,
+	Handle::HICANN&, h,
+	SynapseArrayOnHICANN const&, synarray)
 {
-	static_cast<void>(c);
-
-	ReticleControl& reticle = *h.get_reticle();
-
-	//choose synapse block
-	HicannCtrl::Synapse index = (y == top)? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
+	ReticleControl const& reticle = *h.get_reticle();
+	HicannCtrl::Synapse const index =
+		synarray.isTop() ? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
 	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
 
-	while(sc.arraybusy()) {}
-}
-
-
-HALBE_SETTER_GUARDED(EventStartExperiment,
-	stop_stdp,
-	Handle::HICANN &, h,
-	SideVertical const&, y,
-	STDPControl const&, c)
-{
-	/*ReticleControl& reticle = *h.get_reticle();
-
-	//choose synapse block
-	HicannCtrl::Synapse index = (y == top)? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
-	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
-
-	//format data
-	std::bitset<30> config_data = bit::concat(
-	std::bitset<1>(c.read_acausal),
-	std::bitset<1>(c.read_causal),
-	std::bitset<1>(c.without_reset),
-	std::bitset<3>(0), //column set not required, process works row-wise
-	c.last_row_bits(),
-	c.first_row_bits(),
-	std::bitset<1>(0),
-	std::bitset<1>(1), //newcmd = 1
-	std::bitset<1>(c.continuous_autoupdate),
-	std::bitset<1>(1), //enable correlation readout
-	std::bitset<4>(facets::SynapseControl::sc_cmd_idle)); //idle command
-
-	//write control register
-	sc.write_data(facets::SynapseControl::sc_ctrlreg, config_data.to_ulong());*/
-
-	ReticleControl& reticle = *h.get_reticle();
-
-	//choose synapse block
-	HicannCtrl::Synapse index = (y == top)? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
-	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
-
-	//format data
-	std::bitset<30> config_data = bit::concat(
-	std::bitset<1>(c.read_acausal),
-	std::bitset<1>(c.read_causal),
-	std::bitset<1>(c.without_reset),
-	std::bitset<3>(0), //column set not required, process works row-wise
-	c.last_row_bits(),
-	c.first_row_bits(),
-	std::bitset<1>(0),
-	std::bitset<1>(0), // no new command, just removing the continuous mode
-	//std::bitset<1>(c.continuous_autoupdate),
-	std::bitset<1>(0),  // disable continuous mode
-	std::bitset<1>(1), //enable correlation readout
-	std::bitset<4>(facets::SynapseControl::sc_cmd_auto)); //auto command
-
-	//write control register
-	sc.write_data(facets::SynapseControl::sc_ctrlreg, config_data.to_ulong());
-	// wait until controller has completed up to lastaddr
-	while(sc.arraybusy()) {}
-
-	// set command to idle (not necessary to stop)
-	//format data
-	config_data = bit::concat(
-		std::bitset<1>(c.read_acausal),
-		std::bitset<1>(c.read_causal),
-		std::bitset<1>(c.without_reset),
-		std::bitset<3>(0), //column set not required, process works row-wise
-		c.last_row_bits(),
-		c.first_row_bits(),
-		std::bitset<1>(0),
-		std::bitset<1>(1), //newcmd = 1
-		std::bitset<1>(c.continuous_autoupdate),
-		std::bitset<1>(1), //enable correlation readout
-		std::bitset<4>(facets::SynapseControl::sc_cmd_idle)); //auto command
-	sc.write_data(facets::SynapseControl::sc_ctrlreg, config_data.to_ulong());
-	while(sc.arraybusy()) {}
-}
-
-
-HALBE_SETTER_GUARDED(EventSetupSynapses,
-	stdp_reset_capacitors,
-	Handle::HICANN &, h,
-	SynapseRowOnHICANN const&, s,
-	STDPControl::corr_row const&, r)
-{
-	ReticleControl& reticle = *h.get_reticle();
-
-	//calculate the correct hardware address of the line and choose the synapse block instance
-	uint8_t addr = 0;
-	HicannCtrl::Synapse index;
-	SynapseDriverOnHICANN const drv = s.toSynapseDriverOnHICANN();
-
-	if (drv.line() < 112) { //upper half of ANNCORE
-		addr = 223-(drv.line()*2) - s.toRowOnSynapseDriver(); ///top line within driver is line=0
-		index = HicannCtrl::SYNAPSE_TOP;
-	}
-	else {  //lower half of ANNCORE
-		addr = (drv.line()-112)*2 + s.toRowOnSynapseDriver(); ///line=top/bottom here is geometrical, not hardware!
-		index = HicannCtrl::SYNAPSE_BOTTOM;
-	}
-	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
-
-	//reset capacitors: columnset-wise
-	for (size_t colset = 0; colset < 8; colset++){
-		//generate correctly formatted data for the hardware
-		std::bitset<32> causal;
-		std::bitset<32> acausal;
-
-		for (size_t i = 0; i < 4; i++){ //looping over slices
-			for (size_t j = 0; j < 8; j++) { //single corelation bits
-				causal[8*i + j] = r[STDPControl::CAUSAL][64*i + 8*colset + j];
-				acausal[8*i + j] = r[STDPControl::ACAUSAL][64*i + 8*colset + j];
-			}
-		}
-
-		sc.write_data(facets::SynapseControl::sc_synrst, causal.to_ulong());
-		sc.write_data(facets::SynapseControl::sc_synrst+1, acausal.to_ulong());
-
-		//put together a reset command for the controller
-		uint32_t const reset_command = facets::SynapseControl::sc_cmd_rst_corr |
-						(addr << facets::SynapseControl::sc_adr_p) |
-						(colset << facets::SynapseControl::sc_colset_p) |
-						(1 << facets::SynapseControl::sc_newcmd_p);
-
-		sc.write_data(SynapseControl::sc_ctrlreg, reset_command); //write reset command
-		while(sc.arraybusy()) {} //wait until controller not busy
-	}
-}
-
-
-HALBE_GETTER(STDPControl::corr_row, stdp_read_correlation,
-	Handle::HICANN &, h,
-	SynapseRowOnHICANN const&, s)
-{
-	ReticleControl& reticle = *h.get_reticle();
-
-	//calculate the correct hardware address of the line and choose the synapse block instance
-	uint8_t addr = 0;
-	HicannCtrl::Synapse index;
-	SynapseDriverOnHICANN const drv = s.toSynapseDriverOnHICANN();
-
-	if (drv.line() < 112) { //upper half of ANNCORE
-		addr = 223-(drv.line()*2) - s.toRowOnSynapseDriver(); ///top line within driver is line=0
-		index = HicannCtrl::SYNAPSE_TOP;
-	}
-	else {  //lower half of ANNCORE
-		addr = (drv.line()-112)*2 + s.toRowOnSynapseDriver(); ///line=top/bottom here is geometrical, not hardware!
-		index = HicannCtrl::SYNAPSE_BOTTOM;
-	}
-
-	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
-
-	//read the data from hardware: columnset-wise
-	uint32_t const open_row = facets::SynapseControl::sc_cmd_st_rd | //put together an "open row" command
-				(1 << facets::SynapseControl::sc_newcmd_p) |
-				(addr << facets::SynapseControl::sc_adr_p);
-	uint32_t const close_row = facets::SynapseControl::sc_cmd_close | //put together a "close row" command
-				(1 << facets::SynapseControl::sc_newcmd_p) |
-				(addr << facets::SynapseControl::sc_adr_p);
-
-	sc.write_data(facets::SynapseControl::sc_ctrlreg, open_row); //open row for reading
-	while(sc.arraybusy()) {} //wait until controller not busy
-
-	STDPControl::corr_row returnvalue; //256 x 2 array of bool
-
-	for (size_t colset = 0; colset < 8; colset++){
-		uint32_t read_command = facets::SynapseControl::sc_cmd_read |         //put together a read command
-							(colset << facets::SynapseControl::sc_colset_p) | //choose column set
-							(1 << facets::SynapseControl::sc_newcmd_p) |      //set new command flag
-							(1 << facets::SynapseControl::sc_scc) |           //assert causal signal
-							(1 << facets::SynapseControl::sc_sca) |           //assert acausal signal
-							(1 << facets::SynapseControl::sc_encr_p) |        //enable correlation readout
-							(addr << facets::SynapseControl::sc_adr_p);       //choose synapse row
-
-		sc.write_data(facets::SynapseControl::sc_ctrlreg, read_command); //issue read command
-		while(sc.arraybusy()) {} //wait until not busy
-
-		std::bitset<32> causal = sc.read_data(facets::SynapseControl::sc_syncor);
-		std::bitset<32> acausal = sc.read_data(facets::SynapseControl::sc_syncor+1);
-
-		causal = bit::reverse(causal);
-		acausal = bit::reverse(acausal);
-
-		for (size_t i = 0; i < 4; i++){ //looping over slices
-			for (size_t j = 0; j < 8; j++) { //single corelation bits
-				returnvalue[STDPControl::CAUSAL][64*i + 8*colset + j] = causal[8*i + j]; //causal
-				returnvalue[STDPControl::ACAUSAL][64*i + 8*colset + j] = acausal[8*i + j]; //acausal
-			}
-		}
-	}
-
-	sc.write_data(facets::SynapseControl::sc_ctrlreg, close_row); //close row
-	while(sc.arraybusy()) {} //wait until not busy
-
-	return returnvalue;
-}
-
-
-HALBE_SETTER_GUARDED(EventSetupSynapses,
-	set_stdp_config,
-	Handle::HICANN &, h,
-	SideVertical const&, y,
-	STDPControl const&, c)
-{
-	ReticleControl& reticle = *h.get_reticle();
-
-	//choose synapse block
-	HicannCtrl::Synapse index = (y == top)? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
-	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
-
-	//format data
-	std::bitset<28> config_data = bit::concat(
-		c.timing.wrdel,
-		c.timing.outdel,
-		std::bitset<2>(0x3), //dll reset bits
-		std::bitset<4>(0x0),
-	//	c.timing.slen,
-		c.timing.predel,
-		c.timing.endel,
-		c.eval.extract_bits());
-
-	std::bitset<30> control_data = bit::concat(
-	std::bitset<1>(c.read_acausal),
-	std::bitset<1>(c.read_causal),
-	std::bitset<1>(c.without_reset),
-	std::bitset<3>(0), //column set not required, process works row-wise
-	c.last_row_bits(),
-	c.first_row_bits(),
-	std::bitset<1>(0), //reserved
-	std::bitset<1>(1), //newcmd = 1
-	std::bitset<1>(c.continuous_autoupdate),
-	std::bitset<1>(1), //enable correlation readout
-	std::bitset<4>(facets::SynapseControl::sc_cmd_idle)); //idle command
-
-	///write lookup-table
-	//registers 0 and 1: acausal
-	sc.write_data(facets::SynapseControl::sc_lut, c.lut.acausal.extract_low().to_ulong());
-	sc.write_data(facets::SynapseControl::sc_lut+1, c.lut.acausal.extract_high().to_ulong());
-	//registers 2 and 3: causal
-	sc.write_data(facets::SynapseControl::sc_lut+2, c.lut.causal.extract_low().to_ulong());
-	sc.write_data(facets::SynapseControl::sc_lut+3, c.lut.causal.extract_high().to_ulong());
-	//registers 4 and 5: combined
-	sc.write_data(facets::SynapseControl::sc_lut+4, c.lut.combined.extract_low().to_ulong());
-	sc.write_data(facets::SynapseControl::sc_lut+5, c.lut.combined.extract_high().to_ulong());
-
-	///write control register
-	//std::cout << "stdp_control_configuration (control_data): " << std::hex<<control_data.to_ulong() <<"\n"; 
-	sc.write_data(facets::SynapseControl::sc_ctrlreg, control_data.to_ulong());
-
-	///write all reset-registers to 1
-	sc.write_data(facets::SynapseControl::sc_synrst, 0xffffffff);
-	sc.write_data(facets::SynapseControl::sc_synrst+1, 0xffffffff);
-
-	///write config register containing digital delays and correlation evaluation patterns
-	//std::cout << "stdp-bit-configuration (config_data): " << std::hex<<config_data.to_ulong() <<"\n"; 
-	sc.write_data(facets::SynapseControl::sc_cnfgreg, config_data.to_ulong());
-}
-
-
-HALBE_GETTER(STDPControl, get_stdp_config,
-	Handle::HICANN &, h,
-	SideVertical const&, y)
-{
-	ReticleControl& reticle = *h.get_reticle();
-
-	//choose synapse block
-	HicannCtrl::Synapse index = (y == top)? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
-	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
-
-	STDPControl returnvalue = STDPControl();
-
-	//read config register nad import timings and evaluation bits
-	std::bitset<28> conreg = sc.read_data(facets::SynapseControl::sc_cnfgreg);
-	returnvalue.timing.wrdel  = bit::crop<2>(conreg, 26);
-	returnvalue.timing.outdel = bit::crop<4>(conreg, 22);
-	returnvalue.timing.slen   = bit::crop<4>(conreg, 16);
-	returnvalue.timing.predel = bit::crop<4>(conreg, 12);
-	returnvalue.timing.endel  = bit::crop<4>(conreg, 8);
-	returnvalue.eval.import_bits(bit::crop<8>(conreg, 0));
+	STDPLUT returnvalue;
 
 	//read acausal LUT
 	std::bitset<32> data = sc.read_data(facets::SynapseControl::sc_lut);
-	returnvalue.lut.acausal.import_low(data);
-	data = sc.read_data(facets::SynapseControl::sc_lut+1);
-	returnvalue.lut.acausal.import_high(data);
+	synapse_set_lut_low(returnvalue.acausal, data);
+	data = sc.read_data(facets::SynapseControl::sc_lut + 1);
+	synapse_set_lut_high(returnvalue.acausal, data);
 	//read causal LUT
-	data = sc.read_data(facets::SynapseControl::sc_lut+2);
-	returnvalue.lut.causal.import_low(data);
-	data = sc.read_data(facets::SynapseControl::sc_lut+3);
-	returnvalue.lut.causal.import_high(data);
+	data = sc.read_data(facets::SynapseControl::sc_lut + 2);
+	synapse_set_lut_low(returnvalue.causal, data);
+	data = sc.read_data(facets::SynapseControl::sc_lut + 3);
+	synapse_set_lut_high(returnvalue.causal, data);
 	//read combined LUT
-	data = sc.read_data(facets::SynapseControl::sc_lut+4);
-	returnvalue.lut.combined.import_low(data);
-	data = sc.read_data(facets::SynapseControl::sc_lut+5);
-	returnvalue.lut.combined.import_high(data);
+	data = sc.read_data(facets::SynapseControl::sc_lut + 4);
+	synapse_set_lut_low(returnvalue.combined, data);
+	data = sc.read_data(facets::SynapseControl::sc_lut + 5);
+	synapse_set_lut_high(returnvalue.combined, data);
 
-	//read control register
-	data = sc.read_data(facets::SynapseControl::sc_ctrlreg);
-	returnvalue.read_acausal = data[29];
-	returnvalue.read_causal = data[28];
-	returnvalue.without_reset = data[27];
-	returnvalue.continuous_autoupdate = data[5];
-
-	uint8_t last = bit::convert<uint8_t>(bit::crop<8>(data, 16));
-	uint8_t first = bit::convert<uint8_t>(bit::crop<8>(data, 8));
-	returnvalue.set_last_row(last);
-	returnvalue.set_first_row(first);
 	return returnvalue;
 }
 
+HALBE_SETTER_GUARDED(EventSetupSynapses, set_syn_rst,
+	Handle::HICANN&, h,
+	SynapseArrayOnHICANN const&, synarray,
+	HICANN::SynapseController::syn_rst_t const&, syn_rst)
+{
+	ReticleControl const& reticle = *h.get_reticle();
+	HicannCtrl::Synapse const index =
+		synarray.isTop() ? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
+	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
+
+	sc.write_data(facets::SynapseControl::sc_synrst, syn_rst.to_ulong());
+}
+
+HALBE_GETTER(HICANN::SynapseController::syn_rst_t, get_syn_rst,
+	Handle::HICANN&, h,
+	SynapseArrayOnHICANN const&, synarray)
+{
+	ReticleControl const& reticle = *h.get_reticle();
+	HicannCtrl::Synapse const index =
+		synarray.isTop() ? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
+	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
+
+	HICANN::SynapseController::syn_rst_t const returnvalue =
+		sc.read_data(facets::SynapseControl::sc_synrst);
+
+	return returnvalue;
+}
+
+HALBE_SETTER_GUARDED(EventSetupSynapses, set_syn_ctrl,
+	Handle::HICANN&, h,
+	SynapseArrayOnHICANN const&, synarray,
+	HICANN::SynapseControlRegister const&, ctrl_reg)
+{
+	ReticleControl const& reticle = *h.get_reticle();
+	HicannCtrl::Synapse const index =
+		synarray.isTop() ? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
+	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
+
+	std::bitset<32> ctrl_bitset;
+	synapse_ctrl_formater(ctrl_reg, ctrl_bitset);
+	sc.write_data(facets::SynapseControl::sc_ctrlreg, ctrl_bitset.to_ulong());
+}
+
+HALBE_GETTER(HICANN::SynapseControlRegister, get_syn_ctrl,
+	Handle::HICANN&, h,
+	SynapseArrayOnHICANN const&, synarray)
+{
+	ReticleControl const& reticle = *h.get_reticle();
+	HicannCtrl::Synapse const index =
+		synarray.isTop() ? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
+	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
+
+	HICANN::SynapseControlRegister returnvalue(synarray);
+
+	std::bitset<32> const data = sc.read_data(facets::SynapseControl::sc_ctrlreg);
+	returnvalue.idle = data[30];
+	returnvalue.sca = data[29];
+	returnvalue.scc = data[28];
+	returnvalue.without_reset = data[27];
+	returnvalue.sel = SynapseSel(bit::crop<3>(data, 24).to_ulong());
+
+	uint8_t last_addr = bit::crop<8>(data, 16).to_ulong();
+	returnvalue.set_last_row(AddrOnHW_to_SynapseRowOnHICANN(last_addr, synarray));
+	uint8_t addr = bit::crop<8>(data, 8).to_ulong();
+	returnvalue.set_row(AddrOnHW_to_SynapseRowOnHICANN(addr, synarray));
+
+	returnvalue.newcmd = data[6];
+	returnvalue.continuous = data[5];
+	returnvalue.encr = data[4];
+
+	returnvalue.cmd = SynapseCmd(bit::crop<4>(data, 0).to_ulong());
+	return returnvalue;
+}
+
+HALBE_SETTER_GUARDED(EventSetupSynapses, set_syn_cnfg,
+	Handle::HICANN&, h,
+	SynapseArrayOnHICANN const&, synarray,
+	HICANN::SynapseConfigurationRegister const&, cnfg_reg)
+{
+	ReticleControl const& reticle = *h.get_reticle();
+	HicannCtrl::Synapse const index =
+		synarray.isTop() ? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
+	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
+
+	std::bitset<32> cnfg_bitset;
+	synapse_cnfg_formater(cnfg_reg, cnfg_bitset);
+	sc.write_data(facets::SynapseControl::sc_cnfgreg, cnfg_bitset.to_ulong());
+}
+
+HALBE_GETTER(HICANN::SynapseConfigurationRegister, get_syn_cnfg,
+	Handle::HICANN&, h,
+	SynapseArrayOnHICANN const&, synarray)
+{
+	ReticleControl const& reticle = *h.get_reticle();
+	HicannCtrl::Synapse const index =
+		synarray.isTop() ? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
+	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
+
+	HICANN::SynapseConfigurationRegister returnvalue;
+
+	// bit 31-28: reserved
+	std::bitset<28> const data = sc.read_data(facets::SynapseControl::sc_cnfgreg);
+
+	returnvalue.synarray_timings.write_delay = SynapseWriteDelay(bit::crop<2>(data, 26).to_ulong());
+	returnvalue.synarray_timings.output_delay =
+		SynapseOutputDelay(bit::crop<4>(data, 22).to_ulong());
+	returnvalue.dllresetb = SynapseDllresetb(bit::crop<2>(data, 20).to_ulong());
+	returnvalue.gen = SynapseGen(bit::crop<4>(data, 16).to_ulong());
+	returnvalue.synarray_timings.setup_precharge =
+		SynapseSetupPrecharge(bit::crop<4>(data, 12).to_ulong());
+	returnvalue.synarray_timings.enable_delay =
+		SynapseEnableDelay(bit::crop<4>(data, 8).to_ulong());
+
+	returnvalue.pattern0.cc = data[7];
+	returnvalue.pattern1.cc = data[6];
+
+	returnvalue.pattern0.ca = data[5];
+	returnvalue.pattern1.ca = data[4];
+
+	returnvalue.pattern0.ac = data[3];
+	returnvalue.pattern1.ac = data[2];
+
+	returnvalue.pattern0.aa = data[1];
+	returnvalue.pattern1.aa = data[0];
+
+	return returnvalue;
+}
+
+HALBE_GETTER(HICANN::SynapseStatusRegister, get_syn_status,
+	Handle::HICANN&, h,
+	SynapseArrayOnHICANN const&, synarray)
+{
+	ReticleControl const& reticle = *h.get_reticle();
+	HicannCtrl::Synapse const index =
+		synarray.isTop() ? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
+	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
+
+	HICANN::SynapseStatusRegister returnvalue;
+
+	std::bitset<3> const data = sc.read_data(facets::SynapseControl::sc_status);
+
+	returnvalue.auto_busy = data[2];
+	returnvalue.slice_busy = data[1];
+	returnvalue.syndrv_busy = data[0];
+
+	return returnvalue;
+}
+
+HALBE_SETTER_GUARDED(EventSetupL1, set_synapse_controller,
+	Handle::HICANN&, h,
+	SynapseArrayOnHICANN const&, synarray,
+	HICANN::SynapseController const&, synapse_controller)
+{
+	ReticleControl const& reticle = *h.get_reticle();
+	HicannCtrl::Synapse const index =
+		synarray.isTop() ? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
+	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
+
+	sc.set_sram_timings(synapse_controller.syndrv_timings.read_delay,
+	                    synapse_controller.syndrv_timings.setup_precharge,
+	                    synapse_controller.syndrv_timings.write_delay);
+
+	set_syn_cnfg(h, synarray, synapse_controller.cnfg_reg);
+	set_stdp_lut(h, synarray, synapse_controller.lut);
+	set_syn_rst(h, synarray, synapse_controller.syn_rst);
+	set_syn_ctrl(h, synarray, synapse_controller.ctrl_reg);
+}
+
+HALBE_GETTER(SynapseController, get_synapse_controller,
+	Handle::HICANN&, h,
+	SynapseArrayOnHICANN const&, synarray)
+{
+	HICANN::SynapseController returnvalue(synarray);
+
+	ReticleControl const& reticle = *h.get_reticle();
+	HicannCtrl::Synapse const index =
+		synarray.isTop() ? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
+	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
+
+	std::array<uint, 3> data;
+	sc.get_sram_timings(data[0], data[1], data[2]);
+	returnvalue.syndrv_timings = HICANN::SRAMControllerTimings(
+		SRAMReadDelay(data[0]), SRAMSetupPrecharge(data[1]), SRAMWriteDelay(data[2]));
+
+	returnvalue.ctrl_reg = get_syn_ctrl(h, synarray);
+	returnvalue.cnfg_reg = get_syn_cnfg(h, synarray);
+	returnvalue.status_reg = get_syn_status(h, synarray);
+	returnvalue.lut = get_stdp_lut(h, synarray);
+	// TODO: Read SYN_CORR register
+	returnvalue.syn_rst = get_syn_rst(h, synarray);
+
+	return returnvalue;
+}
 
 HALBE_SETTER_GUARDED(EventResetCold,
 	reset,

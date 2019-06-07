@@ -103,7 +103,8 @@ def build(bld):
 
     bld(
         target          = 'halbe_container_inc',
-        use             = ['halbe_coordinate_inc', 's2hal_inc', 'realtime_inc', 'hostfpga_inc'],
+        use             = ['halbe_coordinate_inc', 's2hal_inc', 'realtime_inc', 'hostfpga_inc',
+                           'hate_inc'],
     )
 
     # ECM (2018-10-19) FIXME: marocco depends on coordinate checks (existance of switches)

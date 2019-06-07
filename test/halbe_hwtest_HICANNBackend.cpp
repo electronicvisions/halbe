@@ -174,30 +174,6 @@ TYPED_TEST(HICANNBackendTest, SynapseDriverHWTest) {
 	// RET->getSC(HCSYN::SYNAPSE_BOTTOM).reset_drivers();
 }
 
-TYPED_TEST(HICANNBackendTest, STDPConfigHWTest) {
-	HICANN::init(this->h, false); //initialize HICANN to be able to do the test in the first place
-
-	//generate test data
-	HICANN::STDPControl pattern1, pattern2;
-
-	pattern1.eval = HICANN::STDPEval();
-	pattern1.lut.set_defaults();
-	pattern1.lut.causal[7] = 15;
-	pattern1.without_reset = true;
-	pattern1.read_causal = true;
-	pattern1.read_acausal = false;
-	pattern1.continuous_autoupdate = false;
-	pattern1.set_first_row(2);
-	pattern1.set_last_row(8);
-	pattern1.timing.predel = 8;
-	pattern1.timing.outdel = 8;
-
-	HICANN::set_stdp_config(this->h, top, pattern1);
-	pattern2 = HICANN::get_stdp_config(this->h, top);
-
-	EXPECT_GETTER_EQ(pattern1, pattern2);
-}
-
 static size_t hamming_distance(HICANN::NeuronQuad const& a, HICANN::NeuronQuad const& b)
 {
 	size_t distance = 0;
@@ -1493,59 +1469,6 @@ TYPED_TEST(HICANNBackendTest, WriteFloatingGateHWTest) {
 	//~ RET->getFC(HCFG::FG_TOP_RIGHT).print_config();
 	//~ RET->getFC(HCFG::FG_BOTTOM_LEFT).print_config();
 	//~ RET->getFC(HCFG::FG_BOTTOM_RIGHT).print_config();
-}
-
-TYPED_TEST(HICANNBackendTest, WriteSTDPConfigHWTest) {
-	HICANN::init(this->h, false); //initialize HICANN to be able to do the test in the first place
-
-	//generate test data
-	HICANN::STDPControl pattern;
-
-	pattern.eval = HICANN::STDPEval();
-	pattern.lut.set_defaults();
-	pattern.lut.causal[7] = 15;
-	pattern.without_reset = true;
-	pattern.read_causal = true;
-	pattern.read_acausal = false;
-	pattern.continuous_autoupdate = false;
-	pattern.set_first_row(2);
-	pattern.set_last_row(8);
-	pattern.timing.wrdel = 2;
-	pattern.timing.outdel = 3;
-	pattern.timing.predel = 4;
-	HICANN::set_stdp_config(this->h, top, pattern);
-
-	pattern.without_reset = false;
-	pattern.read_acausal = true;
-	pattern.continuous_autoupdate = true;
-	pattern.set_first_row(10);
-	pattern.set_last_row(223);
-	HICANN::set_stdp_config(this->h, bottom, pattern);
-
-	std::array<uint32_t, 9> hwdata;
-
-	if (auto * reticle = this->get_reticle()) { // Test only for a real hardware test
-		hwdata[0] = RET->getSC(HCSYN::SYNAPSE_TOP).read_data(facets::SynapseControl::sc_lut);
-		hwdata[1] = RET->getSC(HCSYN::SYNAPSE_TOP).read_data(facets::SynapseControl::sc_lut+1);
-		hwdata[2] = RET->getSC(HCSYN::SYNAPSE_TOP).read_data(facets::SynapseControl::sc_lut+2);
-		hwdata[3] = RET->getSC(HCSYN::SYNAPSE_TOP).read_data(facets::SynapseControl::sc_lut+3);
-		hwdata[4] = RET->getSC(HCSYN::SYNAPSE_TOP).read_data(facets::SynapseControl::sc_lut+4);
-		hwdata[5] = RET->getSC(HCSYN::SYNAPSE_TOP).read_data(facets::SynapseControl::sc_lut+5);
-		hwdata[6] = RET->getSC(HCSYN::SYNAPSE_TOP).read_data(facets::SynapseControl::sc_ctrlreg);
-		hwdata[7] = RET->getSC(HCSYN::SYNAPSE_TOP).read_data(facets::SynapseControl::sc_cnfgreg);
-
-		EXPECT_GETTER_EQ(0x0ecd89ab, hwdata[0]);
-		EXPECT_GETTER_EQ(0x01234567, hwdata[1]);
-		EXPECT_GETTER_EQ(0x89abcdef, hwdata[2]);
-		EXPECT_GETTER_EQ(0x456723ff, hwdata[3]);
-		EXPECT_GETTER_EQ(0x01234567, hwdata[4]);
-		EXPECT_GETTER_EQ(0x89abcdef, hwdata[5]);
-		EXPECT_GETTER_EQ(0x58080250, hwdata[6]);
-		EXPECT_GETTER_EQ(0x08ff4f09, hwdata[7]);
-
-		hwdata[8] = RET->getSC(HCSYN::SYNAPSE_BOTTOM).read_data(facets::SynapseControl::sc_ctrlreg);
-		EXPECT_GETTER_EQ(0x70df0a70, hwdata[8]);
-	}
 }
 
 /** End of Write-tests */

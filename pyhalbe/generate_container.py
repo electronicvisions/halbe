@@ -92,7 +92,15 @@ for ns in included_ns:
 
     ns_util.add_namespace(ns)
 
-for c in ['Analog', 'BackgroundGenerator', 'BackgroundGeneratorArray', 'Crossbar', 'CrossbarRow', 'DNCMerger', 'DNCMergerLine', 'DecoderDoubleRow', 'DecoderRow', 'DriverDecoder', 'FGBlock', 'FGConfig', 'FGControl', 'FGInstruction', 'FGStimulus', 'GbitLink', 'HorizontalRepeater', 'L1Address', 'Merger', 'MergerTree', 'Neuron', 'NeuronConfig', 'NeuronQuad', 'Repeater', 'RepeaterBlock', 'RowConfig', 'STDPAnalog', 'STDPControl', 'STDPEval', 'STDPLUT', 'STDPTiming', 'Status', 'SynapseDecoder', 'SynapseDriver', 'SynapseSwitch', 'SynapseSwitchRow', 'SynapseWeight', 'TestEvent_3', 'VerticalRepeater', 'WeightRow']:
+for c in ['Analog', 'BackgroundGenerator', 'BackgroundGeneratorArray', 'Crossbar', 'CrossbarRow',
+            'DNCMerger', 'DNCMergerLine', 'DecoderDoubleRow', 'DecoderRow', 'DriverDecoder',
+            'FGBlock', 'FGConfig', 'FGControl', 'FGInstruction', 'FGStimulus', 'GbitLink',
+            'HorizontalRepeater', 'L1Address', 'Merger', 'MergerTree', 'Neuron', 'NeuronConfig',
+            'NeuronQuad', 'Repeater', 'RepeaterBlock', 'RowConfig', 'Status',
+            'STDPEvaluationPattern', 'STDPLUT', 'SynapseCmd', 'SynapseConfigurationRegister',
+            'SynapseController','SynapseControlRegister', 'SynapseDecoder', 'SynapseDllresetb',
+            'SynapseDriver', 'SynapseGen', 'SynapseSel', 'SynapseStatusRegister', 'SynapseSwitch',
+            'SynapseSwitchRow', 'SynapseWeight', 'TestEvent_3', 'VerticalRepeater', 'WeightRow']:
     cls = ns_hmf.class_('::HMF::HICANN::' + c)
     classes.add_pickle_suite(cls)
 

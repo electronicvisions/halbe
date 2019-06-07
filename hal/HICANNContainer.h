@@ -1,6 +1,9 @@
 #pragma once
 
 #include <bitset>
+#include <boost/optional.hpp>
+#include <boost/serialization/export.hpp>
+#include <boost/serialization/optional.hpp>
 
 #include "pywrap/compat/macros.hpp"
 
@@ -8,8 +11,8 @@
 #include "hal/strong_typedef.h"
 #include "hal/HMFCommon.h"
 #include "hal/Coordinate/HMFGeometry.h"
+#include "hal/Coordinate/typed_array.h"
 
-#include "hal/HICANN/STDPControl.h"
 #include "hal/HICANN/DriverDecoder.h"
 #include "hal/HICANN/SynapseDecoder.h"
 #include "hal/HICANN/L1Address.h"
@@ -320,21 +323,18 @@ class SRAMReadDelay
     : public Coordinate::detail::RantWrapper<SRAMReadDelay, size_t, 255, 1> {
 public:
 	explicit PYPP_CONSTEXPR SRAMReadDelay(size_t val) : rant_t(val) {}
-	std::bitset<8> to_bitset() const { return std::bitset<8>(value()); }
 };
 
 class SRAMSetupPrecharge
     : public Coordinate::detail::RantWrapper<SRAMSetupPrecharge, size_t, 15, 0> {
 public:
 	explicit PYPP_CONSTEXPR SRAMSetupPrecharge(size_t val) : rant_t(val) {}
-	std::bitset<4> to_bitset() const { return std::bitset<4>(value()); }
 };
 
 class SRAMWriteDelay
     : public Coordinate::detail::RantWrapper<SRAMWriteDelay, size_t, 15, 0> {
 public:
 	explicit PYPP_CONSTEXPR SRAMWriteDelay(size_t val) : rant_t(val) {}
-	std::bitset<4> to_bitset() const { return std::bitset<4>(value()); }
 };
 
 class SRAMControllerTimings {
@@ -701,28 +701,24 @@ class SynapseWriteDelay
     : public Coordinate::detail::RantWrapper<SynapseWriteDelay, size_t, 3, 0> {
 public:
 	explicit PYPP_CONSTEXPR SynapseWriteDelay(size_t val) : rant_t(val) {}
-	std::bitset<2> to_bitset() const { return std::bitset<2>(value()); }
 };
 
 class SynapseOutputDelay
     : public Coordinate::detail::RantWrapper<SynapseOutputDelay, size_t, 15, 0> {
 public:
 	explicit PYPP_CONSTEXPR SynapseOutputDelay(size_t val) : rant_t(val) {}
-	std::bitset<4> to_bitset() const { return std::bitset<4>(value()); }
 };
 
 class SynapseSetupPrecharge
     : public Coordinate::detail::RantWrapper<SynapseSetupPrecharge, size_t, 15, 0> {
 public:
 	explicit PYPP_CONSTEXPR SynapseSetupPrecharge(size_t val) : rant_t(val) {}
-	std::bitset<4> to_bitset() const { return std::bitset<4>(value()); }
 };
 
 class SynapseEnableDelay
     : public Coordinate::detail::RantWrapper<SynapseEnableDelay, size_t, 15, 0> {
 public:
 	explicit PYPP_CONSTEXPR SynapseEnableDelay(size_t val) : rant_t(val) {}
-	std::bitset<4> to_bitset() const { return std::bitset<4>(value()); }
 };
 
 class SynapseControllerTimings {
@@ -789,8 +785,8 @@ public:
 	};
 
 	PYPP_CONSTEXPR RepeaterBlock() :
-		drvresetb(1),
-		dllresetb(1),
+		drvresetb(!false), // heuristically it was found that not pulling drvreset helps locking
+		dllresetb(!true), // start with drivers in DLL reset
 		fextcap(0),
 		start_tdi(0),
 		start_tdo(0),
@@ -840,6 +836,305 @@ private:
 		}
 	}
 	friend std::ostream& operator<< (std::ostream& os, RepeaterBlock const& o);
+};
+
+class STDPEvaluationPattern
+{
+public:
+	// The following boolean values specify which capacitors in the STDP evaluation circuit are
+	//  connected during evaluation
+
+	// Connection between acausal and high threshold capacitor
+	PYPP_INIT(bool aa, 0);
+	// Connection between causal and low threshold capacitor
+	PYPP_INIT(bool ac, 0);
+	// Connection between acausal and low threshold capacitor
+	PYPP_INIT(bool ca, 0);
+	// Connection between causal and high threshold capacitor
+	PYPP_INIT(bool cc, 0);
+
+	bool operator==(const STDPEvaluationPattern& p) const;
+	bool operator!=(const STDPEvaluationPattern& p) const;
+
+private:
+	friend class boost::serialization::access;
+	template <typename Archiver>
+	void serialize(Archiver& ar, unsigned const int);
+
+	friend std::ostream& operator<<(std::ostream& os, STDPEvaluationPattern const& p);
+};
+
+class SynapseCmd : public Coordinate::detail::RantWrapper<SynapseCmd, size_t, 15, 0>
+{
+public:
+	explicit PYPP_CONSTEXPR SynapseCmd(size_t val = 0) : rant_t(val) {}
+};
+
+class SynapseSel : public Coordinate::detail::RantWrapper<SynapseSel, size_t, 7, 0>
+{
+public:
+	explicit PYPP_CONSTEXPR SynapseSel(size_t val = 0) : rant_t(val) {}
+};
+
+class SynapseGen : public Coordinate::detail::RantWrapper<SynapseGen, size_t, 15, 0>
+{
+public:
+	explicit PYPP_CONSTEXPR SynapseGen(size_t val = 0) : rant_t(val) {}
+};
+
+class SynapseDllresetb : public Coordinate::detail::RantWrapper<SynapseDllresetb, size_t, 3, 0>
+{
+public:
+	explicit PYPP_CONSTEXPR SynapseDllresetb(size_t val = 3) : rant_t(val) {}
+};
+
+class SynapseControlRegister
+{
+public:
+	struct Opcodes
+	{
+		static SynapseCmd const IDLE;       // Do nothing
+		static SynapseCmd const START_READ; // Open one row for reading of synaptic weights
+		static SynapseCmd const READ;       // Read weights from one column set into SYNOUT register
+		static SynapseCmd const WRITE;      // Write weights from SYNIN register into one column set
+		static SynapseCmd const RST_CORR;   // Reset correlation capacitors according to the
+		                                    // SYNRST register
+		static SynapseCmd const START_RDEC; // Open one row for reading of decoder addresses
+		static SynapseCmd const RDEC;       // Read decoder addresses from one column set into
+		                                    // SYNOUT register
+		static SynapseCmd const WDEC;       // Write decoder addresses from SYNIN register into
+		                                    // one column set
+		static SynapseCmd const AUTO;       // Start the automatic weight update process
+		static SynapseCmd const CLOSE_ROW;  // Close current row after it was opend with START_READ
+		                                    // or START_RDEC
+	};
+
+	typedef Coordinate::SynapseRowOnHICANN syn_row_t;
+	typedef Coordinate::SynapseRowOnArray syn_row_on_array_t;
+
+	SynapseControlRegister();
+	SynapseControlRegister(Coordinate::SynapseArrayOnHICANN synarray);
+
+	bool operator==(SynapseControlRegister const& reg) const;
+	bool operator!=(SynapseControlRegister const& reg) const;
+
+	/**
+	 * Sets the row from which the STDP evaluation starts.
+	 *
+	 * @note Automatic update of weights starts at row 0 in first iteration (bug #1969)
+	 * @param row Row to be set.
+	 */
+	void set_row(syn_row_t const& row);
+
+	/**
+	 * Sets the row until which the STDP evaluation should be performed.
+	 *
+	 * @param last_row Last row for which STDP evaluation should be performed.
+	 */
+	void set_last_row(syn_row_t const& last_row);
+
+	/**
+	 * Gets the row from which the STDP evaluation starts.
+	 *
+	 * @note Automatic update of weights starts at row 0 in first iteration (bug #1969)
+	 * @return Row from which the STDP evaluation starts.
+	 */
+	syn_row_t get_row() const;
+
+	/**
+	 * Gets the row until which the STDP evaluation should be performed.
+	 *
+	 * @return Last row for which STDP evaluation should be performed.
+	 */
+	syn_row_t get_last_row() const;
+
+	/**
+	 * Returns the synapse array of the control register.
+	 *
+	 * @return Synapse Array on HICANN.
+	 */
+	Coordinate::SynapseArrayOnHICANN toSynapseArrayOnHICANN() const;
+
+	// Idle status of synapse controller (read-only)
+	boost::optional<bool> idle;
+	// Enables readout of acausal capacitor
+	PYPP_INIT(bool sca, true);
+	// Enables readout of causal capacitor
+	PYPP_INIT(bool scc, true);
+	// Disables reset after evaluation of capacitors
+	PYPP_INIT(bool without_reset, false);
+	// Selects column set on which the operation specified by cmd is performed
+	PYPP_INIT(SynapseSel sel, SynapseSel(0));
+
+	// Specifies whether cmd holds a new comand
+	PYPP_INIT(bool newcmd, false);
+	/**
+	 * In non-continuous mode STDP evaluation is just performed once between
+	 * row and last row. In the continuous case the evaluation restarts at row after
+	 * last row was reached
+	 */
+	PYPP_INIT(bool continuous, false);
+	// Enables correlation readout during synaptic weight read sequence
+	PYPP_INIT(bool encr, false);
+
+	// Command to be executed. Compare "Opcodes"
+	PYPP_INIT(SynapseCmd cmd, Opcodes::IDLE);
+
+private:
+	Coordinate::SynapseArrayOnHICANN synapse_array;
+	syn_row_t row;
+	syn_row_t last_row;
+
+	friend class boost::serialization::access;
+	template <typename Archiver>
+	void serialize(Archiver& ar, unsigned const int);
+
+	friend std::ostream& operator<<(std::ostream& os, SynapseControlRegister const& reg);
+};
+
+class SynapseConfigurationRegister
+{
+public:
+	// Timings in the synapse array
+	PYPP_INIT(SynapseControllerTimings synarray_timings,
+		SynapseControllerTimings(SynapseWriteDelay(2),
+                                 SynapseOutputDelay(0xf),
+                                 SynapseSetupPrecharge(0xf),
+                                 SynapseEnableDelay(0xf)
+		)
+	);
+	// Disables DLL-reset of the synapse drivers
+	PYPP_INIT(SynapseDllresetb dllresetb, SynapseDllresetb(SynapseDllresetb::min));
+	PYPP_INIT(SynapseGen gen, SynapseGen(0));	// TODO: add description
+	STDPEvaluationPattern pattern0; // Evaluation pattern to be used for first evaluation
+	STDPEvaluationPattern pattern1; // Evaluation pattern to be used for second evaluation
+
+
+	/**
+	 * Enables DLL reset for the synapse drivers on both sides of the synapse array.
+	 */
+	void enable_dllreset();
+
+	/**
+	 * Disables DLL reset for the synapse drivers on both sides of the synapse array.
+	 */
+	void disable_dllreset();
+
+	bool operator==(SynapseConfigurationRegister const& reg) const;
+	bool operator!=(SynapseConfigurationRegister const& reg) const;
+
+private:
+	friend class boost::serialization::access;
+	template <typename Archiver>
+	void serialize(Archiver& ar, unsigned const int);
+
+	friend std::ostream& operator<<(std::ostream& os, SynapseConfigurationRegister const& reg);
+};
+
+class SynapseStatusRegister
+{
+public:
+	bool auto_busy;
+	bool slice_busy;
+	bool syndrv_busy;
+
+	bool operator==(SynapseStatusRegister const& reg) const;
+	bool operator!=(SynapseStatusRegister const& reg) const;
+
+private:
+	friend class boost::serialization::access;
+	template <typename Archiver>
+	void serialize(Archiver& ar, unsigned const int);
+
+	friend std::ostream& operator<<(std::ostream& os, SynapseStatusRegister const& reg);
+};
+
+struct STDPLUT
+{
+	typedef Coordinate::typed_array<SynapseWeight, SynapseWeight> LUT;
+
+	STDPLUT();
+
+	LUT causal;
+	LUT acausal;
+	LUT combined; // both causal and acausal are active
+
+	bool operator==(STDPLUT const& b) const;
+	bool operator!=(STDPLUT const& other) const;
+
+private:
+	friend class boost::serialization::access;
+	template <typename Archiver>
+	void serialize(Archiver& ar, unsigned int const);
+
+	friend std::ostream& operator<<(std::ostream& os, STDPLUT const& o);
+};
+
+class SynapseController
+{
+public:
+	SynapseController();
+	SynapseController(Coordinate::SynapseArrayOnHICANN synarray);
+
+	PYPP_INLINE(static size_t const, SLICES, 4);
+	PYPP_INLINE(static size_t const, SYNAPSES_PER_COLUMN_SET, 32);
+	PYPP_INLINE(static size_t const, SYNAPSES_PER_ROW, Coordinate::SynapseOnHICANN::x_type::end);
+	PYPP_INLINE(static size_t const, N_COLUMN_SET, SYNAPSES_PER_ROW / SYNAPSES_PER_COLUMN_SET);
+	PYPP_INLINE(static size_t const, SYNAPSES_PER_SLICE, SYNAPSES_PER_ROW / SLICES);
+	PYPP_INLINE(static size_t const,
+	            SYNAPSES_PER_SLICE_PER_COLUMN_SET,
+	            SYNAPSES_PER_COLUMN_SET / SLICES);
+
+	// Types to save correlation for whole synapse row
+	typedef std::bitset<SYNAPSES_PER_ROW> corr_single_pattern_row_t;
+	typedef std::array<corr_single_pattern_row_t, 2> corr_row_t;
+
+	// SYNIN
+	typedef std::array<std::bitset<4>, 8> syn_in_single_reg_t; // 8 slices with 4-bit values
+	typedef std::array<syn_in_single_reg_t, 4> syn_in_t; // SYNIN is made up of 4 32-bit registers
+	boost::optional<syn_in_t> syn_in;
+
+	// SYNOUT
+	typedef std::array<std::bitset<4>, 8> syn_out_single_reg_t; // 8 slices with 4-bit values
+	typedef std::array<syn_out_single_reg_t, 4> syn_out_t; // SYNOUT is made up of 4 32-bit registers
+	boost::optional<syn_out_t> syn_out;
+
+	// SYNRST: Controls for which columns in a column set the correlation
+	// information is reset
+	typedef std::bitset<SYNAPSES_PER_COLUMN_SET> syn_rst_t;
+	PYPP_INIT(syn_rst_t syn_rst, 0xffffffff);
+
+	// SYNCORR: Correlation register (two patterns)
+	typedef std::bitset<SYNAPSES_PER_COLUMN_SET> corr_single_reg_t;
+	typedef std::array<corr_single_reg_t, 2> corr_reg_t;
+	boost::optional<corr_reg_t> syn_corr;
+
+	// CREG: Control register
+	SynapseControlRegister ctrl_reg;
+	// CFGREG: Configuration Register
+	SynapseConfigurationRegister cnfg_reg;
+	// STATUS: Status register
+	boost::optional<SynapseStatusRegister> status_reg;
+
+	// LUT
+	STDPLUT lut;
+
+	// Synapse driver timings
+	SRAMControllerTimings syndrv_timings;
+
+	bool operator==(SynapseController const& s) const;
+	bool operator!=(SynapseController const& s) const;
+
+	Coordinate::SynapseArrayOnHICANN toSynapseArrayOnHICANN() const;
+
+private:
+	Coordinate::SynapseArrayOnHICANN synapse_array;
+
+	friend class boost::serialization::access;
+	template <typename Archiver>
+	void serialize(Archiver& ar, unsigned const int);
+
+	friend std::ostream& operator<<(std::ostream& os, SynapseController const& s);
 };
 
 STRONG_TYPEDEF_CONSTEXPR(TestEvent_3,
@@ -968,6 +1263,14 @@ typedef Phase phase_t __attribute__ ((deprecated));
 BOOST_CLASS_VERSION(::HMF::HICANN::NeuronConfig, 2)
 BOOST_CLASS_VERSION(::HMF::HICANN::RepeaterBlock, 1)
 
+BOOST_CLASS_EXPORT_KEY(HMF::HICANN::STDPEvaluationPattern)
+BOOST_CLASS_EXPORT_KEY(HMF::HICANN::SynapseControlRegister)
+BOOST_CLASS_EXPORT_KEY(HMF::HICANN::SynapseConfigurationRegister)
+BOOST_CLASS_EXPORT_KEY(HMF::HICANN::SynapseStatusRegister)
+BOOST_CLASS_EXPORT_KEY(HMF::HICANN::STDPLUT)
+BOOST_CLASS_EXPORT_KEY(HMF::HICANN::STDPLUT::LUT)
+BOOST_CLASS_EXPORT_KEY(HMF::HICANN::SynapseController)
+
 namespace std {
 
 HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseWeight)
@@ -978,8 +1281,13 @@ HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SRAMSetupPrecharge)
 HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SRAMWriteDelay)
 
 HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseEnableDelay)
+HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseCmd)
+HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseSel)
+HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseGen)
+HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseDllresetb)
 HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseSetupPrecharge)
 HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseWriteDelay)
 HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseOutputDelay)
+
 
 } // namespace std
