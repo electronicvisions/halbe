@@ -29,6 +29,7 @@ using halco::hicann::v2::ChannelOnADC;
 using halco::hicann::v2::TriggerOnADC;
 using halco::hicann::v2::IPv4;
 using halco::hicann::v2::IPv4_array_t;
+using halco::hicann::v2::JTAGFrequency;
 
 } // Coordinate
 } // HMF

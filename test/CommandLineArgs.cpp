@@ -16,7 +16,8 @@ CommandLineArgs::CommandLineArgs() :
 		pmu_ip(),
 		highspeed(true),
 		arq(true),
-		use_scheriff(false)
+		use_scheriff(false),
+		jtag_freq(HMF::Coordinate::JTAGFrequency())
 	{}
 
 CommandLineArgs CommandLineArgs::parse(int argc, char *argv[])
@@ -25,6 +26,7 @@ CommandLineArgs CommandLineArgs::parse(int argc, char *argv[])
 
 	std::string fpga_ip, pmu_ip, on;
 	geometry::Enum h, d, f, w;
+	size_t jtag_freq;
 	std::vector< geometry::Enum> ah;
 	size_t ll;
 	std::string lf;
@@ -44,6 +46,8 @@ CommandLineArgs CommandLineArgs::parse(int argc, char *argv[])
 			 "specify IP (std::string) of FPGA")
 		("pmu_ip",          po::value<std::string>(&pmu_ip)->default_value("0.0.0.0"),
 			 "specify IP (std::string) of PMU")
+		("jtag_freq",   po::value<size_t>(&jtag_freq)->default_value(10000),
+			 "specify Jtag clock frequency in kHz")
 		("dnc,d",       po::value<geometry::Enum>(&d)->default_value(geometry::Enum(0)),
 			"specify HMF::Coordinate::DNCOnFPGA")
 		("hicann,h",    po::value<geometry::Enum>(&h)->default_value(geometry::Enum(0)),
@@ -82,6 +86,7 @@ CommandLineArgs CommandLineArgs::parse(int argc, char *argv[])
 	// collect connection information into single struct
 	conn.fpga_ip = HMF::Coordinate::IPv4::from_string(fpga_ip);
 	conn.pmu_ip = HMF::Coordinate::IPv4::from_string(pmu_ip);
+	conn.jtag_freq = HMF::Coordinate::JTAGFrequency(jtag_freq * 1e3);
 	conn.h = HMF::Coordinate::HICANNOnDNC(h);
 	conn.d = HMF::Coordinate::DNCOnFPGA(d);
 	conn.f = HMF::Coordinate::FPGAGlobal(

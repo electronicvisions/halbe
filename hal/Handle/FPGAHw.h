@@ -31,6 +31,7 @@ struct FPGAHw : public FPGAMixin<HICANNHw>
 		std::set<Coordinate::HICANNOnDNC> usable_hicanns;
 		Coordinate::SetupType setup;
 		Coordinate::IPv4 pmu_ip;
+		Coordinate::JTAGFrequency jtag_frequency;
 
 		void check() {
 			// TODO
@@ -46,7 +47,8 @@ struct FPGAHw : public FPGAMixin<HICANNHw>
 	///         ignored if on_wafer = true.
 	/// \note non-highspeed-required HICANNs are not (yet) supported (API change required)
 	FPGAHw(Coordinate::FPGAGlobal const c, Coordinate::IPv4 const ip,
-	       Coordinate::DNCOnFPGA const d, Coordinate::IPv4 const pmu_ip, bool on_wafer = false, size_t num_hicanns = 1);
+	       Coordinate::DNCOnFPGA const d, Coordinate::IPv4 const pmu_ip, bool on_wafer = false, size_t num_hicanns = 1,
+	       Coordinate::JTAGFrequency jtag_frequency = Coordinate::JTAGFrequency());
 
 	/// Dummy destructor needed by unique_ptr member.
 	~FPGAHw();
@@ -83,12 +85,14 @@ private:
 private:
 	// FPGA ip corresponding to FPGA coordinate
 	Coordinate::IPv4 const fpga_ip;
+	// jtag speed
+	Coordinate::JTAGFrequency jtag_frequency;
 };
 
 // FIXME holy ugliness! looks like a failed attempt to workaround ownership/lifetime issues
 boost::shared_ptr<FPGAHw> createFPGAHw(Coordinate::FPGAGlobal const c,
 		Coordinate::IPv4 const ip, Coordinate::DNCOnFPGA const d, Coordinate::IPv4 const pmu_ip,
-		bool on_wafer=false, size_t num_hicanns=1);
+		bool on_wafer=false, size_t num_hicanns=1, Coordinate::JTAGFrequency jtag_frequency = Coordinate::JTAGFrequency());
 void freeFPGAHw(boost::shared_ptr<FPGAHw> & handle);
 
 } // namespace Handle

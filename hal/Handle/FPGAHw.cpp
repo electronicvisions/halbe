@@ -25,7 +25,8 @@ struct FPGAHw::FPGAHandlePIMPL {
 	    std::set<Coordinate::HICANNOnDNC> physically_available_hicanns,
 	    std::set<Coordinate::HICANNOnDNC> highspeed_hicanns,
 	    std::set<Coordinate::HICANNOnDNC> usable_hicanns,
-	    Coordinate::IPv4 pmu_ip)
+	    Coordinate::IPv4 pmu_ip,
+	    Coordinate::JTAGFrequency jtag_frequency)
 	    : fpga(f),
 	      dnc(d),
 	      fpga_jtag_port(Coordinate::UDPPort(jtag_base_port + d.value())),
@@ -34,7 +35,8 @@ struct FPGAHw::FPGAHandlePIMPL {
 	      physically_available_hicanns(physically_available_hicanns),
 	      highspeed_hicanns(highspeed_hicanns),
 	      usable_hicanns(usable_hicanns),
-	      pmu_ip(pmu_ip)
+	      pmu_ip(pmu_ip),
+	      jtag_frequency(jtag_frequency)
 	{}
 
 	void init() {
@@ -53,7 +55,7 @@ struct FPGAHw::FPGAHandlePIMPL {
 	void setup() {
 		myPowerBackend->SetupReticle(
 		    fpga.dnc(dnc), fpga, fpga_jtag_port, pmu_ip, physically_available_hicanns,
-		    highspeed_hicanns, on_wafer, arq_mode);
+		    highspeed_hicanns, on_wafer, arq_mode, jtag_frequency);
 	}
 
 	~FPGAHandlePIMPL() {
@@ -76,6 +78,7 @@ struct FPGAHw::FPGAHandlePIMPL {
 	bool const highspeed_mode = true;
 	bool const arq_mode = true;
 	static uint16_t const jtag_base_port = 1700;
+	Coordinate::JTAGFrequency jtag_frequency;
 };
 // end of ugly PIMPLed stuff
 
@@ -95,17 +98,20 @@ FPGAHw::FPGAHw(HandleParameter handleparam)
           handleparam.physically_available_hicanns,
           handleparam.highspeed_hicanns,
           handleparam.usable_hicanns,
-          handleparam.pmu_ip)),
+          handleparam.pmu_ip,
+          handleparam.jtag_frequency)),
       fpga_ip(handleparam.fpga_ip)
 {
 	pimpl->init();
 }
 
 FPGAHw::FPGAHw(Coordinate::FPGAGlobal const c, Coordinate::IPv4 const fpga_ip,
-               Coordinate::DNCOnFPGA const d, Coordinate::IPv4 const pmu_ip, bool on_wafer, size_t num_hicanns) :
+               Coordinate::DNCOnFPGA const d, Coordinate::IPv4 const pmu_ip, bool on_wafer, size_t num_hicanns,
+               Coordinate::JTAGFrequency jtag_frequency) :
 		FPGA(c),
 		Base(c),
-		fpga_ip(fpga_ip)
+		fpga_ip(fpga_ip),
+		jtag_frequency(jtag_frequency)
 {
 	//FIXME: UGLY but could not find other way to initlize available hicanns set for pimpl
 	std::set<Coordinate::HICANNOnDNC> avail_hicanns;
@@ -116,7 +122,7 @@ FPGAHw::FPGAHw(Coordinate::FPGAGlobal const c, Coordinate::IPv4 const fpga_ip,
 	// FIXME: does not support non-highspeed hicanns
 	std::unique_ptr<FPGAHandlePIMPL> tempptr(new FPGAHandlePIMPL(
 	    *this, d, on_wafer, avail_hicanns,
-	    avail_hicanns, avail_hicanns, pmu_ip));
+	    avail_hicanns, avail_hicanns, pmu_ip, jtag_frequency));
 	pimpl = std::move(tempptr);
 	pimpl->init();
 }
@@ -182,9 +188,9 @@ boost::shared_ptr<facets::ReticleControl> FPGAHw::get_reticle(const Coordinate::
 
 boost::shared_ptr<FPGAHw> createFPGAHw(Coordinate::FPGAGlobal const c,
 		Coordinate::IPv4 const fpga_ip, Coordinate::DNCOnFPGA const d, Coordinate::IPv4 const pmu_ip,
-		bool on_wafer, size_t num_hicanns)
+		bool on_wafer, size_t num_hicanns, Coordinate::JTAGFrequency jtag_frequency)
 {
-	boost::shared_ptr<FPGAHw> ptr{new FPGAHw(c, fpga_ip, d, pmu_ip, on_wafer, num_hicanns)};
+	boost::shared_ptr<FPGAHw> ptr{new FPGAHw(c, fpga_ip, d, pmu_ip, on_wafer, num_hicanns, jtag_frequency)};
 	return ptr;
 }
 

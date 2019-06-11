@@ -19,6 +19,7 @@ struct CommandLineArgs
 	bool arq;
 	::HMF::Coordinate::SetupType setup;
 	bool use_scheriff;
+	HMF::Coordinate::JTAGFrequency jtag_freq; // Hz
 
 	static CommandLineArgs parse(int argc, char *argv[]);
 };

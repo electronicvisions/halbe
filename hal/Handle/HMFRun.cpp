@@ -117,7 +117,8 @@ void PowerBackend::SetupReticle(
     std::set<Coordinate::HICANNOnDNC> physically_available_hicanns,
     std::set<Coordinate::HICANNOnDNC> highspeed_hicanns,
     bool on_wafer,
-    bool arq_mode)
+    bool arq_mode,
+    Coordinate::JTAGFrequency jtag_freq)
 {
 	if (all_reticles.size() > 1) {
 		throw runtime_error("PowerBackend::SetupReticle: Too many reticles instantiated!");
@@ -156,7 +157,7 @@ void PowerBackend::SetupReticle(
 	    d, boost::shared_ptr<ReticleControl>(new ReticleControl(
 	           reticle_number, ip_, jtag_port, pmu_ip, avail_hicann_bitset_in_hs_order,
 	           highspeed_bitset, on_wafer,
-	           arq_mode))));
+	           arq_mode, jtag_freq.value() / 1e3))));
 	if (!ret.second) {
 		throw runtime_error("PowerBackend::SetupReticle: Could not insert reticle");
 	}

@@ -95,7 +95,8 @@ private:
 	    std::set<Coordinate::HICANNOnDNC> physically_available_hicanns,
 	    std::set<Coordinate::HICANNOnDNC> highspeed_hicanns,
 	    bool on_wafer,
-	    bool arq_mode = true);
+	    bool arq_mode = true,
+	    Coordinate::JTAGFrequency jtag_freq = Coordinate::JTAGFrequency());
 };
 #endif // #ifndef PYPLUSPLUS
 
