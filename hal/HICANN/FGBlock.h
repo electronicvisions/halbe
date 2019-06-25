@@ -17,7 +17,7 @@ namespace HICANN {
 enum shared_parameter {
 	//!<              WHERE    INDEX       EXPLANATION
 	V_reset,      //!< both      0     voltage, membrane is pulled to during reset pulse (left:even, right:odd denmems) [NEURON]
-	int_op_bias,  //!< both      1     internal OP bias
+	int_op_bias,  //!< both      1     internal OP bias, bias of floating gate array amplifiers
 	V_dllres,     //!< both      2     dll ctrl voltage of receivers is pulled to this voltage during reset of pll
 	V_bout,       //!< left      3     global biasing of neuron readout
 	V_bexp,       //!< right     3     lower exp voltage driver bias
@@ -92,6 +92,16 @@ bool isCurrentParameter(shared_parameter p);
 bool isVoltageParameter(neuron_parameter p);
 /// Check if the given parameter is a voltage
 bool isVoltageParameter(shared_parameter p);
+
+/// Check if the given paramter is essential for floating gates
+bool isFGParameter(shared_parameter p);
+/// Check if the given paramter is essential for L1
+bool isL1Parameter(shared_parameter p);
+
+/// Check if row on any block is essential for floating gates
+bool isPotentialFGRow(Coordinate::FGRowOnFGBlock const&);
+/// Check if row on any block is essential for L1
+bool isPotentialL1Row(Coordinate::FGRowOnFGBlock const&);
 
 std::string to_string(neuron_parameter p);
 std::string to_string(shared_parameter p);

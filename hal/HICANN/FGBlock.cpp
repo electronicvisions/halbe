@@ -1,4 +1,6 @@
 #include "hal/HICANN/FGBlock.h"
+#include "hal/Coordinate/iter_all.h"
+
 #include "pythonic/enumerate.h"
 
 #include <bitter/bitter.h>
@@ -267,6 +269,52 @@ bool isVoltageParameter(neuron_parameter p)
 bool isVoltageParameter(shared_parameter p)
 {
 	return !isCurrentParameter(p);
+}
+
+bool isFGParameter(shared_parameter p)
+{
+	switch (p) {
+		case int_op_bias:
+			return true;
+		default:
+			return false;
+	}
+}
+
+bool isL1Parameter(shared_parameter p)
+{
+	switch (p) {
+		case V_dllres:
+			return true;
+		case V_ccas: // also cbias
+			return true;
+		default:
+			return false;
+	}
+}
+
+bool isPotentialL1Row(Coordinate::FGRowOnFGBlock const& row) {
+	for (auto block : Coordinate::iter_all<Coordinate::FGBlockOnHICANN>()) {
+		try {
+			if (isL1Parameter(getSharedParameter(block, row))) {
+				return true;
+			}
+		} catch (std::out_of_range const&) {
+		}
+	}
+	return false;
+}
+
+bool isPotentialFGRow(Coordinate::FGRowOnFGBlock const& row) {
+	for (auto block : Coordinate::iter_all<Coordinate::FGBlockOnHICANN>()) {
+		try {
+			if (isFGParameter(getSharedParameter(block, row))) {
+				return true;
+			}
+		} catch (std::out_of_range const&) {
+		}
+	}
+	return false;
 }
 
 Coordinate::FGRowOnFGBlock
