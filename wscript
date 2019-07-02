@@ -145,10 +145,8 @@ def build(bld):
         srcs = bld.path.ant_glob('ESS/*.cpp')
         bld.shlib(
             target          = 'ESS',
-            features        = 'post_task',
             source          = srcs,
             install_path    = '${PREFIX}/lib',
-            post_task       = 'test-ess',
             use             = uses,
             cxxflags=cxxflags
         )
