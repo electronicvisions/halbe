@@ -36,7 +36,7 @@ FPGAEss::FPGAEss(Coordinate::FPGAGlobal const c, boost::shared_ptr<Ess> ess, con
     }
 }
 
-auto FPGAEss::create_hicann(Coordinate::HICANNGlobal const& h) -> hicann_handle_t
+auto FPGAEss::create_hicann(Coordinate::HICANNGlobal const& h, bool /*request_highspeed*/) -> hicann_handle_t
 {
 	return boost::make_shared<HICANNEss>(h, mEss);
 }

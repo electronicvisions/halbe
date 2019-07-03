@@ -31,7 +31,8 @@ struct HICANNHw : public HICANN
 
 	/// Construct a HICANN that is connected to FPGA f
 	HICANNHw(Coordinate::HICANNGlobal const& h,
-	         const boost::shared_ptr<facets::ReticleControl>& rc, uint8_t jtag_addr);
+	         const boost::shared_ptr<facets::ReticleControl>& rc, uint8_t jtag_addr,
+	         bool request_highspeed);
 
 private:
 	boost::weak_ptr<facets::ReticleControl> mReticleControl;

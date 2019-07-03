@@ -154,7 +154,7 @@ RealtimeComm& FPGAHw::get_realtime_comm() const {
 	return *realtime_comm.get();
 }
 
-auto FPGAHw::create_hicann(Coordinate::HICANNGlobal const& h) -> hicann_handle_t
+auto FPGAHw::create_hicann(Coordinate::HICANNGlobal const& h, bool request_highspeed) -> hicann_handle_t
 {
 	Coordinate::DNCGlobal dnc{h.toDNCGlobal(), coordinate().toWafer()};
 	if (h.toWafer() != coordinate().toWafer())
@@ -176,7 +176,7 @@ auto FPGAHw::create_hicann(Coordinate::HICANNGlobal const& h) -> hicann_handle_t
 	}
 
 	uint8_t jtag_addr =  getPowerBackend().hicann_jtag_addr(h);
-	return boost::make_shared<HICANNHw>(h, getPowerBackend().get_reticle_ptr(dnc), jtag_addr);
+	return boost::make_shared<HICANNHw>(h, getPowerBackend().get_reticle_ptr(dnc), jtag_addr, request_highspeed);
 }
 
 boost::shared_ptr<facets::ReticleControl> FPGAHw::get_reticle(const Coordinate::DNCOnFPGA & d)

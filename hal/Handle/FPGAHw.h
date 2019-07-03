@@ -80,7 +80,7 @@ private:
 	std::shared_ptr<SpinnController> spinn_controller;
 	std::shared_ptr<RealtimeComm> realtime_comm;
 
-	hicann_handle_t create_hicann(Coordinate::HICANNGlobal const& h) override;
+	hicann_handle_t create_hicann(Coordinate::HICANNGlobal const& h, bool request_highspeed) override;
 #endif
 private:
 	// FPGA ip corresponding to FPGA coordinate

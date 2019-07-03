@@ -92,7 +92,7 @@ void FPGA::add_hicann(const dnc_coord_t & dnc, const hicann_coord_t & h, bool co
 {
 	if (!dnc_active(dnc))
 		throw std::runtime_error("Attempted to add a HICANN to an inactive DNC");
-	hicanns[dnc][h] = create_hicann(hicann(dnc, h));
+	hicanns[dnc][h] = create_hicann(hicann(dnc, h), request_highspeed);
 
 	if (request_highspeed)
 		highspeed_hicanns[dnc][h] = hicanns[dnc][h];

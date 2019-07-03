@@ -33,7 +33,7 @@ struct FPGAEss : public FPGAMixin<HICANNEss>
 
 private:
 #ifndef PYPLUSPLUS
-	hicann_handle_t create_hicann(Coordinate::HICANNGlobal const& h) override;
+	hicann_handle_t create_hicann(Coordinate::HICANNGlobal const& h, bool /*request_highspeed*/) override;
 #endif
 	boost::shared_ptr<Ess> mEss;
 };

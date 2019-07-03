@@ -4,8 +4,8 @@
 namespace HMF {
 namespace Handle {
 
-HICANN::HICANN(const Coordinate::HICANNGlobal & h) :
-	coord(h)
+HICANN::HICANN(const Coordinate::HICANNGlobal & h, bool request_highspeed) :
+	coord(h), m_highspeed(request_highspeed)
 {}
 
 bool HICANN::useScheriff() const {
@@ -16,11 +16,14 @@ Scheriff& HICANN::get_scheriff() const {
 	return Base().get_scheriff();
 }
 
-/// Equality operator checks coordinates
+/// Equality operator checks coordinates and highspeed
 bool HICANN::operator==(HICANN const& b) const {
-	return coordinate() == b.coordinate();
+	return (coordinate() == b.coordinate()) && (highspeed() == b.highspeed());
 }
 
+bool HICANN::highspeed() const {
+	return m_highspeed;
+}
 
 } // end namespace HMF
 } // end namespace Handle

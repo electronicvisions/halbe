@@ -116,7 +116,7 @@ protected:
 
 private:
 #ifndef PYPLUSPLUS
-	virtual hicann_handle_t create_hicann(Coordinate::HICANNGlobal const& h) = 0;
+	virtual hicann_handle_t create_hicann(Coordinate::HICANNGlobal const& h, bool request_highspeed = true) = 0;
 #endif
 
 	// FPGA coordinate
