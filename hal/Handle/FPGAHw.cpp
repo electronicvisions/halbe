@@ -6,9 +6,12 @@
 
 #include "hal/Coordinate/HMFGrid.h"
 #include "hal/Coordinate/iter_all.h"
+#include "hal/Coordinate/FormatHelper.h"
 
 #include "spinn_controller.h"
 #include "RealtimeComm.h"
+
+#include "slurm/vision_defines.h"
 
 namespace HMF {
 namespace Handle {
@@ -40,6 +43,9 @@ struct FPGAHw::FPGAHandlePIMPL {
 	{}
 
 	void init() {
+		if (!fpga.license_valid()) {
+			throw std::runtime_error("Missing license for " + Coordinate::short_format(fpga.coordinate()));
+		}
 		setup();
 		fpga.activate_dnc(dnc);
 		create_hicanns();
@@ -200,6 +206,19 @@ void freeFPGAHw(boost::shared_ptr<FPGAHw> & handle)
 	if (handle.use_count() != 1)
 		throw std::runtime_error("Too many instances of this Handle are out there...");
 	handle.reset();
+}
+
+std::optional<FPGA::license_t> FPGAHw::expected_license() const
+{
+	return Coordinate::slurm_license(coordinate());
+}
+
+bool FPGAHw::license_valid() const
+{
+	std::string const hardware_licenses = (std::getenv(vision_slurm_hardware_licenses_env_name) != nullptr)
+	                                          ? std::getenv(vision_slurm_hardware_licenses_env_name)
+	                                          : "";
+	return hardware_licenses.find(expected_license().value()) != std::string::npos;
 }
 
 } // namespace Handle

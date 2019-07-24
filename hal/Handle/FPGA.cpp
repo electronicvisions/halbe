@@ -98,5 +98,10 @@ void FPGA::add_hicann(const dnc_coord_t & dnc, const hicann_coord_t & h, bool co
 		highspeed_hicanns[dnc][h] = hicanns[dnc][h];
 }
 
+std::optional<FPGA::license_t> FPGA::expected_license() const
+{
+	return std::nullopt;
+}
+
 } // namespace Handle
 } // namespace HMF

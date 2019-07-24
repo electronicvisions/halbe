@@ -21,6 +21,7 @@ def depends(ctx):
     ctx('logger')
     ctx('vmodule')
     ctx('hate')
+    ctx('visions-slurm', branch='production')
     # please specify waf setup --project=XYZ --with-ess to enable ESS-build
     # for old build flow: use configure/build/install --with-ess
     if ctx.options.with_ess:
@@ -168,7 +169,8 @@ def build(bld):
         'vmodule_objects',
         's2hal_obj',
         'tud_jtag',
-        'rcf-boost-only'
+        'rcf-boost-only',
+        'visions-slurm_inc'
     ]
     bld.shlib(
         target          = 'halbe_handle',

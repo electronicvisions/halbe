@@ -74,6 +74,9 @@ struct FPGAHw : public FPGAMixin<HICANNHw>
 	SpinnController &get_spinn_controller() const;
 	RealtimeComm &get_realtime_comm() const;
 
+	std::optional<license_t> expected_license() const;
+	bool license_valid() const;
+
 private:
 	struct FPGAHandlePIMPL;
 	std::unique_ptr<FPGAHandlePIMPL> pimpl;

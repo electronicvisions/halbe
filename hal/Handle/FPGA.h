@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #ifndef PYPLUSPLUS
 #include <memory>
 #endif
@@ -104,6 +106,13 @@ struct FPGA : public Base
 
 	void setListenGlobalMode(bool listen);
 
+	typedef std::string license_t;
+#ifndef PYPLUSPLUS
+	/// Returns the expected license. Empty if no license is needed.
+	virtual std::optional<license_t> expected_license() const;
+	// Returns if license is valid. Defaults to true.
+	virtual bool license_valid() const { return true; }
+#endif
 
 protected:
 	FPGA(Coordinate::FPGAGlobal const c);
