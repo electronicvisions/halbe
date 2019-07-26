@@ -790,8 +790,8 @@ public:
 	};
 
 	PYPP_CONSTEXPR RepeaterBlock() :
-		drvresetb(1),
-		dllresetb(1),
+		drvresetb(!false), // heuristically it was found that not pulling drvreset helps locking
+		dllresetb(!true), // start with drivers in DLL reset
 		fextcap(0),
 		start_tdi(0),
 		start_tdo(0),
