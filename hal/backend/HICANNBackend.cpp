@@ -555,7 +555,7 @@ HALBE_GETTER(SynapseDriver, get_synapse_driver,
 		while(sc.driverbusy()) {} // TODO ECM: SF says => not necessary; only after next command
 		sc.read_data(facets::SynapseControl::sc_engmax+addr[i]);          // trigger
 		while(sc.driverbusy()) {}
-		gmax[i] = sc.read_data(facets::SynapseControl::sc_endrv+addr[i]); // retrieve
+		gmax[i] = sc.read_data(facets::SynapseControl::sc_engmax+addr[i]); // retrieve
 	}
 
 	//right drivers have registers shifted by 8 bits
