@@ -1,5 +1,6 @@
 #include <iostream>
 #include <chrono>
+#include "hal/Coordinate/FormatHelper.h"
 #include "hal/backend/HICANNBackendHelper.h"
 #include "hal/HICANN/FGInstruction.h"
 #include "hal/Coordinate/iter_all.h"
@@ -165,7 +166,7 @@ bool popexec_sc_write_data_queue(
 		while(sc.arraybusy());
 		idx++;
 	} else {
-		throw std::runtime_error("Cannot happen");
+		throw std::runtime_error("Cannot happen on " + short_format(h.coordinate()));
 	}
 
 	return true;
@@ -532,7 +533,9 @@ ci_data_t fg_read_answer(
 	// sanity check (might be unecessary, but never trust the hardware)
 	if (addr != facets::FGControl::REG_SLAVE)
 	{
-		throw std::runtime_error("fg_read_answer: fgcontrol address mismatch (REG_SLAVE)");
+		throw std::runtime_error(
+		    "fg_read_answer: fgcontrol address mismatch (REG_SLAVE) on " +
+		    short_format(h.coordinate()));
 	}
 
 	return value;
@@ -606,7 +609,8 @@ FGErrorResultRow fg_log_error(
 			LOG4CXX_ERROR(fglogger, "FG Cell " << data.get_cell()
 			                                   << " has been already reported as errornous, FG "
 			                                      "controller state machine seems to be fubar!");
-			throw std::runtime_error("fg_log_error controller error");
+			throw std::runtime_error(
+			    "fg_log_error controller error on " + short_format(h.coordinate()));
 		}
 
 		// save returned data to return data structure
@@ -614,7 +618,7 @@ FGErrorResultRow fg_log_error(
 
 		// FG controller read-out timeout
 		if (system_clock::now() > end_time)
-			throw std::runtime_error("fg_log_error timeout");
+			throw std::runtime_error("fg_log_error timeout on " + short_format(h.coordinate()));
 	}
 
 	// if we had an error, print it
@@ -636,7 +640,7 @@ FGErrorResultRow fg_busy_wait(
 	auto end_time = system_clock::now() + seconds(10);
 	do {
 		if (system_clock::now() > end_time)
-			throw std::runtime_error("fg_busy_wait timeout");
+			throw std::runtime_error("fg_busy_wait timeout on " + short_format(h.coordinate()));
 		value = fg_read_answer(h, b);
 
 		busy = FGErrorResult{value}.get_busy_flag();
@@ -797,7 +801,7 @@ void set_PLL_multiplier(
 	if (freq < 50.0 || freq > 250.0)
 	{
 		std::stringstream err;
-		err << "Invalid PLL frequency of " << freq << "MHz";
+		err << "Invalid PLL frequency of " << freq << "MHz on " + short_format(h.coordinate());
 		throw std::runtime_error(err.str());
 	}
 
