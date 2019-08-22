@@ -441,11 +441,29 @@ std::ostream& operator<<(std::ostream& os, Status const& o)
 	return os;
 }
 
+size_t SRAMControllerTimings::cycles_read() const
+{
+	return setup_precharge +
+	       additional_cycles_setup +
+	       read_delay +
+	       additional_cycles_read;
+}
+
+size_t SRAMControllerTimings::cycles_write() const
+{
+	return setup_precharge +
+	       additional_cycles_setup +
+	       write_delay +
+	       additional_cycles_write;
+}
+
 std::ostream& operator<<(std::ostream& os, SRAMControllerTimings const& o)
 {
 	os << "read delay: " << o.read_delay.value() << ", "
 	   << "setup precharge: " << o.setup_precharge.value() << ", "
-	   << "write delay: " << o.write_delay.value();
+	   << "write delay: " << o.write_delay.value() << '\n'
+	   << "cycles read: " << o.cycles_read() << '\n'
+	   << "cycles write: " << o.cycles_write() << '\n';
 	return os;
 }
 
@@ -629,6 +647,36 @@ void SynapseStatusRegister::serialize(Archiver& ar, unsigned const int)
 ////////////////////////////////////////////////////////////////////////////////
 // SynapseController
 
+size_t SynapseController::cycles_synarray(SynapseControllerCmd const& cmd) const
+{
+	switch(cmd)
+	{
+		case SynapseControllerCmd::IDLE:
+		case SynapseControllerCmd::AUTO:
+			return 0;
+		case SynapseControllerCmd::START_READ:
+		case SynapseControllerCmd::START_RDEC:
+			return cnfg_reg.synarray_timings.setup_precharge +
+			       cnfg_reg.synarray_timings.enable_delay +
+			       additional_cycles_synarray_rowopen;
+		case SynapseControllerCmd::READ:
+		case SynapseControllerCmd::RDEC:
+			return cnfg_reg.synarray_timings.output_delay +
+			       additional_cycles_synarray_read;
+		case SynapseControllerCmd::WRITE:
+		case SynapseControllerCmd::WDEC:
+			return cnfg_reg.synarray_timings.write_delay +
+			       additional_cycles_synarray_write;
+		case SynapseControllerCmd::CLOSE_ROW:
+			return additional_cycles_synarray_rowclose;
+		case SynapseControllerCmd::RST_CORR:
+			return cnfg_reg.synarray_timings.output_delay +
+			       additional_cycles_synarray_rst_corr;
+		default:
+			throw std::runtime_error("Unknown SynapseControllerCmd");
+	}
+}
+
 bool SynapseController::operator==(SynapseController const& s) const
 {
 	return (hate::compare_optional_equal(syn_in, s.syn_in, true) &&
@@ -711,6 +759,14 @@ std::ostream& operator<<(std::ostream& os, SynapseController const& s)
 	os << "SYN_RST:\n\t" << s.syn_rst << '\n';
 	os << s.lut << '\n';
 	os << s.syndrv_timings << '\n';
+	os << "cycles synarray open row: "
+	   << s.cycles_synarray(SynapseControllerCmd::START_READ) << '\n';
+	os << "cycles synarray read: "
+	   << s.cycles_synarray(SynapseControllerCmd::READ) << '\n';
+	os << "cycles synarray write: "
+	   << s.cycles_synarray(SynapseControllerCmd::WRITE) << '\n';
+	os << "cycles synarray close row: "
+	   << s.cycles_synarray(SynapseControllerCmd::CLOSE_ROW) << '\n';
 	return os;
 }
 

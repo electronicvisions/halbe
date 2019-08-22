@@ -350,16 +350,29 @@ public:
 	    SRAMWriteDelay wd = SRAMWriteDelay(8))
 	    : read_delay(rd), setup_precharge(sp), write_delay(wd) {}
 
+	// Returns the number of HICANN clock cycles needed for completion of a
+	// read from SRAM, i.e. controller is not busy anymore
+	size_t cycles_read() const;
+	// Returns the number of HICANN clock cycles needed for completion of a
+	// write to SRAM, i.e. controller is not busy anymore
+	size_t cycles_write() const;
+
 	SRAMReadDelay read_delay;
 	SRAMSetupPrecharge setup_precharge;
 	SRAMWriteDelay write_delay;
 
 	bool operator==(SRAMControllerTimings const& s) const {
-		return (read_delay == s.read_delay) && (setup_precharge == s.setup_precharge) &&
+		return (read_delay == s.read_delay) &&
+		       (setup_precharge == s.setup_precharge) &&
 		       (write_delay == s.write_delay);
 	}
 
 private:
+	// Estimated factors for state transitions
+	PYPP_INLINE(static size_t const, additional_cycles_setup, 2);
+	PYPP_INLINE(static size_t const, additional_cycles_read, 2);
+	PYPP_INLINE(static size_t const, additional_cycles_write, 2);
+
 	friend class boost::serialization::access;
 	template <typename Archiver>
 	void serialize(Archiver& ar, const unsigned int) {
@@ -1074,10 +1087,29 @@ public:
 	// Synapse driver timings
 	SRAMControllerTimings syndrv_timings;
 
+
+	/**
+	 * Returns the number of HICANN clock cycles the synapse controller needs
+	 * to perform a specific command cmd, i.e. number of cycles until the
+	 * controller is not busy anymore.
+	 *
+	 * @param cmd Command the synapse controller should perform
+	 *
+	 * @return Number of HICANN clock cycles needed to perform command
+	 */
+	size_t cycles_synarray(SynapseControllerCmd const& cmd) const;
+
 	bool operator==(SynapseController const& s) const;
 	bool operator!=(SynapseController const& s) const;
 
 private:
+	// Estimated factors accounting for state transitions
+	PYPP_INLINE(static size_t const, additional_cycles_synarray_rowopen, 4);
+	PYPP_INLINE(static size_t const, additional_cycles_synarray_read, 3);
+	PYPP_INLINE(static size_t const, additional_cycles_synarray_write, 4);
+	PYPP_INLINE(static size_t const, additional_cycles_synarray_rowclose, 3);
+	PYPP_INLINE(static size_t const, additional_cycles_synarray_rst_corr, 6);
+
 	friend class boost::serialization::access;
 	template <typename Archiver>
 	void serialize(Archiver& ar, unsigned const int);
