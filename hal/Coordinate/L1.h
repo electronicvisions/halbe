@@ -5,6 +5,7 @@
 namespace HMF {
 namespace Coordinate {
 
+using halco::hicann::v2::CrossbarSwitchOnHICANN;
 using halco::hicann::v2::SynapseSwitchOnHICANN;
 using halco::hicann::v2::HLineOnHICANN;
 using halco::hicann::v2::VLineOnHICANN;
