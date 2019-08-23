@@ -16,6 +16,7 @@ using halco::hicann::v2::NeuronOnHICANN;
 using halco::hicann::v2::NeuronOnWafer;
 using halco::hicann::v2::NeuronGlobal;
 using halco::hicann::v2::SynapticInputOnNeuron;
+using halco::hicann::v2::SynapticInputOnHICANN;
 
 } // Coordinate
 } // HMF
