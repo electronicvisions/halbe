@@ -283,6 +283,7 @@ public:
     Realtime::spike spin_and_get_next_realtime_pulse_as_custom(Handle::FPGA const &){ESS_NOT_IMPLEMENTED();return Realtime::spike{0u, 0u, 0u, 0u};}
     Realtime::spike_h spin_and_get_next_realtime_pulse_as_spinnaker(Handle::FPGA const &){ESS_NOT_IMPLEMENTED();return Realtime::spike_h{0u};}
 	void queue_spinnaker_realtime_pulse(Handle::FPGA &, Realtime::spike_h){ESS_NOT_IMPLEMENTED();};
+	void flush(Handle::FPGA const&) { ESS_DUMMY(); }
 
 //Functions of ADCBackend
 	typedef uint16_t raw_type;

@@ -3,6 +3,7 @@
 #include <chrono>
 #include <cstdint>
 #include <sstream>
+#include <thread>
 
 #include <boost/config.hpp>
 
@@ -915,6 +916,23 @@ HALBE_GETTER(Realtime::spike_h, spin_and_get_next_realtime_pulse_as_spinnaker,
 	ret.ntoh();
 	rc.free_receive();
 	return ret;
+}
+
+HALBE_SETTER(flush, Handle::FPGA &, f)
+{
+	sctrltp::ARQStream* const arq_ptr = f.getPowerBackend().get_host_al(f).getARQStream();
+
+	auto const start_of_flush = std::chrono::steady_clock::now();
+	while (!arq_ptr->all_packets_sent()) {
+		// wait for 500ms at most
+		auto const waited_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+				std::chrono::steady_clock::now() - start_of_flush).count();
+		if (waited_in_ms > 500) {
+			throw std::runtime_error("HMF::FPGA::flush: Wait for completion of transfer timed out");
+		}
+
+		std::this_thread::sleep_for(10ms);
+	}
 }
 
 } //namespace FPGA

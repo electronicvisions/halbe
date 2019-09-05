@@ -266,6 +266,16 @@ Realtime::spike spin_and_get_next_realtime_pulse_as_custom(
 Realtime::spike_h spin_and_get_next_realtime_pulse_as_spinnaker(
 	Handle::FPGA & f);
 
+/**
+ * Flush FPGA communication channel
+ *
+ * This function blocks until Host-FPGA communication channel is idle.
+ * The FPGA-Chip communication is not considered in this function.
+ * After a maximum waiting time of 500ms a runtime error is thrown.
+ *
+ */
+void flush(Handle::FPGA& f);
+
 
 } //namespace FPGA
 } //namespace HMF
