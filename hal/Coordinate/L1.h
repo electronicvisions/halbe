@@ -9,6 +9,8 @@ using halco::hicann::v2::CrossbarSwitchOnHICANN;
 using halco::hicann::v2::SynapseSwitchOnHICANN;
 using halco::hicann::v2::HLineOnHICANN;
 using halco::hicann::v2::VLineOnHICANN;
+using halco::hicann::v2::HLineOnWafer;
+using halco::hicann::v2::VLineOnWafer;
 using halco::hicann::v2::BackgroundGeneratorOnHICANN;
 using halco::hicann::v2::DNCMergerOnHICANN;
 using halco::hicann::v2::DNCMergerOnWafer;
