@@ -33,7 +33,8 @@ static const std::vector<std::pair<int, std::string>> bitfile_whitelist = {
 	{2, "14a549d1"},
 	{2, "6ff130"},
 	{2, "10d79fae"},
-	{2, "1bbb73a"}
+	{2, "1bbb73a"},
+	{2, "f8d825"}
 };
 
 namespace HMF {
