@@ -89,7 +89,7 @@ def build(bld):
     bld(
         features        = 'use',
         target          = 'halbe_coordinate_inc',
-        use             = ['halco_hicann_v2_inc'],
+        use             = ['halco_inc'],
         export_includes = ['.'],
     )
 
