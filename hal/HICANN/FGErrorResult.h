@@ -4,9 +4,7 @@
 #include <boost/serialization/serialization.hpp>
 
 #include "hal/Coordinate/geometry.h"
-#ifndef PYPLUSPLUS
 #include "hal/Coordinate/typed_array.h"
-#endif // PYPLUSPLUS
 #include "hal/HICANN/FGBlock.h"
 
 
@@ -100,13 +98,11 @@ struct FGErrorResultQuadRow {
 	friend std::ostream& operator<< (std::ostream& os, FGErrorResultQuadRow const& fgeqr);
 
 private:
-#ifndef PYPLUSPLUS
 	Coordinate::typed_array<FGErrorResultRow, Coordinate::FGBlockOnHICANN> m_quad_row_results;
 
 	friend class boost::serialization::access;
 	template<typename Archiver>
 	void serialize(Archiver& ar, unsigned int const);
-#endif // PYPLUSPLUS
 };
 
 

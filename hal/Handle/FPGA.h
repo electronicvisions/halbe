@@ -12,10 +12,7 @@
 #include "hal/Handle/HICANN.h"
 
 #include "hal/Coordinate/HMFGeometry.h"
-
-#ifndef PYPLUSPLUS
 #include "hal/Coordinate/typed_array.h"
-#endif
 
 // fwd decl
 struct SpinnController;
@@ -143,7 +140,6 @@ private:
 	// FPGA operates in listen global Mode, i.e. synchronized multi FPGA Experiment
 	bool m_listen_global;
 
-#ifndef PYPLUSPLUS
 	// attached HICANNs
 	// FIXME: this array should be list of actually used hicanns and not all available hicanns
 	Coordinate::typed_array<Coordinate::typed_array<hicann_handle_t, hicann_coord_t>, dnc_coord_t>
@@ -156,7 +152,6 @@ private:
 	// HICANNs that can be used (e.g. return correct JTAG id)
 	Coordinate::typed_array<Coordinate::typed_array<hicann_handle_t, hicann_coord_t>, dnc_coord_t>
 	    usable_hicanns;
-#endif
 };
 
 template <typename FPGAType>
