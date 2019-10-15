@@ -341,9 +341,9 @@ class SRAMControllerTimings {
 
 public:
 	explicit PYPP_CONSTEXPR SRAMControllerTimings(
-	    SRAMReadDelay rd = SRAMReadDelay(SRAMReadDelay::max),
-	    SRAMSetupPrecharge sp = SRAMSetupPrecharge(SRAMSetupPrecharge::max),
-	    SRAMWriteDelay wd = SRAMWriteDelay(SRAMWriteDelay::max))
+	    SRAMReadDelay rd = SRAMReadDelay(64),
+	    SRAMSetupPrecharge sp = SRAMSetupPrecharge(8),
+	    SRAMWriteDelay wd = SRAMWriteDelay(8))
 	    : read_delay(rd), setup_precharge(sp), write_delay(wd) {}
 
 	SRAMReadDelay read_delay;
@@ -412,7 +412,6 @@ public:
 		fast_I_gladapt(0),
 		slow_I_gl(0),
 		fast_I_gl(0),
-		timings(SRAMReadDelay(64), SRAMSetupPrecharge(8), SRAMWriteDelay(8)),
 		reset_neuron(false),
 		reset_spl1(false)
 	{}
@@ -797,8 +796,7 @@ public:
 		start_tdo(0),
 		full_flag(0),
 		tdi_data(), //container to store test input packets
-		tdo_data(), //container to store test output packets
-		timings(SRAMReadDelay(64), SRAMSetupPrecharge(8), SRAMWriteDelay(8))
+		tdo_data() //container to store test output packets
 	{}
 
 	bool                     drvresetb;
