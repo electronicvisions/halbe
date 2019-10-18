@@ -119,7 +119,7 @@ TEST_F(Layer2Test, HICANNLoopbackHWTest) {
 
 		Logger& log = Logger::instance();
 		log(Logger::INFO) << "Start Playback writing";
-		FPGA::write_playback_pulses(f, pc, runtime_in_dnc_cycles, /* fpga_hicann_delay */ 63); // 63 fpga_clk cycles are 504 nano seconds
+		FPGA::write_playback_program(f, pc, runtime_in_dnc_cycles, /* fpga_hicann_delay */ 63, true /*enable trace recording*/); // 63 fpga_clk cycles are 504 nano seconds
 		log(Logger::INFO) << "Start Playback writing done";
 		usleep(1000);
 		FPGA::prime_experiment(f);
@@ -187,7 +187,7 @@ TEST_F(Layer2Test, PlaybackTraceSimpleHWTest) {
 
 	Logger& log = Logger::instance();
 	log(Logger::INFO) << "Start Playback writing";
-	FPGA::write_playback_pulses(f, pc, runtime_in_dnc_cycles, /* fpga_hicann_delay */ 63); // 63 fpga_clk cycles are 504 nano seconds
+	FPGA::write_playback_program(f, pc, runtime_in_dnc_cycles, /* fpga_hicann_delay */ 63, true /*enable space recording*/); // 63 fpga_clk cycles are 504 nano seconds
 	log(Logger::INFO) << "Start Playback writing done";
 	FPGA::prime_experiment(f);
 	FPGA::start_experiment(f);
@@ -265,7 +265,7 @@ TEST_F(Layer2Test, PlaybackTraceTwiceHWTest) {
 		Logger& log = Logger::instance();
 		log(Logger::INFO) << "Run " << i;
 		log(Logger::INFO) << "Start Playback writing";
-		FPGA::write_playback_pulses(f, pc, runtime_in_dnc_cycles, /* fpga_hicann_delay */ 63); // 63 fpga_clk cycles are 504 nano seconds
+		FPGA::write_playback_program(f, pc, runtime_in_dnc_cycles, /* fpga_hicann_delay */ 63, true /*enable trace recording*/); // 63 fpga_clk cycles are 504 nano seconds
 		log(Logger::INFO) << "Start Playback writing done";
 		FPGA::prime_experiment(f);
 		FPGA::start_experiment(f);

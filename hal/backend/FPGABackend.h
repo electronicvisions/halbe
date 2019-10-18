@@ -122,12 +122,14 @@ void set_fpga_background_generator(
  * @param fpga_hicann_delay  number of FPGA clk cycles (8ns), by which pulses 
  * are released in the FPGA BEFORE the time specified in the FPGAPulseEvents in
  * the pulse list
+ * @param enable_trace_recording if true, FPGA records from HICANN
  */
-void write_playback_pulses(
+void write_playback_program(
 	Handle::FPGA & f,
 	PulseEventContainer const& st,
 	PulseEvent::spiketime_t runtime,
-	uint16_t fpga_hicann_delay
+	uint16_t fpga_hicann_delay,
+	bool enable_trace_recording
 	);
 
 /**

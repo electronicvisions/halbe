@@ -2110,15 +2110,15 @@ void HAL2ESS::reset(Handle::FPGA const& )
 void HAL2ESS::set_fpga_background_generator(Handle::FPGA const&, Coordinate::DNCOnFPGA const, FPGA::BackgroundGenerator const&)
 {}
 
-void HAL2ESS::write_playback_pulses(Handle::FPGA const& f, FPGA::PulseEventContainer const& st, FPGA::PulseEvent::spiketime_t /*runtime*/, uint16_t fpga_hicann_delay)
+void HAL2ESS::write_playback_program(Handle::FPGA const& f, FPGA::PulseEventContainer const& st, FPGA::PulseEvent::spiketime_t /*runtime*/, uint16_t fpga_hicann_delay, bool /*enable_trace_recording*/)
 {
 	size_t fpga_id = f.coordinate().value();
 	auto & playback_pulses = mFPGAConfig[fpga_id].playback_pulses;
 
-	// several calls of write_playback_pulses are currently not allowed here, as we don't track the last fpga release time in this function.
+	// several calls of write_playback_program are currently not allowed here, as we don't track the last fpga release time in this function.
 	// Hence, the existing pulses are cleared. 
 	if ( playback_pulses.size() ) {
-		LOG4CXX_WARN(_logger, "write_playback_pulses (..): There are already " << playback_pulses.size() << " pulses, which will be overwritten!");
+		LOG4CXX_WARN(_logger, "write_playback_program (..): There are already " << playback_pulses.size() << " pulses, which will be overwritten!");
 		playback_pulses.clear();
 	}
 
@@ -2145,7 +2145,7 @@ void HAL2ESS::write_playback_pulses(Handle::FPGA const& f, FPGA::PulseEventConta
 		LostEventLogger::count_pre_sim();
 
 		if (pulse_event.getTime() < fpga_hicann_delay*2)
-			throw std::runtime_error("write_playback_pulses: the time of the PulseEvent in the spike list has to be greater or equal than fpga_hicann_delay*2");
+			throw std::runtime_error("write_playback_program: the time of the PulseEvent in the spike list has to be greater or equal than fpga_hicann_delay*2");
 		uint64_t rel_time_in_fpga_clks = pulse_event.getTime()/2 - fpga_hicann_delay; // 1 fpga clk = 2 dnc clk
 
 		int delta_time_in_fpga_cycles = rel_time_in_fpga_clks - prev_rel_time_in_fpga_clks;
@@ -2161,7 +2161,7 @@ void HAL2ESS::write_playback_pulses(Handle::FPGA const& f, FPGA::PulseEventConta
 			// drop event
 			LostEventLogger::log_pre_sim();
 			if (num_times_warning_called < 5 ) {
-				LOG4CXX_WARN(_logger, "write_playback_pulses (..): Pulses come to close. Have to drop pulse " << pulse_event);
+				LOG4CXX_WARN(_logger, "write_playback_program (..): Pulses come to close. Have to drop pulse " << pulse_event);
 				num_times_warning_called++;
 				if (num_times_warning_called == 5 ){
 					LOG4CXX_WARN(_logger, "\tFuture warnings will be suppressed");

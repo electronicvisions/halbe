@@ -400,13 +400,18 @@ HALBE_SETTER_GUARDED(EventSetupL2,
 
 // TODO: uint16_t is ugly!
 HALBE_SETTER_GUARDED(EventSetupL2,
-	write_playback_pulses,
+	write_playback_program,
 	Handle::FPGA &, f,
 	PulseEventContainer const&, st,
 	PulseEvent::spiketime_t, runtime,
-	uint16_t,fpga_hicann_delay)
+	uint16_t,fpga_hicann_delay,
+	bool, enable_trace_recording)
 {
 	HostALController& host_al = f.getPowerBackend().get_host_al(f);
+
+	host_al.addPlaybackFPGAConfig(
+	    0 /*time*/, false /*end_mark*/, false /*stop trace*/, false /*start trace read*/,
+	    !enable_trace_recording /*block trace recording*/);
 
 	size_t const npulses = st.size();
 	uint64_t last_fpga_time = 0;
@@ -414,7 +419,7 @@ HALBE_SETTER_GUARDED(EventSetupL2,
 		PulseEvent pe = st[n];
 		if (pe.getTime() < fpga_hicann_delay*2)
 			throw std::runtime_error(
-				"write_playback_pulses: the time of the PulseEvent in the spike "
+				"write_playback_program: the time of the PulseEvent in the spike "
 				"list has to be greater or equal than fpga_hicann_delay*2");
 		last_fpga_time = pe.getTime()/2 - fpga_hicann_delay;
 		uint16_t id =  pe.getLabel();
@@ -425,14 +430,15 @@ HALBE_SETTER_GUARDED(EventSetupL2,
 	// Calculate EoE timestamp in FPGA clock cycles, devide by two as DNC frequency == 2 * FPGA frequency
 	size_t end_of_experiment_timestamp = (runtime + 1) / 2;
 	if (end_of_experiment_timestamp < last_fpga_time)
-		throw std::runtime_error("write_playback_pulses: runtime shorter than spike trains length");
+		throw std::runtime_error("write_playback_program: runtime shorter than spike trains length");
 
 	// Add end of experiment marker
 	host_al.addPlaybackFPGAConfig(
-	    end_of_experiment_timestamp, true /*end_mark*/, true /*stop trace*/, true /*start trace read*/);
+	    end_of_experiment_timestamp, true /*end_mark*/, true /*stop trace*/,
+	    true /*start trace read*/, false /*block trace read*/);
 	bool success = host_al.flushPlaybackPulses();
 	if (!success)
-		throw std::runtime_error("write_playback_pulses: failed to send pulse packets to FPGA");
+		throw std::runtime_error("write_playback_program: failed to send pulse packets to FPGA");
 }
 
 // FIXME: Adapt scheriff to upcoming canonical state machine from spec

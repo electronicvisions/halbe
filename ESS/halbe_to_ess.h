@@ -241,7 +241,7 @@ public:
 //functions of FPGABackend
     void reset(Handle::FPGA const&);
     void set_fpga_background_generator(Handle::FPGA const& f, Coordinate::DNCOnFPGA const d, FPGA::BackgroundGenerator const& bg);
-    void write_playback_pulses(Handle::FPGA const& f, FPGA::PulseEventContainer const& st, FPGA::PulseEvent::spiketime_t runtime, uint16_t fpga_hicann_delay);
+    void write_playback_program(Handle::FPGA const& f, FPGA::PulseEventContainer const& st, FPGA::PulseEvent::spiketime_t runtime, uint16_t fpga_hicann_delay, bool enable_trace_recording);
 	bool get_pbmem_buffering_completed(Handle::FPGA & f);
 	FPGA::AlmostSortedPulseEvents read_trace_pulses(Handle::FPGA const& f, FPGA::PulseEvent::spiketime_t runtime, bool drop_background_events = false);
     //dummy implementetions, not needed for ESS afaik
