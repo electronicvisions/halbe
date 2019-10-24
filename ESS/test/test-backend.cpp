@@ -7,7 +7,6 @@
 #include "bitter/integral.h"
 
 #include "hal/backend/HMFBackend.h"
-#include "hal/HMFUtil.h"
 //#include "neuronbuilder_control.h"
 
 //include halbe types

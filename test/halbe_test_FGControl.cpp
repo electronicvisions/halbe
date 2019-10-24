@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include "hal/HMFUtil.h"
 #include "hal/HICANN/FGControl.h"
 
 using namespace std;

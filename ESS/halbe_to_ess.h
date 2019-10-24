@@ -13,7 +13,6 @@
 //HALbe datatypes
 #include "hal/DNCContainer.h"
 #include "hal/FPGAContainer.h"
-#include "hal/HMFUtil.h"
 #include "hal/Coordinate/HMFGeometry.h"
 #include "hal/HICANNContainer.h"
 #include "hal/HICANN/FGConfig.h"
@@ -301,18 +300,12 @@ public:
 //Functions of SupportBackend
     void set_hicann_reset(Coordinate::IPv4 const&, Coordinate::HICANNGlobal const&, bool){ESS_DUMMY();}
 	void set_reticle_power(Coordinate::IPv4 const&, Coordinate::DNCGlobal const&, bool){ESS_DUMMY();}
-    HMF::Support::Power::ReticleStatus get_reticle_status(HMF::Coordinate::IPv4 const&, HMF::Coordinate::DNCGlobal const&)
-	{ESS_DUMMY();return HMF::Support::Power::ReticleStatus();}
-    HMF::Support::Power::PsbVoltages get_psb_voltages(HMF::Coordinate::IPv4 const&)
-    {ESS_DUMMY();return HMF::Support::Power::PsbVoltages();}
     void voh_up(Handle::PMU &){ESS_DUMMY();}
 	void voh_down(Handle::PMU &){ESS_DUMMY();}
 	void vol_up(Handle::PMU &){ESS_DUMMY();}
 	void vol_down(Handle::PMU &){ESS_DUMMY();}
 	void resetVoltages(Handle::PMU &){ESS_DUMMY();}
 	void set_L1_voltages(Handle::HICANN &, float, float){ESS_DUMMY();}
-	HMF::Support::Power::SystemTemperatures get_system_temperatures(HMF::Coordinate::IPv4 const&)
-    {ESS_DUMMY();return HMF::Support::Power::SystemTemperatures();}
 
 // Public non-halbe funcions
     // retunrs the adex-model-parameter of nrn

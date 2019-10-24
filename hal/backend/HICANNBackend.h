@@ -4,7 +4,6 @@
 
 #include "hal/Coordinate/HMFGeometry.h"
 #include "hal/HICANN.h"
-#include "hal/HMFUtil.h"
 
 namespace HMF {
 

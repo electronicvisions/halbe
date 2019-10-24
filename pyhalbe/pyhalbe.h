@@ -28,5 +28,4 @@
 #endif
 
 // Stuff
-#include "hal/HMFUtil.h"
 #include "hal/Coordinate/FormatHelper.h"
