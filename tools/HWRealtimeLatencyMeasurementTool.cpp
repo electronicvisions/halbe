@@ -65,7 +65,9 @@ void HWRealtimeLatencyMeasurementTool::configureHardware() {
 	size_t runtime_in_dnc_clock_cycles = 400; //arbitrary number is arbitrary
 
 	// do experiment before (copied from BV's python-based test)
-	HMF::FPGA::write_playback_program(f, HMF::FPGA::PulseEventContainer(), runtime_in_dnc_clock_cycles, 63, true /*enable trace recording*/);
+	HMF::FPGA::write_playback_program(
+	    f, HMF::FPGA::PulseEventContainer(), runtime_in_dnc_clock_cycles, 63,
+	    true /*enable trace recording*/, true /*drop background events*/);
 	HMF::FPGA::prime_experiment(f);
 	HMF::FPGA::start_experiment(f);
 	HMF::FPGA::read_trace_pulses(f, runtime_in_dnc_clock_cycles);

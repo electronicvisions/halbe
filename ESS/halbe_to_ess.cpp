@@ -2110,7 +2110,13 @@ void HAL2ESS::reset(Handle::FPGA const& )
 void HAL2ESS::set_fpga_background_generator(Handle::FPGA const&, Coordinate::DNCOnFPGA const, FPGA::BackgroundGenerator const&)
 {}
 
-void HAL2ESS::write_playback_program(Handle::FPGA const& f, FPGA::PulseEventContainer const& st, FPGA::PulseEvent::spiketime_t /*runtime*/, uint16_t fpga_hicann_delay, bool /*enable_trace_recording*/)
+void HAL2ESS::write_playback_program(
+    Handle::FPGA const& f,
+    FPGA::PulseEventContainer const& st,
+    FPGA::PulseEvent::spiketime_t /*runtime*/,
+    uint16_t fpga_hicann_delay,
+    bool /*enable_trace_recording*/,
+    bool /*drop_background_events*/)
 {
 	size_t fpga_id = f.coordinate().value();
 	auto & playback_pulses = mFPGAConfig[fpga_id].playback_pulses;
@@ -2190,13 +2196,13 @@ bool HAL2ESS::get_pbmem_buffering_completed(Handle::FPGA & /*f*/)
 
 //returns the PulseEventContainer with the Events that where read out during the simulation
 //call after the simulation has run!!
-FPGA::AlmostSortedPulseEvents HAL2ESS::read_trace_pulses(Handle::FPGA const& f, FPGA::PulseEvent::spiketime_t /*runtime*/, bool drop_background_events)
+std::vector<FPGA::PulseEvent> HAL2ESS::read_trace_pulses(
+    Handle::FPGA const& f, FPGA::PulseEvent::spiketime_t /*runtime*/)
 {
 	size_t fpga_id = f.coordinate().value();
 	mvirtual_hw->pcb_i.at(0)->get_fpga(fpga_id)->setStopTrace(true);
 
-	size_t dropped_events = 0;
-	FPGA::AlmostSortedPulseEvents::container_type rv;
+	std::vector<FPGA::PulseEvent> rv;
 	static const size_t  dnc_cycle_length = (1<<TIMESTAMP_WIDTH); // number of dnc cycles after which the counter overflow occurs.
 	if(mvirtual_hw->pcb_i[0]->get_fpga(fpga_id)->getStopTrace()) {
 		auto trace_pulses = mvirtual_hw->pcb_i[0]->get_fpga(fpga_id)->getTracePulses();
@@ -2204,11 +2210,6 @@ FPGA::AlmostSortedPulseEvents HAL2ESS::read_trace_pulses(Handle::FPGA const& f, 
 		for (auto pulse : trace_pulses ) {
 			auto fpga_time = pulse.fpga_time;
 			auto pulse_event = pulse.event;
-
-			if (drop_background_events && pulse_event.getNeuronAddress().value() == 0) {
-				++dropped_events;
-				continue;
-			}
 
 			auto time_stamp = pulse_event.getTime();
 			// compute overflow count from fpga time
@@ -2225,7 +2226,7 @@ FPGA::AlmostSortedPulseEvents HAL2ESS::read_trace_pulses(Handle::FPGA const& f, 
 	{
 		LOG4CXX_WARN(_logger, "read_trace_pulses:fpga_id = " << fpga_id << " You tried to read out traces before calling stop_trace_memory" );
 	}
-	return FPGA::AlmostSortedPulseEvents(std::move(rv), dropped_events);
+	return rv;
 }
 
 //************

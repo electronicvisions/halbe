@@ -406,36 +406,6 @@ private:
 std::ostream& operator<< (std::ostream& o, PulseEvent const & p);
 
 /**
- * @brief Stream of almost-sorted pulse events as read out by #read_trace_pulses().
- * @note This should only be used as the return type of #read_trace_pulses().
- * @see PulseEventContainer
- */
-struct AlmostSortedPulseEvents {
-	typedef std::vector<PulseEvent> container_type;
-
-	AlmostSortedPulseEvents();
-	AlmostSortedPulseEvents(container_type const& events_, size_t dropped_events_ = 0);
-#ifndef PYPLUSPLUS
-	AlmostSortedPulseEvents(container_type&& events_, size_t dropped_events_ = 0);
-#endif // !PYPLUSPLUS
-
-	container_type events;
-	size_t dropped_events;
-
-private:
-	friend class boost::serialization::access;
-	template<typename Archiver>
-	void serialize(Archiver& ar, const unsigned int)
-	{
-		// clang-format off
-		using namespace boost::serialization;
-		ar & make_nvp("events", events)
-		   & make_nvp("dropped_events", dropped_events);
-		// clang-format on
-	}
-}; // AlmostSortedPulseEvents
-
-/**
  * @brief Contains pulse events (e.g. for 8 HICANNs of the same reticle), sorted by time.
  */
 struct PulseEventContainer
@@ -444,12 +414,10 @@ public:
 	typedef std::vector<PulseEvent> container_type;
 
 	PulseEventContainer();
-	PulseEventContainer(container_type const& data, bool is_almost_sorted = false);
-	PulseEventContainer(AlmostSortedPulseEvents const& data);
+	PulseEventContainer(container_type const& data);
 
 #ifndef PYPLUSPLUS
-	PulseEventContainer(container_type&& data, bool is_almost_sorted = false);
-	PulseEventContainer(AlmostSortedPulseEvents&& data);
+	PulseEventContainer(container_type&& data);
 #endif // !PYPLUSPLUS
 
 	void clear();
@@ -475,7 +443,7 @@ public:
 
 	bool operator!=(const PulseEventContainer& other) const;
 private:
-	void sort(bool is_almost_sorted);
+	void sort();
 
 	container_type m_events;
 

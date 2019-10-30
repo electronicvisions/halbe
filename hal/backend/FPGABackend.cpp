@@ -404,10 +404,18 @@ HALBE_SETTER_GUARDED(EventSetupL2,
 	Handle::FPGA &, f,
 	PulseEventContainer const&, st,
 	PulseEvent::spiketime_t, runtime,
-	uint16_t,fpga_hicann_delay,
-	bool, enable_trace_recording)
+	uint16_t, fpga_hicann_delay,
+	bool, enable_trace_recording,
+	bool, drop_background_events)
 {
 	HostALController& host_al = f.getPowerBackend().get_host_al(f);
+	ReticleControl& reticle = f.getPowerBackend().get_reticle(f, Coordinate::DNCOnFPGA());
+	for (auto hicann : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>()) {
+		reticle.jtag->K7FPGA_set_hicannif(hicann.toEnum());
+		// filter all events where neuron address bits are 0
+		reticle.jtag->K7FPGA_set_neuron_addr_filter(
+		    0b111111111, drop_background_events ? 0b111000000 : 0b111111111);
+	}
 
 	host_al.addPlaybackFPGAConfig(
 	    0 /*time*/, false /*end_mark*/, false /*stop trace*/, false /*start trace read*/,
@@ -450,11 +458,9 @@ HALBE_GETTER(bool, get_pbmem_buffering_completed,
 	return (host_al.getPlaybackEndAddress() != 0);
 }
 
-HALBE_GETTER(AlmostSortedPulseEvents, read_trace_pulses,
+HALBE_GETTER(PulseEventContainer::container_type, read_trace_pulses,
 	Handle::FPGA &, f,
-	PulseEvent::spiketime_t const, runtime,
-	bool const, drop_background_events
-	)
+	PulseEvent::spiketime_t const, runtime)
 {
 	// We have to handle all possible types of packets described in section
 	// "I-10.2.1. FPGA Trace / Pulse Data" of the specification, i.e. pulse
@@ -509,12 +515,10 @@ HALBE_GETTER(AlmostSortedPulseEvents, read_trace_pulses,
 		} \
 	}
 
-	size_t dropped_events = 0;
-	AlmostSortedPulseEvents::container_type pulse_events;
+	PulseEventContainer::container_type pulse_events;
 	auto const receive_pulse_events =
-		[trace_enabled, drop_background_events, &dropped_events, &pulse_events,
-		 &trace_overflow_count,
-		 &f](sctrltp::ARQStream* const arq_ptr) -> std::tuple<bool, std::uint64_t> {
+	    [trace_enabled, &pulse_events, &trace_overflow_count,
+	     &f](sctrltp::ARQStream* const arq_ptr) -> std::tuple<bool, std::uint64_t> {
 
 		bool received_eot = false;
 		std::uint64_t received_pulse_events_count = 0;
@@ -652,11 +656,6 @@ HALBE_GETTER(AlmostSortedPulseEvents, read_trace_pulses,
 				// used to decide when to timeout below.
 				++received_pulse_events_count;
 
-				if (drop_background_events && !(entry.event.label & HICANN::L1Address::max)) {
-					++dropped_events;
-					continue;
-				}
-
 				pulse_events.push_back(
 					PulseEvent(PulseAddress(entry.event.label), full_timestamp));
 			}
@@ -665,11 +664,6 @@ HALBE_GETTER(AlmostSortedPulseEvents, read_trace_pulses,
 	}; // receive_pulse_events
 
 #undef HALBE_RTP_TRACE
-
-	if (drop_background_events) {
-		LOG4CXX_INFO(logger, HMF::Coordinate::short_format(f.coordinate())
-		                         << " background pulse events will be dropped");
-	}
 
 	HostALController& host_al = f.getPowerBackend().get_host_al(f);
 	unsigned int sleep_duration_in_us = 500;
@@ -734,11 +728,11 @@ HALBE_GETTER(AlmostSortedPulseEvents, read_trace_pulses,
 			throw std::runtime_error("usleep failed in read_trace_pulses");
 		}
 	}
-	LOG4CXX_INFO(logger, HMF::Coordinate::short_format(f.coordinate())
-	                         << " received " << (dropped_events + pulse_events.size())
-	                         << " pulse events");
+	LOG4CXX_INFO(
+	    logger, HMF::Coordinate::short_format(f.coordinate())
+	                << " received " << pulse_events.size() << " pulse events");
 
-	return AlmostSortedPulseEvents(std::move(pulse_events), dropped_events);
+	return pulse_events;
 }
 
 

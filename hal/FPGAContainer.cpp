@@ -207,23 +207,6 @@ std::ostream& operator<< (std::ostream& o, PulseEvent const & p) {
 		<< ", Time: " << p.getTime();
 	return o;
 }
-////////////////////////////////////////////////////////////////////////////////
-// PulseEventStream
-
-AlmostSortedPulseEvents::AlmostSortedPulseEvents() : events(), dropped_events()
-{
-}
-
-AlmostSortedPulseEvents::AlmostSortedPulseEvents(
-	container_type const& events_, size_t const dropped_events_)
-	: events(events_), dropped_events(dropped_events_)
-{
-}
-
-AlmostSortedPulseEvents::AlmostSortedPulseEvents(container_type&& events_, size_t dropped_events_)
-	: events(std::move(events_)), dropped_events(dropped_events_)
-{
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // PulseEventContainer
@@ -232,28 +215,14 @@ PulseEventContainer::PulseEventContainer() : m_events()
 {
 }
 
-PulseEventContainer::PulseEventContainer(container_type const& data, bool const is_almost_sorted)
-	: m_events(data)
+PulseEventContainer::PulseEventContainer(container_type const& data) : m_events(data)
 {
-	sort(is_almost_sorted);
+	sort();
 }
 
-PulseEventContainer::PulseEventContainer(container_type&& data, bool const is_almost_sorted)
-	: m_events(std::move(data))
+PulseEventContainer::PulseEventContainer(container_type&& data) : m_events(std::move(data))
 {
-	sort(is_almost_sorted);
-}
-
-PulseEventContainer::PulseEventContainer(AlmostSortedPulseEvents const& data)
-	: m_events(data.events)
-{
-	sort(true);
-}
-
-PulseEventContainer::PulseEventContainer(AlmostSortedPulseEvents&& data)
-	: m_events(std::move(data.events))
-{
-	sort(true);
+	sort();
 }
 
 void PulseEventContainer::clear()
@@ -280,13 +249,9 @@ size_t PulseEventContainer::size() const
 	return m_events.size();
 }
 
-void PulseEventContainer::sort(bool const is_almost_sorted)
+void PulseEventContainer::sort()
 {
-	if (is_almost_sorted) {
-		insertion_sort(m_events.begin(), m_events.end());
-	} else {
-		std::sort(m_events.begin(), m_events.end());
-	}
+	std::sort(m_events.begin(), m_events.end());
 }
 
 bool PulseEventContainer::operator==(PulseEventContainer const& other) const {

@@ -112,25 +112,26 @@ void set_fpga_background_generator(
 	Coordinate::DNCOnFPGA const d,
 	BackgroundGenerator const& bg);
 
-/** 
+/**
  * Writes pulses into the FPGA playback memory (DDR2).
  *
  * Pulses are appended to the list of pulses in the DDR2 memory
  *
  * @param st                 Pulse list
  * @param runtime            Experiment runtime in dnc cycles
- * @param fpga_hicann_delay  number of FPGA clk cycles (8ns), by which pulses 
+ * @param fpga_hicann_delay  number of FPGA clk cycles (8ns), by which pulses
  * are released in the FPGA BEFORE the time specified in the FPGAPulseEvents in
  * the pulse list
  * @param enable_trace_recording if true, FPGA records from HICANN
+ * @param drop_background_events if true, FPGA does not record L1 events with address 0
  */
 void write_playback_program(
-	Handle::FPGA & f,
-	PulseEventContainer const& st,
-	PulseEvent::spiketime_t runtime,
-	uint16_t fpga_hicann_delay,
-	bool enable_trace_recording
-	);
+    Handle::FPGA& f,
+    PulseEventContainer const& st,
+    PulseEvent::spiketime_t runtime,
+    uint16_t fpga_hicann_delay,
+    bool enable_trace_recording,
+    bool drop_background_events);
 
 /**
  * Check if end-of-experiment FPGA config packet was acknowledged by FPGA
@@ -142,15 +143,11 @@ bool get_pbmem_buffering_completed(Handle::FPGA & f);
  * @brief Read pulses from the FPGA trace memory (DDR2).
  * 
  * @param runtime Experiment runtime in dnc cycles
- * @param drop_background_events Whether pulse events with L1 address zero should be dropped.
  * @note Before reading the pulses the the trace memory is stopped to make sure that no
  *       new pulses enter the memory during read out.
  */
-AlmostSortedPulseEvents read_trace_pulses(
-	Handle::FPGA & f,
-	PulseEvent::spiketime_t runtime,
-	bool drop_background_events = false
-	);
+PulseEventContainer::container_type read_trace_pulses(
+    Handle::FPGA& f, PulseEvent::spiketime_t runtime);
 
 /**
 *  Set port that the SpiNNaker pulse interface reacts on.

@@ -241,10 +241,17 @@ public:
 //functions of FPGABackend
     void reset(Handle::FPGA const&);
     void set_fpga_background_generator(Handle::FPGA const& f, Coordinate::DNCOnFPGA const d, FPGA::BackgroundGenerator const& bg);
-    void write_playback_program(Handle::FPGA const& f, FPGA::PulseEventContainer const& st, FPGA::PulseEvent::spiketime_t runtime, uint16_t fpga_hicann_delay, bool enable_trace_recording);
+	void write_playback_program(
+	    Handle::FPGA const& f,
+	    FPGA::PulseEventContainer const& st,
+	    FPGA::PulseEvent::spiketime_t runtime,
+	    uint16_t fpga_hicann_delay,
+	    bool enable_trace_recording,
+	    bool drop_background_events = false);
 	bool get_pbmem_buffering_completed(Handle::FPGA & f);
-	FPGA::AlmostSortedPulseEvents read_trace_pulses(Handle::FPGA const& f, FPGA::PulseEvent::spiketime_t runtime, bool drop_background_events = false);
-    //dummy implementetions, not needed for ESS afaik
+	std::vector<FPGA::PulseEvent> read_trace_pulses(
+	    Handle::FPGA const& f, FPGA::PulseEvent::spiketime_t runtime);
+	//dummy implementetions, not needed for ESS afaik
     void reset(Handle::FPGA const&, FPGA::Reset const&){ESS_DUMMY();}
     void reset_pbmem(Handle::FPGA const&){ESS_DUMMY();}
 	void init(Handle::FPGA&, bool const = true){ ESS_DUMMY();}
