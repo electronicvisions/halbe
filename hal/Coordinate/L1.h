@@ -16,6 +16,7 @@ using halco::hicann::v2::DNCMergerOnHICANN;
 using halco::hicann::v2::DNCMergerOnWafer;
 using halco::hicann::v2::TestPortOnRepeaterBlock;
 using halco::hicann::v2::RepeaterBlockOnHICANN;
+using halco::hicann::v2::RepeaterBlockOnWafer;
 using halco::hicann::v2::SendingRepeaterOnHICANN;
 using halco::hicann::v2::HRepeaterOnHICANN;
 using halco::hicann::v2::VRepeaterOnHICANN;
