@@ -16,7 +16,6 @@ class HWTest(PyhalbeTest):
             self.LOGLEVEL = 2
             self.ON_WAFER = False
             self.WAFER  = 0
-            self.USE_SCHERIFF = False
 
         from pyhalbe import Handle, Coordinate, HICANN, FPGA, Coordinate, Debug
         # The module pyhalbe.apicheck wraps pyhalbe for hardware-less
@@ -39,8 +38,6 @@ class HWTest(PyhalbeTest):
         self.f = Coordinate.FPGAGlobal(Enum(self.FPGA), Coordinate.Wafer(Enum(self.WAFER)))
 
         self.fpga = Handle.createFPGAHw(self.f, fpga_ip, self.dnc, self.ON_WAFER, hicann_num, pmu_ip)
-        if self.USE_SCHERIFF:
-            self.fpga.enableScheriff()
         self.addCleanup(Handle.freeFPGAHw, self.fpga)
 
         self.h  = self.fpga.get(self.dnc, self.hicann)
@@ -117,7 +114,6 @@ class HWTest(PyhalbeTest):
         parser.add_argument('--loglevel', action='store', required = False,
                 type=int, default=-1,
                 help='specify loglevel [0-ERROR,1-WARNING(default),2-INFO,3-DEBUG0,4-DEBUG1,5-DEBUG2,6-DEBUG3]')
-        parser.add_argument('--kill-scheriff', action='store_true', help='disable scheriff')
         parser.add_argument('--xml-output-dir', action='store', default=None,
                 required=False, help='create xml reports')
 
@@ -132,7 +128,6 @@ class HWTest(PyhalbeTest):
         HWTest.LOGLEVEL = args.loglevel
         HWTest.ON_WAFER = (args.on == 'WAFER') or args.w > 0
         HWTest.WAFER    = args.w
-        HWTest.USE_SCHERIFF = not args.kill_scheriff
         test_runner = None
         if args.xml_output_dir:
             from xmlrunner import XMLTestRunner

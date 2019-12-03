@@ -6,7 +6,6 @@
 #include <boost/shared_ptr.hpp>
 
 namespace HMF {
-struct Scheriff;
 
 namespace Handle {
 
@@ -18,13 +17,6 @@ struct Base :
 {
 	virtual ~Base();
 
-	bool useScheriff() const;
-	void enableScheriff();
-	PYPP_EXCLUDE(Scheriff& get_scheriff() const;)
-
-private:
-	// @ECM: ok?
-	static boost::shared_ptr<Scheriff> elSheriff;
 };
 
 bool operator==(Base const& a, Base const& b);

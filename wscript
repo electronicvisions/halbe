@@ -9,7 +9,12 @@ def depends(ctx):
     ctx('hicann-system', 'units/hicann_test')
     ctx('hicann-system', 'units/stage2_hal')
     ctx('hicann-system', 'units/communication')
-    ctx('halbe', 'scheriff')
+
+    # anarm-only code path (ugly!)
+    if not getattr(ctx.options, 'with_haldls_anarm', False):
+        ctx('hicann-system', 'units/hicann_test')
+        ctx('hicann-system', 'units/stage2_hal')
+
     ctx('halco')
     ctx('lib-rcf')
     ctx('ztl')
@@ -166,7 +171,6 @@ def build(bld):
     halbe_handle_uses = [
         'halbe_ess_obj', # might be undefined (--without-ess) :)
         'halbe_handle_inc',
-        'scheriff',
         'vmodule_objects',
         's2hal_obj',
         'tud_jtag',
@@ -196,7 +200,7 @@ def build(bld):
         use             = ['halbe_handle', 'halbe_container',
                            'vmodule_objects', 's2hal_obj', 'bitter', 'rcf-boost-only',
                            'BOOST4HALBE', 'halbe_git_version.h',
-                           'git_version.h', 'RT', 'scheriff_obj', 'hate_inc'],
+                           'git_version.h', 'RT', 'hate_inc'],
         cxxflags=cxxflags
     )
 

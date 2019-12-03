@@ -449,7 +449,6 @@ HALBE_SETTER_GUARDED(EventSetupL2,
 		throw std::runtime_error("write_playback_program: failed to send pulse packets to FPGA");
 }
 
-// FIXME: Adapt scheriff to upcoming canonical state machine from spec
 HALBE_GETTER(bool, get_pbmem_buffering_completed,
 	Handle::FPGA &, f
 	)

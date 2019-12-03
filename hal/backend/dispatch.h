@@ -28,7 +28,6 @@
 #include "hate/iterator_traits.h"
 
 #include "hal/macro_HALbe.h"
-#include "scheriff/Scheriff.h"
 
 
 namespace
@@ -233,33 +232,6 @@ auto do_use_hardware(F foo, HandleType& handle, Args... args)
 	}
 
 
-template<typename HandleType, typename EventType>
-auto do_call_scheriff(char const* fooname, HandleType& handle, EventType event)
-{
-	if constexpr(! hate::has_iterator<HandleType>::value) {
-		if (handle.useScheriff()) {
-			if (handle.get_scheriff().process_event(event) == 0) {
-				::HMF::Scheriff::log_f_name(fooname);
-			}
-		}
-	} else {
-		static_assert(hate::is_specialization_of<HandleType, std::vector>::value, "only vector-handles are supported for now");
-		for (auto h: handle) {
-			if (h->useScheriff()) {
-				if (h->get_scheriff().process_event(event) == 0) {
-					::HMF::Scheriff::log_f_name(fooname);
-				}
-			}
-		}
-	}
-}
-
-#define CALL_SCHERIFF(event, fun_name, handle) \
-	{ \
-		do_call_scheriff(#fun_name, handle, ::HMF::event{} ); \
-	}
-
-
 //// Dispatch macros
 #include <boost/preprocessor/facilities/empty.hpp>
 #include <boost/preprocessor/facilities/is_empty.hpp>
@@ -296,7 +268,6 @@ auto do_call_scheriff(char const* fooname, HandleType& handle, EventType event)
 	IMPL_FUNC_PROTO(ReturnType, name, __VA_ARGS__); \
 	CREATE_ESS_DISPATCHER(ret, name, __VA_ARGS__, _) \
 	ReturnType name (EVERYTWO(__VA_ARGS__)) { \
-		CALL_SCHERIFF(event, name, MYSECOND(__VA_ARGS__)) \
 		IMPL_BODY_DISPATCH(ExceptionType, ret, ReturnType, name, __VA_ARGS__) \
 	} \
 	IMPL_FUNC_PROTO(ReturnType, name, __VA_ARGS__)

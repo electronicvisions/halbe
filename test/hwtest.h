@@ -151,8 +151,6 @@ protected:
 
 	virtual void SetUp() {
 		base_t::InstanceSetUp();
-		if (g_conn.use_scheriff)
-			f.enableScheriff();
 		::HMF::FPGA::reset(f);
 	}
 

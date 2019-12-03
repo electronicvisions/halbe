@@ -52,9 +52,6 @@ void HWRealtimeLatencyMeasurementTool::configureHardware() {
 	// DNC & Hicann
 	HMF::Handle::HICANN& h(*f.get(dnc, HMF::Coordinate::HICANNOnDNC(geometry::Enum(0))));
 
-	// disable scheriff
-	// FIXME => disable scheriff by new method!
-
 	// Reset FPGA and all the other shit
 	HMF::FPGA::reset(f);
 	HMF::HICANN::init(h, false);

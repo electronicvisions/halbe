@@ -38,11 +38,6 @@ struct HICANN
 		return coordinate().toHICANNOnDNC();
 	}
 
-	/// Shall we use the sheriff?
-	bool useScheriff() const;
-
-	PYPP_EXCLUDE(Scheriff& get_scheriff() const;)
-
 	/// Equality operator checks coordinates and highspeed
 	bool operator==(HICANN const& b) const;
 	bool operator!=(HICANN const& other) const { return !(*this == other); }

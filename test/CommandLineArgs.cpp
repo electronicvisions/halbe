@@ -16,7 +16,6 @@ CommandLineArgs::CommandLineArgs() :
 		pmu_ip(),
 		highspeed(true),
 		arq(true),
-		use_scheriff(false),
 		jtag_freq(HMF::Coordinate::JTAGFrequency())
 	{}
 
@@ -30,7 +29,7 @@ CommandLineArgs CommandLineArgs::parse(int argc, char *argv[])
 	std::vector< geometry::Enum> ah;
 	size_t ll;
 	std::string lf;
-	bool ld, scheriff;
+	bool ld;
 	std::set< ::HMF::Coordinate::HICANNOnDNC> available_hicanns;
 	std::vector<geometry::Enum> default_hicanns;
 	for(auto hicann_coord : HMF::Coordinate::iter_all< HMF::Coordinate::HICANNOnDNC>()) {
@@ -60,8 +59,6 @@ CommandLineArgs CommandLineArgs::parse(int argc, char *argv[])
 			"used to determine on-wafer position of the FPGA (which is selected by the IP)")
 		("wafer,w",     po::value<geometry::Enum>(&w)->default_value(geometry::Enum(0)),
 			"specify Wafer (global enum);\n")
-		("scheriff",    po::value<bool>(&scheriff)->default_value(true),
-			"call the scheriff")
 		("loglevel",    po::value<size_t>(&ll)->default_value(1),
 			"specify loglevel [0-ERROR, 1-WARNING, 2-INFO, 3..6-DEBUG0..DEBUG3]")
 		("logfile",     po::value<std::string>(&lf),
@@ -102,7 +99,6 @@ CommandLineArgs CommandLineArgs::parse(int argc, char *argv[])
 		available_hicanns.insert(HMF::Coordinate::HICANNOnDNC(*hicann));
 	}
 	conn.available_hicanns = available_hicanns;
-	conn.use_scheriff = scheriff;
 
 	return conn;
 }

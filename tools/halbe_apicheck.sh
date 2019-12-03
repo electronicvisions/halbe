@@ -35,6 +35,6 @@ function die() {
 
 python $1 --help 2>/dev/null | grep -q -- "^HWTest:" || die "$1 is not a HWTest-based test"
 
-ARGUMENTS="--ip 192.168.1.1 --on=vertical --kill-scheriff"
+ARGUMENTS="--ip 192.168.1.1 --on=vertical"
 
 PYHALBE_API_CHECK=True python $* ${ARGUMENTS}

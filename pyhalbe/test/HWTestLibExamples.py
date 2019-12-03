@@ -179,8 +179,6 @@ class HWTestLibExamples(HWTest):
         #~ vol = 0.7
         #~ voh = 0.9
 #~ 
-        #~ import pyoneer
-        #~ pyhalbe.Handle.get_pyoneer().useScheriff = False
         #~ #SetL1Voltages(self.h, vol, voh) #set voltages
         #~ #HICANN.reset(self.h, frequency) #set PLL here
         #~ #HICANN.init(self.h, False) #initialize highspeed
@@ -220,9 +218,6 @@ class HWTestLibExamples(HWTest):
         senderline = 62
         receiver   = 0 #0-7
         mainperiod = 100
-
-        import pyoneer
-        pyhalbe.Handle.get_pyoneer().useScheriff = False
 
         repblock, repnr = SetL1Crossbar(self.h, senderline, receiver)
         L1Send(self.h, self.fpga.dnc(self.dnc), self.fpga, mainperiod, senderline, testaddr)

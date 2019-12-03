@@ -8,14 +8,6 @@ HICANN::HICANN(const Coordinate::HICANNGlobal & h, bool request_highspeed) :
 	coord(h), m_highspeed(request_highspeed)
 {}
 
-bool HICANN::useScheriff() const {
-	return Base().useScheriff();
-}
-
-Scheriff& HICANN::get_scheriff() const {
-	return Base().get_scheriff();
-}
-
 /// Equality operator checks coordinates and highspeed
 bool HICANN::operator==(HICANN const& b) const {
 	return (coordinate() == b.coordinate()) && (highspeed() == b.highspeed());

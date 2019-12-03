@@ -1,8 +1,5 @@
 #pragma once
 
-// MPL redefines
-#include "scheriff/defines.h"
-
 // Backend (includes Containers)
 #include "hal/backend/ADCBackend.h"
 #include "hal/backend/HMFBackend.h"
