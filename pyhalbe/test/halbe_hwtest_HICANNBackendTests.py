@@ -231,7 +231,7 @@ class HICANNBackendHWTests(HWTest):
 
         #turn off the links to prevent packet collision
         for hicann in Coordinate.iter_all(Coordinate.HICANNOnDNC):
-            link.dirs[hicann.id().value()] = HICANN.GbitLink.Direction.OFF
+            link.dirs[hicann.toEnum().value()] = HICANN.GbitLink.Direction.OFF
             gbit[hicann] = link
         HICANN.set_gbit_link(self.h, link)
         DNC.set_hicann_directions(self.fpga, self.dnc, gbit)

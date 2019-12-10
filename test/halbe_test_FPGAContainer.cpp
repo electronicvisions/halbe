@@ -101,7 +101,7 @@ TEST(PulseAddress, ChipAddress)
 		ASSERT_EQ(addr.getChannel(),       link);
 		ASSERT_EQ(addr.getNeuronAddress(), neuron);
 		const PulseAddress::label_t label_value =
-			default_value | (link_to_hw.at(h_test.id().value()) << 9);
+			default_value | (link_to_hw.at(h_test.toEnum().value()) << 9);
 		ASSERT_EQ(addr.getLabel(), label_value);
 		ASSERT_EQ(addr, PulseAddress(d, h_test, link, neuron));
 	}

@@ -33,7 +33,7 @@ CommandLineArgs CommandLineArgs::parse(int argc, char *argv[])
 	std::set< ::HMF::Coordinate::HICANNOnDNC> available_hicanns;
 	std::vector<geometry::Enum> default_hicanns;
 	for(auto hicann_coord : HMF::Coordinate::iter_all< HMF::Coordinate::HICANNOnDNC>()) {
-		default_hicanns.push_back(geometry::Enum(hicann_coord.id()));
+		default_hicanns.push_back(geometry::Enum(hicann_coord.toEnum()));
 	}
 	namespace po = boost::program_options;
 	po::options_description desc("Allowed options");

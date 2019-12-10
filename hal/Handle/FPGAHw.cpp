@@ -122,7 +122,7 @@ FPGAHw::FPGAHw(Coordinate::FPGAGlobal const c, Coordinate::IPv4 const fpga_ip,
 	//FIXME: UGLY but could not find other way to initlize available hicanns set for pimpl
 	std::set<Coordinate::HICANNOnDNC> avail_hicanns;
 	for (auto hicann : Coordinate::iter_all<Coordinate::HICANNOnDNC>()) {
-		if (hicann.id()<num_hicanns)
+		if (hicann.toEnum()<num_hicanns)
 			avail_hicanns.insert(HMF::Coordinate::HICANNOnDNC(hicann));
 	}
 	// FIXME: does not support non-highspeed hicanns

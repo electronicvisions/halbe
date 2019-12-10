@@ -177,7 +177,7 @@ void HAL2ESS::initialize_sim()
 				bool available = mhal_access->wafer().hicanns[hicann_id].available;
 
                 //determine the parent DNC of this hicann
-				int dnc_id = hicann_c.toDNCOnWafer().id();
+				int dnc_id = hicann_c.toDNCOnWafer().toEnum();
                 //determine the Hicann-DNC-Channel and the DNC-FPGA-Channel
 				auto hod = hicann_c.toHICANNOnDNC();
 				int hicann_channel  = hod.x()*2 + hod.y(); // convert to numbering on DNC
@@ -269,7 +269,7 @@ void HAL2ESS::run_sim(long duration_in_ns)
 void HAL2ESS::set_crossbar_switch_row(Handle::HICANN const& h, Coordinate::HLineOnHICANN y_, geometry::Side s, HICANN::CrossbarRow const & switches)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	size_t hic_id = static_cast<size_t>(e);
 
 	size_t hbus = revert_hbus(y_);
@@ -310,7 +310,7 @@ void HAL2ESS::set_crossbar_switch_row(Handle::HICANN const& h, Coordinate::HLine
 HICANN::CrossbarRow HAL2ESS::get_crossbar_switch_row(Handle::HICANN const& h, Coordinate::HLineOnHICANN y_, geometry::Side s)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	HICANN::CrossbarRow returnval;
@@ -353,7 +353,7 @@ HICANN::CrossbarRow HAL2ESS::get_crossbar_switch_row(Handle::HICANN const& h, Co
 void HAL2ESS::set_syndriver_switch_row(Handle::HICANN const& h, Coordinate::SynapseSwitchRowOnHICANN const& s, HICANN::SynapseSwitchRow const& switches)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	//convert HALBE-Numbering to ESS-Numbering
@@ -384,7 +384,7 @@ void HAL2ESS::set_syndriver_switch_row(Handle::HICANN const& h, Coordinate::Syna
 HICANN::SynapseSwitchRow HAL2ESS::get_syndriver_switch_row(Handle::HICANN const& h, Coordinate::SynapseSwitchRowOnHICANN const& s)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	//convert HALBE-Numbering to ESS-Numbering
@@ -415,7 +415,7 @@ HICANN::SynapseSwitchRow HAL2ESS::get_syndriver_switch_row(Handle::HICANN const&
 void HAL2ESS::set_weights_row(Handle::HICANN const& h, Coordinate::SynapseRowOnHICANN const& s, HICANN::WeightRow const& weights)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	//calculate the address
@@ -444,7 +444,7 @@ void HAL2ESS::set_weights_row(std::vector<boost::shared_ptr<Handle::HICANN> > ha
 HICANN::WeightRow HAL2ESS::get_weights_row(Handle::HICANN const& h, Coordinate::SynapseRowOnHICANN const& s)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	HICANN::WeightRow returnval;
@@ -468,7 +468,7 @@ HICANN::WeightRow HAL2ESS::get_weights_row(Handle::HICANN const& h, Coordinate::
 void HAL2ESS::set_decoder_double_row(Handle::HICANN const& h, Coordinate::SynapseDriverOnHICANN const& s, HICANN::DecoderDoubleRow const& data)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	//calculate the address
@@ -506,7 +506,7 @@ HICANN::DecoderDoubleRow HAL2ESS::get_decoder_double_row(Handle::HICANN const& h
 	HICANN::DecoderDoubleRow returnval;
 
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	//calculate the address
@@ -534,14 +534,14 @@ HICANN::DecoderDoubleRow HAL2ESS::get_decoder_double_row(Handle::HICANN const& h
 void HAL2ESS::set_synapse_driver(Handle::HICANN const& h, Coordinate::SynapseDriverOnHICANN const& s, HICANN::SynapseDriver const& drv_row)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	//determine the block and the address inside the block TODO check if addressing is correct
 	size_t side = to_synblock(s);
 	size_t addr = to_drvaddr(s);
 
-	LOG4CXX_DEBUG(_logger, "set_synapse_driver: Transformed HALbe-Address: " << s.id() << " to ESS-Address: Side: " << side << " Address inside Block: " <<  addr );
+	LOG4CXX_DEBUG(_logger, "set_synapse_driver: Transformed HALbe-Address: " << s.toEnum() << " to ESS-Address: Side: " << side << " Address inside Block: " <<  addr );
 	LOG4CXX_TRACE(_logger, s);
 	LOG4CXX_TRACE(_logger, drv_row);
 
@@ -673,7 +673,7 @@ void HAL2ESS::set_synapse_driver(Handle::HICANN const& h, Coordinate::SynapseDri
 HICANN::SynapseDriver HAL2ESS::get_synapse_driver(Handle::HICANN const& h, Coordinate::SynapseDriverOnHICANN const& s)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	HICANN::SynapseDriver returnval;
@@ -774,7 +774,7 @@ HICANN::SynapseDriver HAL2ESS::get_synapse_driver(Handle::HICANN const& h, Coord
 void HAL2ESS::set_denmem_quad(Handle::HICANN const& h, Coordinate::QuadOnHICANN qb, HICANN::NeuronQuad const& nquad)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	//Configure the quad intraconnectivity
@@ -796,8 +796,8 @@ void HAL2ESS::set_denmem_quad(Handle::HICANN const& h, Coordinate::QuadOnHICANN 
     for(auto nrn_on_quad : Coordinate::iter_all<Coordinate::NeuronOnQuad>())
     {
         Coordinate::NeuronOnHICANN nrn(qb,nrn_on_quad);									    //calculate the coordinate on hic
-	    auto& neuron = mhal_access->wafer().hicanns[hic_id].neurons_on_hicann[nrn.id()];	//reference to the neuron
-	    LOG4CXX_DEBUG(_logger, "set_denmem_quad: Configuration for Neuron " << nrn.id() << " on HICANN " << h.coordinate().toHICANNOnWafer().id() );
+	    auto& neuron = mhal_access->wafer().hicanns[hic_id].neurons_on_hicann[nrn.toEnum()];	//reference to the neuron
+	    LOG4CXX_DEBUG(_logger, "set_denmem_quad: Configuration for Neuron " << nrn.toEnum() << " on HICANN " << h.coordinate().toHICANNOnWafer().toEnum() );
         neuron.activate_firing = nquad[nrn_on_quad].activate_firing();
 	    LOG4CXX_DEBUG(_logger, "activate_firing was set to " << neuron.activate_firing );
         neuron.enable_output = nquad[nrn_on_quad].enable_aout();
@@ -819,7 +819,7 @@ void HAL2ESS::set_denmem_quad(Handle::HICANN const& h, Coordinate::QuadOnHICANN 
 HICANN::NeuronQuad HAL2ESS::get_denmem_quad(Handle::HICANN const& h, Coordinate::QuadOnHICANN qb)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	HICANN::NeuronQuad returnvalue;
@@ -839,7 +839,7 @@ HICANN::NeuronQuad HAL2ESS::get_denmem_quad(Handle::HICANN const& h, Coordinate:
         Coordinate::NeuronOnQuad nrn_on_quad{Coordinate::NeuronOnQuad::enum_type{ii}};
         Coordinate::NeuronOnHICANN nrn_on_hic{qb, nrn_on_quad};
         auto& nrn = returnvalue[nrn_on_quad];
-        const auto& nrn_conf = mhal_access->wafer().hicanns[hic_id].neurons_on_hicann[nrn_on_hic.id()];
+        const auto& nrn_conf = mhal_access->wafer().hicanns[hic_id].neurons_on_hicann[nrn_on_hic.toEnum()];
 		//get L1-address from datacontainer and from ESS and assert their equality
 		auto L1Addr = HICANN::L1Address(nrn_conf.l1_address);
         auto L1Addr_ESS = get_L1Address_ESS(h, nrn_on_hic);
@@ -862,7 +862,7 @@ HICANN::NeuronQuad HAL2ESS::get_denmem_quad(Handle::HICANN const& h, Coordinate:
 void HAL2ESS::set_neuron_config(Handle::HICANN const& h, HICANN::NeuronConfig const& nblock)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 	if(nblock.bigcap[geometry::top] == true)
 	{
@@ -899,7 +899,7 @@ void HAL2ESS::set_neuron_config(Handle::HICANN const& h, HICANN::NeuronConfig co
 HICANN::NeuronConfig HAL2ESS::get_neuron_config(Handle::HICANN const& h)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	HICANN::NeuronConfig returnval{};
@@ -938,13 +938,13 @@ HICANN::FGErrorResultQuadRow HAL2ESS::wait_fg(Handle::HICANN &)
 void HAL2ESS::set_fg_values(Handle::HICANN const& h, Coordinate::FGBlockOnHICANN const& b, HICANN::FGBlock const& fg)
 {
     //Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
     HICANN::FGControl fgc{};
 	fgc[b] = fg;
 
-	size_t fg_addr = static_cast<size_t>(b.id());
+	size_t fg_addr = static_cast<size_t>(b.toEnum());
 	
     LOG4CXX_DEBUG(_logger, "set_fg_values called for fg_block " << fg_addr );
 
@@ -973,7 +973,7 @@ void HAL2ESS::set_fg_values(Handle::HICANN const& h, Coordinate::FGBlockOnHICANN
         Coordinate::QuadOnHICANN quad((Coordinate::Enum(i)));
         Coordinate::NeuronOnQuad nrn_on_quad((Coordinate::Enum(fg_addr)));
         Coordinate::NeuronOnHICANN nrn{quad, nrn_on_quad};
-		size_t addr = static_cast<size_t>(nrn.id());
+		size_t addr = static_cast<size_t>(nrn.toEnum());
         auto &V_reset = mhal_access->wafer().hicanns[hic_id].neurons_on_hicann[addr].V_reset;
         //set V_reset (shared parameter) different block for shared param!
 		HICANN::shared_parameter shrd = HICANN::shared_parameter::V_reset;
@@ -1023,7 +1023,7 @@ void HAL2ESS::set_fg_values(Handle::HICANN const& h, Coordinate::FGBlockOnHICANN
 HICANN::FGErrorResultQuadRow HAL2ESS::set_fg_row_values(Handle::HICANN & h, Coordinate::FGRowOnFGBlock row, HICANN::FGControl const& fg, bool const, bool const)
 {
     //Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
     LOG4CXX_DEBUG(_logger, "set_fg_row_values called for row " << row );
@@ -1071,9 +1071,9 @@ HICANN::FGErrorResultQuadRow HAL2ESS::set_fg_row_values(Handle::HICANN & h, Coor
                 //iterate over the quads
                 for (auto quad : Coordinate::iter_all<Coordinate::QuadOnHICANN>())
                 {
-                    Coordinate::NeuronOnQuad nrn_on_quad( Coordinate::Enum(fg_block.id()) );
+                    Coordinate::NeuronOnQuad nrn_on_quad( Coordinate::Enum(fg_block.toEnum()) );
                     Coordinate::NeuronOnHICANN nrn(quad, nrn_on_quad);
-	            	size_t addr = nrn.id();
+	            	size_t addr = nrn.toEnum();
                     auto & nrn_ess  = mhal_access->wafer().hicanns[hic_id].neurons_on_hicann[addr];
 	            	nrn_ess.V_reset = fg.getShared(fg_block,shared_param_type);
                 }
@@ -1091,7 +1091,7 @@ HICANN::FGErrorResultQuadRow HAL2ESS::set_fg_row_values(Handle::HICANN & h, Coor
             for (auto nrn_fg : Coordinate::iter_all<Coordinate::NeuronOnFGBlock>())
             {
                 Coordinate::NeuronOnHICANN nrn = nrn_fg.toNeuronOnHICANN(fg_block);
-                size_t nrn_id = nrn.id();
+                size_t nrn_id = nrn.toEnum();
 		        auto & nrn_params = mhal_access->wafer().hicanns[hic_id].neurons_on_hicann[nrn_id].neuron_parameters;
                 auto const param = fg.getNeuron(nrn, nrn_param_type);
                 nrn_params.setParam(nrn_param_type, param);
@@ -1111,7 +1111,7 @@ HICANN::FGErrorResultQuadRow HAL2ESS::set_fg_row_values(Handle::HICANN & h, Coor
 		Coordinate::FGRowOnFGBlock row,
 		HICANN::FGRow const& fg, bool const, bool const)
 {
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	// get the block coordinates
@@ -1148,9 +1148,9 @@ HICANN::FGErrorResultQuadRow HAL2ESS::set_fg_row_values(Handle::HICANN & h, Coor
 			//iterate over the quads
 			for (auto quad : Coordinate::iter_all<Coordinate::QuadOnHICANN>())
 			{
-				Coordinate::NeuronOnQuad nrn_on_quad( Coordinate::Enum(fg_block.id()) );
+				Coordinate::NeuronOnQuad nrn_on_quad( Coordinate::Enum(fg_block.toEnum()) );
 				Coordinate::NeuronOnHICANN nrn(quad, nrn_on_quad);
-				size_t addr = nrn.id();
+				size_t addr = nrn.toEnum();
 				auto & nrn_ess  = mhal_access->wafer().hicanns[hic_id].neurons_on_hicann[addr];
 				nrn_ess.V_reset = fg.getShared();
 			}
@@ -1168,7 +1168,7 @@ HICANN::FGErrorResultQuadRow HAL2ESS::set_fg_row_values(Handle::HICANN & h, Coor
 		for (auto nrn_fg : Coordinate::iter_all<Coordinate::NeuronOnFGBlock>())
 		{
 			Coordinate::NeuronOnHICANN nrn = nrn_fg.toNeuronOnHICANN(fg_block);
-			size_t nrn_id = nrn.id();
+			size_t nrn_id = nrn.toEnum();
 			auto & nrn_params = mhal_access->wafer().hicanns[hic_id].neurons_on_hicann[nrn_id].neuron_parameters;
 			auto const param = fg.getNeuron(nrn_fg);
 			nrn_params.setParam(nrn_param_type, param);
@@ -1190,7 +1190,7 @@ HICANN::FGErrorResultQuadRow HAL2ESS::set_fg_row_values(
 {
 	for (auto block : Coordinate::iter_all<Coordinate::FGBlockOnHICANN>())
 	{
-		set_fg_row_values(h, block, rows.at(block.id()), data.at(block.id()),
+		set_fg_row_values(h, block, rows.at(block.toEnum()), data.at(block.toEnum()),
 				          writeDown, blocking);
 	}
 
@@ -1212,9 +1212,9 @@ void HAL2ESS::set_fg_values(Handle::HICANN const& h, HICANN::FGControl const& fg
 //not a fuction of HICANNBackend any,ore, but still here for tests
 HICANN::FGBlock HAL2ESS::get_fg_values(Handle::HICANN const& h, Coordinate::FGBlockOnHICANN const& addr)
 {
-	LOG4CXX_DEBUG(_logger, "get_fg_values for FGBlock " << addr.id() << " on HICANN " << h.coordinate().toHICANNOnWafer().id() );
+	LOG4CXX_DEBUG(_logger, "get_fg_values for FGBlock " << addr.toEnum() << " on HICANN " << h.coordinate().toHICANNOnWafer().toEnum() );
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 	//initialize FGcontrol
 	HICANN::FGBlock fgb{};
@@ -1222,8 +1222,8 @@ HICANN::FGBlock HAL2ESS::get_fg_values(Handle::HICANN const& h, Coordinate::FGBl
 	fgc[addr] = fgb;
 
 	//calculate the address offset and cast the fg-addr to size_t
-	size_t addr_offset = addr.id()*128;
-	size_t fg_addr = static_cast<size_t>(addr.id());
+	size_t addr_offset = addr.toEnum()*128;
+	size_t fg_addr = static_cast<size_t>(addr.toEnum());
     
 	LOG4CXX_DEBUG(_logger, "Shared parameter:");
     //look for a neuron which gets shrd params from this block
@@ -1232,7 +1232,7 @@ HICANN::FGBlock HAL2ESS::get_fg_values(Handle::HICANN const& h, Coordinate::FGBl
     Coordinate::NeuronOnHICANN shrd_nrn{quad, nrn_on_quad};
 
 	//getting V_reset = shared neuron parameter
-    const auto &V_reset = mhal_access->wafer().hicanns[hic_id].neurons_on_hicann[static_cast<size_t>(shrd_nrn.id())].V_reset;
+    const auto &V_reset = mhal_access->wafer().hicanns[hic_id].neurons_on_hicann[static_cast<size_t>(shrd_nrn.toEnum())].V_reset;
     auto shrd = HICANN::shared_parameter::V_reset;
 	LOG4CXX_DEBUG(_logger, "V_reset = " << V_reset);
     fgc.setShared(addr, shrd, V_reset);
@@ -1313,9 +1313,9 @@ void HAL2ESS::set_fg_config(
 		const HICANN::FGConfig & cfg)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
-    size_t fg_addr = b.id();
+    size_t fg_addr = b.toEnum();
 
 	LOG4CXX_DEBUG(_logger, "set_fg_config called for FBBlock " << fg_addr
 			               << "(note: only pulselenght is used)");
@@ -1329,9 +1329,9 @@ HICANN::FGConfig HAL2ESS::get_fg_config(
 		Coordinate::FGBlockOnHICANN const& b)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
-	size_t fg_addr = b.id();
+	size_t fg_addr = b.toEnum();
 
 	LOG4CXX_DEBUG(_logger, "get_fg_config called for FBBlock " << fg_addr
 			               << "(note: only pulselenght is read)");
@@ -1351,10 +1351,10 @@ void HAL2ESS::set_current_stimulus(
 		HICANN::FGStimulus const& stim)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
-    size_t fg_addr = b.id();
+    size_t fg_addr = b.toEnum();
 	LOG4CXX_DEBUG(_logger, "set_current_stimulus called for FBBlock "
 		                   << fg_addr);
 
@@ -1384,12 +1384,12 @@ HICANN::FGStimulus HAL2ESS::get_current_stimulus(
 		Handle::HICANN const& h, Coordinate::FGBlockOnHICANN const& b)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
     HICANN::FGStimulus returnval;
 
-    size_t fg_addr = b.id();
+    size_t fg_addr = b.toEnum();
     auto const& stimulus = mhal_access->wafer().hicanns[hic_id].stimulus_config[fg_addr]; 
 
     returnval.setContinuous(stimulus.Continuous);
@@ -1408,7 +1408,7 @@ HICANN::FGStimulus HAL2ESS::get_current_stimulus(
 void HAL2ESS::set_repeater(Handle::HICANN const& h, Coordinate::VRepeaterOnHICANN r, HICANN::VerticalRepeater const& rc)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	size_t y = static_cast<size_t>(r.toVLineOnHICANN());
@@ -1463,7 +1463,7 @@ HICANN::VerticalRepeater HAL2ESS::get_repeater(Handle::HICANN const& h, Coordina
 	HICANN::VerticalRepeater returnval;
 
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	size_t y = static_cast<size_t>(r.toVLineOnHICANN());
@@ -1529,7 +1529,7 @@ HICANN::VerticalRepeater HAL2ESS::get_repeater(Handle::HICANN const& h, Coordina
 void HAL2ESS::set_repeater(Handle::HICANN const& h, Coordinate::HRepeaterOnHICANN r, HICANN::HorizontalRepeater const& rc)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	size_t x = static_cast<size_t>(r.toHLineOnHICANN());
@@ -1609,7 +1609,7 @@ HICANN::HorizontalRepeater HAL2ESS::get_repeater(
 	HICANN::HorizontalRepeater returnval;
 
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	size_t x =  static_cast<size_t>(r.toHLineOnHICANN());
@@ -1659,7 +1659,7 @@ HICANN::HorizontalRepeater HAL2ESS::get_repeater(
 void HAL2ESS::set_merger_tree(Handle::HICANN const& h, HICANN::MergerTree const& m)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	auto &mergerconfig = mhal_access->wafer().hicanns[hic_id].merger_tree_config;
@@ -1710,7 +1710,7 @@ HICANN::MergerTree HAL2ESS::get_merger_tree(Handle::HICANN const& h)
 	HICANN::MergerTree returnvalue{};
 
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	const auto &mergerconfig = mhal_access->wafer().hicanns[hic_id].merger_tree_config;
@@ -1761,7 +1761,7 @@ HICANN::MergerTree HAL2ESS::get_merger_tree(Handle::HICANN const& h)
 void HAL2ESS::set_dnc_merger(Handle::HICANN const& h, HICANN::DNCMergerLine const& m)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	auto &mergerconfig = mhal_access->wafer().hicanns[hic_id].merger_tree_config;
@@ -1786,7 +1786,7 @@ HICANN::DNCMergerLine HAL2ESS::get_dnc_merger(Handle::HICANN const& h)
 	HICANN::DNCMergerLine returnval{};
 
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	const auto &mergerconfig = mhal_access->wafer().hicanns[hic_id].merger_tree_config;
@@ -1808,7 +1808,7 @@ HICANN::DNCMergerLine HAL2ESS::get_dnc_merger(Handle::HICANN const& h)
 void HAL2ESS::set_gbit_link(Handle::HICANN const& h, HICANN::GbitLink const& link)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
     
     LOG4CXX_DEBUG(_logger, "set_gbit_link: hicann " << hic_id);
@@ -1849,7 +1849,7 @@ void HAL2ESS::set_gbit_link(Handle::HICANN const& h, HICANN::GbitLink const& lin
 void HAL2ESS::set_phase(Handle::HICANN const& h, phase_t phase)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	auto &mergerconfig = mhal_access->wafer().hicanns[hic_id].merger_tree_config;
@@ -1869,7 +1869,7 @@ HAL2ESS::phase_t HAL2ESS::get_phase(Handle::HICANN const& h)
 	phase_t returnval{};
 
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	const auto &mergerconfig = mhal_access->wafer().hicanns[hic_id].merger_tree_config;
@@ -1886,7 +1886,7 @@ HAL2ESS::phase_t HAL2ESS::get_phase(Handle::HICANN const& h)
 void HAL2ESS::set_background_generator(Handle::HICANN const& h, HICANN::BackgroundGeneratorArray const& bg)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	auto &mergerconfig = mhal_access->wafer().hicanns[hic_id].merger_tree_config;
@@ -1926,7 +1926,7 @@ void HAL2ESS::set_background_generator(Handle::HICANN const& h, HICANN::Backgrou
 HICANN::BackgroundGeneratorArray HAL2ESS::get_background_generator(Handle::HICANN const& h)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
 
 	HICANN::BackgroundGeneratorArray returnval;
@@ -2059,8 +2059,8 @@ void HAL2ESS::init(Handle::HICANN const& h, bool)
 //initializes a hicann
 void HAL2ESS::instantiate_hicann(Coordinate::HICANNOnWafer const& h)
 {
-    assert(h.id() < ESS::size::hicanns_on_wafer);
-	unsigned int ident = h.id();
+    assert(h.toEnum() < ESS::size::hicanns_on_wafer);
+	unsigned int ident = h.toEnum();
     LOG4CXX_DEBUG(_logger, "Init called for HICANN " << ident);
 	ESS::hicann hic{ident};
 	hic.available = true;
@@ -2071,7 +2071,7 @@ void HAL2ESS::instantiate_hicann(Coordinate::HICANNOnWafer const& h)
 void HAL2ESS::reset(Handle::HICANN const& h, uint8_t PLL_frequency)
 {
 	//Calculate the hicann coordinate
-	auto e = h.coordinate().toHICANNOnWafer().id();
+	auto e = h.coordinate().toHICANNOnWafer().toEnum();
 	auto hic_id = static_cast<size_t>(e);
     init(h);
     mhal_access->wafer().hicanns[hic_id].PLL_freq = PLL_frequency; 
@@ -2321,8 +2321,8 @@ PyNNParameters::EIF_cond_exp_isfa_ista HAL2ESS::get_bio_parameter(Handle::HICANN
 	size_t x_coord = static_cast<size_t>(coord.x());
 	size_t y_coord = static_cast<size_t>(coord.y());
     // nrn id
-    size_t nrn_id = nrn.id();
-    LOG4CXX_DEBUG(_logger, "HAL2ESS:get_bio_parameter for neuron " << nrn_id << " on HICANN " << coord.toHICANNOnWafer().id() );
+    size_t nrn_id = nrn.toEnum();
+    LOG4CXX_DEBUG(_logger, "HAL2ESS:get_bio_parameter for neuron " << nrn_id << " on HICANN " << coord.toHICANNOnWafer().toEnum() );
     //get the ESS-Neuron-Parameter
     const auto& ESS_param = mvirtual_hw->pcb_i[0]->get_wafer()->hicann_i[y_coord][x_coord]->anncore_behav_i->get_neuron_parameter(nrn_id);
     LOG4CXX_TRACE(_logger, "Reporting Parameter in technical HWRegime" );
@@ -2369,8 +2369,8 @@ PyNNParameters::EIF_cond_exp_isfa_ista HAL2ESS::get_technical_parameter(Handle::
 	size_t x_coord = static_cast<size_t>(coord.x());
 	size_t y_coord = static_cast<size_t>(coord.y());
     // nrn id
-    size_t nrn_id = nrn.id();
-    LOG4CXX_DEBUG(_logger, "HAL2ESS:get_technical_parameter for neuron " << nrn_id << " on HICANN " << coord.toHICANNOnWafer().id() );
+    size_t nrn_id = nrn.toEnum();
+    LOG4CXX_DEBUG(_logger, "HAL2ESS:get_technical_parameter for neuron " << nrn_id << " on HICANN " << coord.toHICANNOnWafer().toEnum() );
     //get the ESS-Neuron-Parameter
     const auto& returnval = mvirtual_hw->pcb_i[0]->get_wafer()->hicann_i[y_coord][x_coord]->anncore_behav_i->get_neuron_parameter(nrn_id);
     LOG4CXX_TRACE(_logger, "Reporting Parameter in technical HWRegime" );
@@ -2444,7 +2444,7 @@ HICANN::L1Address HAL2ESS::get_L1Address_ESS(Handle::HICANN const& h, Coordinate
 	size_t x_coord = static_cast<size_t>(coord.x());
 	size_t y_coord = static_cast<size_t>(coord.y());
 	//determine the neuron address
-	size_t nrn_id = static_cast<size_t>(neuron.id());
+	size_t nrn_id = static_cast<size_t>(neuron.toEnum());
 	//get the l1_address
 	unsigned int l1 = mvirtual_hw->pcb_i[0]->get_wafer()->hicann_i[y_coord][x_coord]->anncore_behav_i->get_6_bit_address(nrn_id);
 	HICANN::L1Address returnval(l1);
@@ -2834,13 +2834,13 @@ HICANN::WeightRow HAL2ESS::get_weights_row_ESS(Handle::HICANN const& h, Coordina
 //gets the fg_values from the ess
 HICANN::FGBlock HAL2ESS::get_fg_values_ESS(Handle::HICANN const& h, Coordinate::FGBlockOnHICANN const& addr) const
 {
-	LOG4CXX_DEBUG(_logger, "get_fg_values_ESS for FGBlock " << addr.id() << " on HICANN " << h.coordinate().toHICANNOnWafer().id() );
+	LOG4CXX_DEBUG(_logger, "get_fg_values_ESS for FGBlock " << addr.toEnum() << " on HICANN " << h.coordinate().toHICANNOnWafer().toEnum() );
     //determine the HICANN x and y - id, and enum
 	Coordinate::HICANNGlobal coord = h.coordinate();
 	size_t x_coord = static_cast<size_t>(coord.x());
 	size_t y_coord = static_cast<size_t>(coord.y());
-	size_t hic_id = static_cast<size_t>(coord.toHICANNOnWafer().id());
-	LOG4CXX_DEBUG(_logger, "get_fg_values for FGBlock " << addr.id() << " on HICANN " << h.coordinate().toHICANNOnWafer().id() );
+	size_t hic_id = static_cast<size_t>(coord.toHICANNOnWafer().toEnum());
+	LOG4CXX_DEBUG(_logger, "get_fg_values for FGBlock " << addr.toEnum() << " on HICANN " << h.coordinate().toHICANNOnWafer().toEnum() );
 
 	//initialize FGcontrol
 	HICANN::FGBlock fgb;
@@ -2848,7 +2848,7 @@ HICANN::FGBlock HAL2ESS::get_fg_values_ESS(Handle::HICANN const& h, Coordinate::
 	fgc[addr] = fgb;
 
 	//calculate the address offset and cast the fg-addr to size_t
-	size_t addr_offset = addr.id()*128;
+	size_t addr_offset = addr.toEnum()*128;
     //getting the global parameters
 	LOG4CXX_DEBUG(_logger, "Global Parameters" );
     // determine the coorect Syndriver address in the ESS

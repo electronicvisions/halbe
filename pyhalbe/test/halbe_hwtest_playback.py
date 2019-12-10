@@ -400,7 +400,7 @@ class PlaybackTraceHWTest(HWTest):
         # different HICANN
         a2 = FPGA.PulseAddress(
                     self.dnc,
-                    HICANNOnDNC(Enum((int(self.h.to_HICANNOnDNC().id()) + 1 )%8)),
+                    HICANNOnDNC(Enum((int(self.h.to_HICANNOnDNC().toEnum()) + 1 )%8)),
                     GbitLinkOnHICANN(0),
                     HICANN.Neuron.address_t(0))
         # tested hicann, different glink

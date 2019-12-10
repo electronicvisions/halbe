@@ -727,7 +727,7 @@ HALBE_SETTER_GUARDED(EventSetupFG,
 	FGBlock const&, fgb)
 {
 	ReticleControl& reticle = *h.get_reticle();
-	auto& fc = reticle.hicann[h.jtag_addr()]->getFC(b.id());
+	auto& fc = reticle.hicann[h.jtag_addr()]->getFC(b.toEnum());
 
 	// and finally analog FG values
 	for (size_t row = 0; row < FGBlock::fg_lines; row++)
@@ -860,11 +860,11 @@ HALBE_SETTER_GUARDED_RETURNS(HICANN::FGErrorResultQuadRow,
 	////setting analog parameters
 	std::bitset<20> data;
 	for (FGBlockOnHICANN blk : iter_all<FGBlockOnHICANN>()) {
-		const FGRowOnFGBlock r = rows.at(blk.id());
-		auto fc = reticle.hicann[h.jtag_addr()]->getFC(blk.id());
+		const FGRowOnFGBlock r = rows.at(blk.toEnum());
+		auto fc = reticle.hicann[h.jtag_addr()]->getFC(blk.toEnum());
 
 		size_t cnt = 0;
-		for (auto const& val : rowData.at(blk.id()).set_formatter()) {
+		for (auto const& val : rowData.at(blk.toEnum()).set_formatter()) {
 			// ECM: TODO later (4 pbmem-based cfg) specify delay for async write (see below too)!
 			fc.write_data(cnt++, val.to_ulong());
 		}
@@ -899,16 +899,16 @@ HALBE_SETTER_GUARDED_RETURNS(HICANN::FGErrorResultQuadRow,
 	size_t cnt = 0;
 	for (auto const& val : fg.set_formatter())
 		// ECM: TODO later (4 pbmem-based cfg) specify delay for async write (see below too)!
-		getFC(block.id()).write_data(cnt++, val.to_ulong());
+		getFC(block.toEnum()).write_data(cnt++, val.to_ulong());
 
 
 	////issue command for writing down or up -- calling both required for arbitrary values
 	if (writeDown) {
 		//execute write cycle
-		getFC(block.id()).write_data(facets::FGControl::REG_ADDRINS,
+		getFC(block.toEnum()).write_data(facets::FGControl::REG_ADDRINS,
 			FGInstruction::writeDown(row));
 	} else {
-		getFC(block.id()).write_data(facets::FGControl::REG_ADDRINS,
+		getFC(block.toEnum()).write_data(facets::FGControl::REG_ADDRINS,
 			FGInstruction::writeUp(row));
 	}
 
@@ -927,7 +927,7 @@ HALBE_SETTER_GUARDED(EventSetupFG,
 	const FGConfig &, config)
 {
 	ReticleControl& reticle = *h.get_reticle();
-	::facets::FGControl & fc = reticle.hicann[h.jtag_addr()]->getFC(block.id());
+	::facets::FGControl & fc = reticle.hicann[h.jtag_addr()]->getFC(block.toEnum());
 	fc.write_data(facets::FGControl::REG_BIAS,
 			config.getBias().to_ulong());
 
@@ -941,7 +941,7 @@ HALBE_GETTER(FGConfig, get_fg_config,
 	FGBlockOnHICANN const&, b)
 {
 	ReticleControl& reticle = *h.get_reticle();
-	auto& fc = reticle.hicann[h.jtag_addr()]->getFC(b.id());
+	auto& fc = reticle.hicann[h.jtag_addr()]->getFC(b.toEnum());
 
 	HICANN::FGConfig config;
 	ci_addr_t addr;
@@ -990,7 +990,7 @@ HALBE_SETTER_GUARDED(EventSetupFG,
 	FGBlockOnHICANN const& b = n.toNeuronFGBlock();
 
 	ReticleControl& reticle = *h.get_reticle();
-	auto& fc = reticle.hicann[h.jtag_addr()]->getFC(b.id());
+	auto& fc = reticle.hicann[h.jtag_addr()]->getFC(b.toEnum());
 
 	uint8_t const column = FGBlock::is_left(b) ? n.toNeuronOnFGBlock()+1 : 128-n.toNeuronOnFGBlock();
 	uint8_t const line   = FGBlock::getNeuronLut(b).at(p);
@@ -1008,7 +1008,7 @@ HALBE_SETTER_GUARDED(EventSetupFG,
 	shared_parameter const&, p)
 {
 	ReticleControl& reticle = *h.get_reticle();
-	auto& fc = reticle.hicann[h.jtag_addr()]->getFC(b.id());
+	auto& fc = reticle.hicann[h.jtag_addr()]->getFC(b.toEnum());
 
 	uint8_t const line   = FGBlock::getSharedLut(b).at(p);
 	if (line == not_connected)
@@ -1025,7 +1025,7 @@ HALBE_SETTER_GUARDED(EventSetupFG,
 	FGCellOnFGBlock const&, c)
 {
 	ReticleControl& reticle = *h.get_reticle();
-	auto& fc = reticle.hicann[h.jtag_addr()]->getFC(b.id());
+	auto& fc = reticle.hicann[h.jtag_addr()]->getFC(b.toEnum());
 
 	fc.write_data(facets::FGControl::REG_ADDRINS, FGInstruction::read(c.y(), c.x()));
 }
@@ -1038,7 +1038,7 @@ HALBE_SETTER_GUARDED(EventSetupFG,
 	FGStimulus const&, stim)
 {
 	ReticleControl& reticle = *h.get_reticle();
-	facets::FGControl& fc = reticle.hicann[h.jtag_addr()]->getFC(b.id());
+	facets::FGControl& fc = reticle.hicann[h.jtag_addr()]->getFC(b.toEnum());
 
 	//always using RAM bank 0 here... for no reason...
 	for (size_t i = 0; i < 128; i+=2)
@@ -1060,7 +1060,7 @@ HALBE_GETTER(FGStimulus, get_current_stimulus,
 	FGBlockOnHICANN const&, b)
 {
 	ReticleControl& reticle = *h.get_reticle();
-	facets::FGControl& fc = reticle.hicann[h.jtag_addr()]->getFC(b.id());
+	facets::FGControl& fc = reticle.hicann[h.jtag_addr()]->getFC(b.toEnum());
 
 	FGStimulus returnvalue;
 
@@ -1138,7 +1138,7 @@ HALBE_SETTER_GUARDED(EventSetupL1,
 {
 	ReticleControl& reticle = *h.get_reticle();
 
-	size_t address = block.id();
+	size_t address = block.toEnum();
 	HicannCtrl::Repeater index = static_cast<HicannCtrl::Repeater>(address);
 	facets::RepeaterControl& rc = reticle.hicann[h.jtag_addr()]->getRC(index);
 
@@ -1180,7 +1180,7 @@ HALBE_GETTER(HICANN::RepeaterBlock, get_repeater_block,
 {
 	ReticleControl& reticle = *h.get_reticle();
 
-	size_t address = block.id();
+	size_t address = block.toEnum();
 	HicannCtrl::Repeater index = static_cast<HicannCtrl::Repeater>(address);
 	facets::RepeaterControl& rc = reticle.hicann[h.jtag_addr()]->getRC(index);
 

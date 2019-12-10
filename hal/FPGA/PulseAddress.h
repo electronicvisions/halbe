@@ -50,7 +50,7 @@ public:
 		channel_t const chan,
 		L1Address const& neuron ) :
 			mData( ((dnc.value() & 0x03) << 12) // 2bit
-					| (link_to_hw(chip.id().value() & 0x7) << 9) // 3bit
+					| (link_to_hw(chip.toEnum().value() & 0x7) << 9) // 3bit
 					| (swap_channel(chan.value() & 0x7) << 6) // 3bit
 					| (neuron.value() & 0x3f) )   // 6bit
 	{}

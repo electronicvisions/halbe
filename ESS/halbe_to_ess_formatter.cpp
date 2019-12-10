@@ -95,7 +95,7 @@ ESS::RepeaterLocation to_repblock(Coordinate::RepeaterBlockOnHICANN const& block
 {
     ESS::RepeaterLocation rep_block = ESS::RepeaterLocation::REP_UL;
 
-    size_t val = static_cast<size_t>(block.id());
+    size_t val = static_cast<size_t>(block.toEnum());
     switch(val)
     {
         case 0 : {rep_block = ESS::RepeaterLocation::REP_UL ; break;}
@@ -112,7 +112,7 @@ ESS::RepeaterLocation to_repblock(Coordinate::RepeaterBlockOnHICANN const& block
 size_t to_repaddr(Coordinate::RepeaterBlockOnHICANN const& block, size_t val)
 {
     size_t addr = 0;
-    size_t rblock = static_cast<size_t>(block.id());
+    size_t rblock = static_cast<size_t>(block.toEnum());
     switch(rblock)
     {
         case 0 :                        //top left repeater block: considering line swapping 

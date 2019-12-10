@@ -44,7 +44,7 @@ def f_wafer(coord):
     WAFER = coord
 
 def print_hicann(coord):
-    return "{:<27} (id: {:>3})):\n".format(coord, coord.id().value())
+    return "{:<27} (id: {:>3})):\n".format(coord, coord.toEnum().value())
 
 def f_hicann(hicann):
     """prints Hicann related variables"""
@@ -56,7 +56,7 @@ def f_hicann(hicann):
                        dnc.toPowerCoordinate(), hicann.toHICANNOnDNC()]:
         has_id = getattr(coordinate, "id", None)
         if has_id:
-            out += "\t{} ({})\n".format(coordinate, coordinate.id())
+            out += "\t{} ({})\n".format(coordinate, coordinate.toEnum())
         else:
             out += "\t{}\n".format(coordinate)
     try:
@@ -74,8 +74,8 @@ def print_hicanns_on_dnc(dnc, indent=""):
     offset = (per_dnc / 2 - 1)
     h0 = Coordinate.HICANNOnDNC(Enum(0)).toHICANNOnWafer(dnc)
     h1 = Coordinate.HICANNOnDNC(Enum(per_dnc / 2)).toHICANNOnWafer(dnc)
-    hid0 = h0.id()
-    hid1 = h1.id()
+    hid0 = h0.toEnum()
+    hid1 = h1.toEnum()
     return "{}{} - {} ({} - {}, {} - {})\n".format(indent, h0, h1,
             hid0, Enum(hid0.value() + offset),
             hid1, Enum(hid1.value() + offset))
@@ -86,14 +86,14 @@ def f_fpga(coord):
     out = "{}:\n".format(gcoord)
     for dnc_f in Coordinate.iter_all(Coordinate.DNCOnFPGA):
         dnc = dnc_f.toDNCOnWafer(gcoord)
-        out += "\t{} ({}, {}):\n".format(dnc, dnc.id(), dnc.toPowerCoordinate())
+        out += "\t{} ({}, {}):\n".format(dnc, dnc.toEnum(), dnc.toPowerCoordinate())
         out += print_hicanns_on_dnc(dnc, "\t\t")
     return out
 
 def f_dnc(dnc):
     """print fpga related infomations"""
     gdnc = Coordinate.DNCGlobal(dnc, WAFER)
-    out = "{} ({}):\n".format(gdnc, gdnc.id())
+    out = "{} ({}):\n".format(gdnc, gdnc.toEnum())
     out += "\t{}\n".format(gdnc.toFPGAOnWafer())
     out += "\t{}\n".format(gdnc.toPowerCoordinate())
     out += print_hicanns_on_dnc(gdnc, "\t")
@@ -105,7 +105,7 @@ def f_reticle(coord):
     gdnc = Coordinate.DNCGlobal(dnc, WAFER)
     out = "{}:\n".format(coord)
     out += "\t{}\n".format(gdnc.toFPGAOnWafer())
-    out += "\t{} ({})\n".format(dnc, dnc.id())
+    out += "\t{} ({})\n".format(dnc, dnc.toEnum())
     out += print_hicanns_on_dnc(dnc, "\t")
     return out
 

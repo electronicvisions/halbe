@@ -522,7 +522,7 @@ ci_data_t fg_read_answer(
 	FGBlockOnHICANN const& b)
 {
 	ReticleControl& reticle = *h.get_reticle();
-	facets::FGControl& fc = reticle.hicann[h.jtag_addr()]->getFC(b.id());
+	facets::FGControl& fc = reticle.hicann[h.jtag_addr()]->getFC(b.toEnum());
 
 	ci_data_t value;
 	ci_addr_t addr;
@@ -554,7 +554,7 @@ FGErrorResultRow fg_log_error(
 	auto end_time = system_clock::now() + seconds(10);
 
 	ReticleControl& reticle = *h.get_reticle();
-	facets::FGControl& fc = reticle.hicann[h.jtag_addr()]->getFC(b.id());
+	facets::FGControl& fc = reticle.hicann[h.jtag_addr()]->getFC(b.toEnum());
 
 	static log4cxx::LoggerPtr fglogger = log4cxx::Logger::getLogger("halbe.fgwriter");
 	LOG4CXX_DEBUG(fglogger, "read error flags for block" << b);

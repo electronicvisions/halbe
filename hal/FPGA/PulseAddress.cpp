@@ -31,7 +31,7 @@ PulseAddress::chip_address_t PulseAddress::getChipAddress() const
 
 void PulseAddress::setChipAddress(const chip_address_t & chip)
 {
-	label_t tmp = (link_to_hw(chip.id().value()) & 0x7) << 9;
+	label_t tmp = (link_to_hw(chip.toEnum().value()) & 0x7) << 9;
 	mData &= ~(label_t(0x7) << 9);
 	mData |= tmp;
 }

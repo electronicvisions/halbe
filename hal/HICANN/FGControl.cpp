@@ -67,24 +67,24 @@ size_t FGControl::size() const
 
 FGBlock& FGControl::operator[] (Coordinate::FGBlockOnHICANN const& b)
 {
-	return mBlock[b.id()];
+	return mBlock[b.toEnum()];
 }
 
 FGBlock const& FGControl::operator[] (Coordinate::FGBlockOnHICANN const& b) const
 {
-	return mBlock[b.id()];
+	return mBlock[b.toEnum()];
 }
 
 FGBlock& FGControl::getBlock(
 	FGBlockOnHICANN const& b)
 {
-	return mBlock[b.id()];
+	return mBlock[b.toEnum()];
 }
 
 FGBlock const& FGControl::getBlock(
 	FGBlockOnHICANN const& b) const
 {
-	return mBlock[b.id()];
+	return mBlock[b.toEnum()];
 }
 
 void FGControl::setBlock(
@@ -97,7 +97,7 @@ void FGControl::setBlock(
 FGBlock& FGControl::_getBlock(
 	FGBlockOnHICANN const& b)
 {
-	return mBlock[b.id()];
+	return mBlock[b.toEnum()];
 }
 
 std::ostream& operator<<(std::ostream& os, FGControl const& fgc)

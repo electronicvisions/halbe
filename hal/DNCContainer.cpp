@@ -7,10 +7,10 @@ namespace HMF {
 namespace DNC {
 
 GbitLink& GbitReticle::operator[] (Coordinate::HICANNOnDNC const & hicann_on_reticle) {
-	return links[hicann_on_reticle.id()];
+	return links[hicann_on_reticle.toEnum()];
 }
 GbitLink const & GbitReticle::operator[] (Coordinate::HICANNOnDNC const & hicann_on_reticle) const {
-	return links[hicann_on_reticle.id()];
+	return links[hicann_on_reticle.toEnum()];
 }
 bool GbitReticle::operator==(const GbitReticle & other) const {
 	return COMPARE_EQUAL(other, links);
@@ -26,10 +26,10 @@ std::ostream& operator<< (std::ostream& o, GbitReticle const& gr) {
 }
 
 bool& Loopback::operator[] (Coordinate::HICANNOnDNC const & hicann_on_reticle) {
-	return data[hicann_on_reticle.id()];
+	return data[hicann_on_reticle.toEnum()];
 }
 bool const& Loopback::operator[] (Coordinate::HICANNOnDNC const & hicann_on_reticle) const {
-	return data[hicann_on_reticle.id()];
+	return data[hicann_on_reticle.toEnum()];
 }
 bool Loopback::operator==(const Loopback & other) const {
 	return COMPARE_EQUAL(other, data);

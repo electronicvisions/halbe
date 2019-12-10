@@ -23,7 +23,7 @@ ADCEss::getESSAnalog() const
 HMF::ADC::USBSerial
 ADCEss::getVirtualADCCoordinate(Coordinate::DNCOnWafer dnc, Coordinate::AnalogOnHICANN analog)
 {
-    size_t const adc_coord_int      = 2*dnc.id().value() + analog.value();
+    size_t const adc_coord_int      = 2*dnc.toEnum().value() + analog.value();
     std::string const adc_coord_str = std::to_string(adc_coord_int);
     return HMF::ADC::USBSerial(adc_coord_str);
 }

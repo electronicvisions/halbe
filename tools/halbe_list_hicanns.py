@@ -37,8 +37,8 @@ def hicanns_on_dnc(dnc):
     h0 = C.HICANNOnDNC(C.Enum(0)).toHICANNOnWafer(dnc)
     h1 = C.HICANNOnDNC(C.Enum(per_dnc / 2)).toHICANNOnWafer(dnc)
 
-    top = range(h0.id().value(), h0.id().value() + offset + 1)
-    bot = range(h1.id().value(), h1.id().value() + offset + 1)
+    top = range(h0.toEnum().value(), h0.toEnum().value() + offset + 1)
+    bot = range(h1.toEnum().value(), h1.toEnum().value() + offset + 1)
     return top + bot
 
 def main():

@@ -223,7 +223,7 @@ class HALbeXML2Sim2Denmem(object):
         else:
             raise Exception("WARG")
         self.neighbor = NeuronGlobal(self.neighbor, self.coordinate.hicann())
-        self.neighbor_fgblock = FGBlockOnHICANN(Enum(int(self.coordinate.toNeuronFGBlock().id())+1))
+        self.neighbor_fgblock = FGBlockOnHICANN(Enum(int(self.coordinate.toNeuronFGBlock().toEnum())+1))
 
         self.tree = etree.parse(self.xmlfile)
 
@@ -353,8 +353,8 @@ class HALbeXML2Sim2Denmem(object):
             # FGCtrl-based overload
             if len(parameters) == 1:
                 fgc = self.coordinate.toNeuronFGBlock()
-                fgb_left = parameters[0].xpath('blocks/elems/item')[int(fgc.id())]
-                fgb_right = parameters[0].xpath('blocks/elems/item')[int(self.neighbor_fgblock.id())]
+                fgb_left = parameters[0].xpath('blocks/elems/item')[int(fgc.toEnum())]
+                fgb_right = parameters[0].xpath('blocks/elems/item')[int(self.neighbor_fgblock.toEnum())]
 
             # FGBlockOnHICANN + FGBlock data overload
             elif len(parameters) == 2:
@@ -451,8 +451,8 @@ class HALbeXML2Sim2Denmem(object):
             cfgs = [self.recursive_dict(x) for x in parameter.xpath('neuron/elems/item/elems/item')]
             assert len(cfgs) == 4
 
-            left_quad  = int(self.coordinate.toNeuronOnQuad().id())
-            right_quad = int(self.coordinate.toNeuronOnQuad().id())+1
+            left_quad  = int(self.coordinate.toNeuronOnQuad().toEnum())
+            right_quad = int(self.coordinate.toNeuronOnQuad().toEnum())+1
             self.out['denmem_quad'] = {
                 'horizontal': hbits[0],
                 'vertical': vbits[0],

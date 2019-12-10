@@ -53,14 +53,14 @@ protected:
 		size_t npulses = pulses.size();
 		for (size_t n = 0; n < npulses; ++n) {
 			++channel_cnt[pulses[n].getChannel()];
-			++chip_cnt[pulses[n].getChipAddress().id()];
+			++chip_cnt[pulses[n].getChipAddress().toEnum()];
 		}
 		std::stringstream out;
 		for (auto chip : iter_all<HICANNOnDNC>())
 		{
-			if (chip_cnt[chip.id()] > 0)
+			if (chip_cnt[chip.toEnum()] > 0)
 			{
-				out	<< chip_cnt[chip.id()] << " spikes on "
+				out	<< chip_cnt[chip.toEnum()] << " spikes on "
 					<< chip << "\n";
 			}
 		}

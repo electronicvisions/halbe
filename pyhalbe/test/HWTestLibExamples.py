@@ -116,13 +116,13 @@ class HWTestLibExamples(HWTest):
 
         #configure crossbars and synapse switches
         for i in range(8):
-            if block.id().value() == 4:
+            if block.toEnum().value() == 4:
                 SetLeftCrossbarLine(hicann, 28-4*i, 6+8*i)
 
-            elif block.id().value() == 5:
+            elif block.toEnum().value() == 5:
                 SetRightCrossbarLine(hicann, 227+4*i, 6+8*i)
 
-            elif block.id().value() == 0:
+            elif block.toEnum().value() == 0:
                 SetLeftCrossbarLine(hicann, 28-4*i, 6+8*i)
                 ss = HICANN.SynapseSwitch()
                 addr = Coordinate.SynapseSwitchRowOnHICANN(Coordinate.Y(15-2*i), Coordinate.left)
@@ -131,7 +131,7 @@ class HWTestLibExamples(HWTest):
                 syn_row_cfg = ss.get_row(addr)
                 HICANN.set_syndriver_switch_row(hicann, addr, syn_row_cfg)
 
-            elif block.id().value() == 1:
+            elif block.toEnum().value() == 1:
                 SetRightCrossbarLine(hicann, 227+4*i, 6+8*i)
                 ss = HICANN.SynapseSwitch()
                 addr = Coordinate.SynapseSwitchRowOnHICANN(Coordinate.Y(15-2*i), Coordinate.right)
@@ -142,14 +142,14 @@ class HWTestLibExamples(HWTest):
 
         #readout-routine
         startrep = 0 #starting readout-repeater
-        if   block.id().value() == 4: startrep = 0   #bottom left
-        elif block.id().value() == 5: startrep = 227 #bottom right
-        elif block.id().value() == 0: startrep = 1   #top left
-        elif block.id().value() == 1: startrep = 226 #top right
+        if   block.toEnum().value() == 4: startrep = 0   #bottom left
+        elif block.toEnum().value() == 5: startrep = 227 #bottom right
+        elif block.toEnum().value() == 0: startrep = 1   #top left
+        elif block.toEnum().value() == 1: startrep = 226 #top right
 
         success_counter = 0
         for i in range(startrep, startrep + 32, 4):
-            times, addresses = L1Receive(hicann, block.id().value(), i)
+            times, addresses = L1Receive(hicann, block.toEnum().value(), i)
 
             for x in range(2): #see how many events come with correct delay (+/- 2)
                 if((abs( abs(times[x+1] - times[x]) - period )) < 3):

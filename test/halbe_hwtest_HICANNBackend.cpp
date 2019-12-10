@@ -1533,7 +1533,7 @@ size_t HICANNBackendTest<T>::L1TransmissionTest(RepeaterBlockOnHICANN const bloc
 	};
 
 	for (size_t i = 0; i < 8; i++) {
-		switch (block.id()) {
+		switch (block.toEnum()) {
 			case bottomleft : {
 				cb.set(VLineOnHICANN(28-4*i), HLineOnHICANN(6+8*i), true);
 				row_cfg = cb.get_row(HLineOnHICANN(6+8*i), left);
@@ -1582,7 +1582,7 @@ size_t HICANNBackendTest<T>::L1TransmissionTest(RepeaterBlockOnHICANN const bloc
 	TestPortOnRepeaterBlock tp(0);
 	SideVertical dir = top;
 
-	switch (block.id()) {
+	switch (block.toEnum()) {
 		case bottomleft : {
 			startrep = 0;
 			tp = TestPortOnRepeaterBlock(0);
@@ -1608,7 +1608,7 @@ size_t HICANNBackendTest<T>::L1TransmissionTest(RepeaterBlockOnHICANN const bloc
 	size_t success_counter = 0;
 
 	// unfortunately center right readout routine is too different...
-	if (block.id() != centerright) {
+	if (block.toEnum() != centerright) {
 		for (size_t i = startrep; i < startrep + 32; i+=4) {
 			//configure receiving repeater
 			vr.setInput(dir);

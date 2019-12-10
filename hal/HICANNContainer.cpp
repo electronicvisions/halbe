@@ -157,7 +157,7 @@ bool NeuronQuad::getHorizontalInterconnect(coord_t::y_type y) const
 
 int NeuronQuad::getHWAddress(coord_t const& n)
 {
-	return neuron_mapping[n.id()];
+	return neuron_mapping[n.toEnum()];
 }
 
 bool NeuronQuad::operator==(NeuronQuad const& b) const

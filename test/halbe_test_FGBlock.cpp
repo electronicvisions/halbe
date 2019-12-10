@@ -139,7 +139,7 @@ TEST(FGBlock, Dimensions)
 		FGBlockOnHICANN b{Enum{ii}};
 		FGBlock block;
 
-		if (b.id() == 0 || b.id() == 2) {
+		if (b.toEnum() == 0 || b.toEnum() == 2) {
 			ASSERT_EQ(geometry::left, b.x());
 			ASSERT_TRUE(block.is_left(b));
 		} else {
