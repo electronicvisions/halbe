@@ -32,7 +32,7 @@ def depends(ctx):
     if ctx.options.with_ess:
         ctx('euter')
         ctx('calibtic')
-        ctx('systemsim-stage2', branch='halbe_ess')
+        ctx('systemsim-stage2')
         ctx('hicann-system', 'units/hicann_cfg')
 
 def options(opt):
