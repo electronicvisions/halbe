@@ -335,6 +335,11 @@ bool Analog::operator ==(Analog const& rhs) const
 	return config == rhs.config;
 }
 
+bool Analog::operator !=(Analog const& rhs) const
+{
+	return !(*this == rhs);
+}
+
 size_t Analog::mult(Coordinate::AnalogOnHICANN const s) const
 {
 	return (s+1)%2;

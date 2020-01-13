@@ -1173,6 +1173,7 @@ public:
 	Analog() : config(0) {}
 
 	bool operator ==(Analog const& rhs) const;
+	bool operator !=(Analog const& rhs) const;
 
 	static const value_type
 		fg_right          = 0,
