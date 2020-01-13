@@ -244,6 +244,10 @@ bool NeuronConfig::operator ==(NeuronConfig const& b) const {
 			&& slow_I_gl==b.slow_I_gl && fast_I_gl==b.fast_I_gl);
 }
 
+bool NeuronConfig::operator !=(NeuronConfig const& b) const {
+	return !(*this == b);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Repeater
 

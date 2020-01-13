@@ -417,6 +417,7 @@ public:
 	{}
 
 	bool operator ==(NeuronConfig const& b) const;
+	bool operator !=(NeuronConfig const& b) const;
 
 private:
 	friend void         HICANN::set_neuron_configIMPL(Handle::HICANNHw &, NeuronConfig const &);
