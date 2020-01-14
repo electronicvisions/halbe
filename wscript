@@ -93,9 +93,7 @@ def build(bld):
 
     # TODO temporary compat
     bld(
-        features        = 'use',
         target          = 'halbe_coordinate_inc',
-        use             = ['halco_inc'],
         export_includes = ['.'],
     )
 
@@ -108,8 +106,7 @@ def build(bld):
 
     bld(
         target          = 'halbe_container_inc',
-        use             = ['halbe_coordinate_inc', 's2hal_inc', 'realtime_inc', 'hostfpga_inc',
-                           'hate_inc'],
+        export_includes = ['.']
     )
 
     # ECM (2018-10-19) FIXME: marocco depends on coordinate checks (existance of switches)
@@ -131,20 +128,18 @@ def build(bld):
             bld.path.ant_glob('hal/ADC/*.cpp')),
         install_path    = '${PREFIX}/lib',
         use             = ['halbe_container_inc', 'halbe_coordinate', 'rcf-boost-only',
-                           'bitter', 'pythonic'],
+                           'bitter', 'pythonic', 'realtime_inc', 'hostfpga_inc', 'hate_inc'],
         cxxflags=cxxflags
     )
 
     bld(
         target          = 'halbe_handle_inc',
-        use             = ['halbe_coordinate_inc'],
         export_includes = ['.'],
     )
 
     if bld.env.build_ess:
         bld(
             target          = 'ESS_inc',
-            use             = ['halbe_coordinate_inc'],
             export_includes = ['.'],
         )
 
@@ -190,7 +185,7 @@ def build(bld):
 
     bld(
         target          = 'halbe_backend_inc',
-        use             = ['halbe_handle_inc', 'halbe_container_inc'],
+        export_includes = ['.'],
     )
 
     bld.shlib(
