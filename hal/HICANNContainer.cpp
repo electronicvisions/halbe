@@ -507,18 +507,6 @@ SynapseControlRegister::SynapseControlRegister(Coordinate::SynapseArrayOnHICANN 
 	last_row = SynapseRowOnHICANN(syn_row_on_array_t(syn_row_on_array_t::max), synarray);
 }
 
-SynapseCmd const SynapseControlRegister::Opcodes::IDLE = SynapseCmd(0);
-SynapseCmd const SynapseControlRegister::Opcodes::START_READ = SynapseCmd(7);
-SynapseCmd const SynapseControlRegister::Opcodes::READ = SynapseCmd(1);
-SynapseCmd const SynapseControlRegister::Opcodes::WRITE = SynapseCmd(3);
-SynapseCmd const SynapseControlRegister::Opcodes::RST_CORR = SynapseCmd(10);
-SynapseCmd const SynapseControlRegister::Opcodes::START_RDEC = SynapseCmd(2);
-SynapseCmd const SynapseControlRegister::Opcodes::RDEC = SynapseCmd(6);
-SynapseCmd const SynapseControlRegister::Opcodes::WDEC = SynapseCmd(5);
-SynapseCmd const SynapseControlRegister::Opcodes::AUTO = SynapseCmd(4);
-SynapseCmd const SynapseControlRegister::Opcodes::CLOSE_ROW = SynapseCmd(9);
-// note: no command number 8
-
 void SynapseControlRegister::set_row(SynapseRowOnHICANN const& r)
 {
 	if (synapse_array != r.toSynapseArrayOnHICANN()) {
@@ -586,7 +574,7 @@ std::ostream& operator<<(std::ostream& os, SynapseControlRegister const& reg)
 	os << "newcmd: " << reg.newcmd << '\n';
 	os << "continuous: " << reg.continuous << '\n';
 	os << "encr: " << reg.encr << '\n';
-	os << "cmd: " << reg.cmd << '\n';
+	os << "cmd: " << static_cast<int>(reg.cmd) << '\n';
 	return os;
 }
 

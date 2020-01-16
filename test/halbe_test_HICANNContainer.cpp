@@ -19,7 +19,6 @@ typedef ::testing::Types<
 	SynapseWeight,
 	SynapseDecoder,
 	DriverDecoder,
-	SynapseCmd,
 	SynapseSel,
 	SynapseGen,
 	SynapseDllresetb

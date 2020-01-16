@@ -865,10 +865,23 @@ private:
 	friend std::ostream& operator<<(std::ostream& os, STDPEvaluationPattern const& p);
 };
 
-class SynapseCmd : public Coordinate::detail::RantWrapper<SynapseCmd, size_t, 15, 0>
+PYPP_CLASS_ENUM(SynapseControllerCmd)
 {
-public:
-	explicit PYPP_CONSTEXPR SynapseCmd(size_t val = 0) : rant_t(val) {}
+	IDLE = 0,       // Do nothing
+	START_READ = 7, // Open one row for reading of synaptic weights
+	READ = 1,       // Read weights from one column set into SYNOUT register
+	WRITE = 3,      // Write weights from SYNIN register into one column set
+	RST_CORR = 10,  // Reset correlation capacitors according to the
+	                // SYNRST register
+	START_RDEC = 2, // Open one row for reading of decoder addresses
+	RDEC = 6,       // Read decoder addresses from one column set into
+	                // SYNOUT register
+	WDEC = 5,       // Write decoder addresses from SYNIN register into
+	                // one column set
+	AUTO = 4,       // Start the automatic weight update process
+	CLOSE_ROW = 9   // Close current row after it was opend with START_READ
+	                // or START_RDEC
+	// note: no command number 8
 };
 
 class SynapseSel : public Coordinate::detail::RantWrapper<SynapseSel, size_t, 7, 0>
@@ -892,24 +905,6 @@ public:
 class SynapseControlRegister
 {
 public:
-	struct Opcodes
-	{
-		static SynapseCmd const IDLE;       // Do nothing
-		static SynapseCmd const START_READ; // Open one row for reading of synaptic weights
-		static SynapseCmd const READ;       // Read weights from one column set into SYNOUT register
-		static SynapseCmd const WRITE;      // Write weights from SYNIN register into one column set
-		static SynapseCmd const RST_CORR;   // Reset correlation capacitors according to the
-		                                    // SYNRST register
-		static SynapseCmd const START_RDEC; // Open one row for reading of decoder addresses
-		static SynapseCmd const RDEC;       // Read decoder addresses from one column set into
-		                                    // SYNOUT register
-		static SynapseCmd const WDEC;       // Write decoder addresses from SYNIN register into
-		                                    // one column set
-		static SynapseCmd const AUTO;       // Start the automatic weight update process
-		static SynapseCmd const CLOSE_ROW;  // Close current row after it was opend with START_READ
-		                                    // or START_RDEC
-	};
-
 	typedef Coordinate::SynapseRowOnHICANN syn_row_t;
 	typedef Coordinate::SynapseRowOnArray syn_row_on_array_t;
 
@@ -979,7 +974,7 @@ public:
 	PYPP_INIT(bool encr, false);
 
 	// Command to be executed. Compare "Opcodes"
-	PYPP_INIT(SynapseCmd cmd, Opcodes::IDLE);
+	PYPP_INIT(SynapseControllerCmd cmd, SynapseControllerCmd::IDLE);
 
 private:
 	Coordinate::SynapseArrayOnHICANN synapse_array;
@@ -1283,7 +1278,6 @@ HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SRAMSetupPrecharge)
 HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SRAMWriteDelay)
 
 HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseEnableDelay)
-HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseCmd)
 HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseSel)
 HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseGen)
 HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseDllresetb)

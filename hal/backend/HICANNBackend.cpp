@@ -1667,7 +1667,7 @@ HALBE_GETTER(HICANN::SynapseControlRegister, get_syn_ctrl,
 	returnvalue.continuous = data[5];
 	returnvalue.encr = data[4];
 
-	returnvalue.cmd = SynapseCmd(bit::crop<4>(data, 0).to_ulong());
+	returnvalue.cmd = SynapseControllerCmd(bit::crop<4>(data, 0).to_ulong());
 	return returnvalue;
 }
 

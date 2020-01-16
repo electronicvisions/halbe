@@ -842,10 +842,10 @@ void synapse_ctrl_formater(HICANN::SynapseControlRegister const& reg, std::bitse
 	returnvalue[5] = reg.continuous;
 	returnvalue[4] = reg.encr;
 
-	returnvalue[3] = reg.cmd.to_bitset<4>()[3];
-	returnvalue[2] = reg.cmd.to_bitset<4>()[2];
-	returnvalue[1] = reg.cmd.to_bitset<4>()[1];
-	returnvalue[0] = reg.cmd.to_bitset<4>()[0];
+	returnvalue[3] = std::bitset<4>(static_cast<int>(reg.cmd))[3];
+	returnvalue[2] = std::bitset<4>(static_cast<int>(reg.cmd))[2];
+	returnvalue[1] = std::bitset<4>(static_cast<int>(reg.cmd))[1];
+	returnvalue[0] = std::bitset<4>(static_cast<int>(reg.cmd))[0];
 }
 
 void synapse_cnfg_formater(
