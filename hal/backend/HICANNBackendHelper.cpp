@@ -784,26 +784,22 @@ size_t translate_neuron_merger(size_t const merger)
 	return _lut[merger];
 }
 
-uint8_t SynapseRowOnHICANN_to_AddrOnHW(Coordinate::SynapseRowOnHICANN const& row)
+uint8_t SynapseRowOnArray_to_AddrOnHW(Coordinate::SynapseRowOnArray const& row,
+                                      Coordinate::SynapseArrayOnHICANN const& synarray)
 {
-	if (row < Coordinate::SynapseRowOnArray::end) {
-		return Coordinate::SynapseRowOnArray::max - row;
-	} else {
-		return row - Coordinate::SynapseRowOnArray::end;
-	}
+	return synarray.isTop() ? Coordinate::SynapseRowOnArray::max - row : row;
 }
 
-Coordinate::SynapseRowOnHICANN AddrOnHW_to_SynapseRowOnHICANN(
+Coordinate::SynapseRowOnArray AddrOnHW_to_SynapseRowOnArray(
     uint8_t const& addr, Coordinate::SynapseArrayOnHICANN const& synarray)
 {
-	if (synarray.isTop()) {
-		return Coordinate::SynapseRowOnHICANN(Coordinate::SynapseRowOnArray::max - addr);
-	} else {
-		return Coordinate::SynapseRowOnHICANN(addr + Coordinate::SynapseRowOnArray::end);
-	}
+	return Coordinate::SynapseRowOnArray(synarray.isTop() ?
+		Coordinate::SynapseRowOnArray::max - addr : addr);
 }
 
-void synapse_ctrl_formater(HICANN::SynapseControlRegister const& reg, std::bitset<32>& returnvalue)
+void synapse_ctrl_formater(HICANN::SynapseControlRegister const& reg,
+                           Coordinate::SynapseArrayOnHICANN const& synarray,
+                           std::bitset<32>& returnvalue)
 {
 	// bit 31: reserverd
 	returnvalue[30] = static_cast<bool>(reg.idle) ? *reg.idle : false;
@@ -816,7 +812,7 @@ void synapse_ctrl_formater(HICANN::SynapseControlRegister const& reg, std::bitse
 	returnvalue[25] = reg.sel.to_bitset<3>()[1];
 	returnvalue[24] = reg.sel.to_bitset<3>()[0];
 
-	std::bitset<8> const last_addr = SynapseRowOnHICANN_to_AddrOnHW(reg.get_last_row());
+	std::bitset<8> const last_addr = SynapseRowOnArray_to_AddrOnHW(reg.last_row, synarray);
 	returnvalue[23] = last_addr[7];
 	returnvalue[22] = last_addr[6];
 	returnvalue[21] = last_addr[5];
@@ -826,7 +822,7 @@ void synapse_ctrl_formater(HICANN::SynapseControlRegister const& reg, std::bitse
 	returnvalue[17] = last_addr[1];
 	returnvalue[16] = last_addr[0];
 
-	std::bitset<8> const addr = SynapseRowOnHICANN_to_AddrOnHW(reg.get_row());
+	std::bitset<8> const addr = SynapseRowOnArray_to_AddrOnHW(reg.row, synarray);
 	returnvalue[15] = addr[7];
 	returnvalue[14] = addr[6];
 	returnvalue[13] = addr[5];

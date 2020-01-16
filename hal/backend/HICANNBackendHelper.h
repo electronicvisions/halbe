@@ -213,27 +213,31 @@ size_t translate_neuron_merger(size_t const merger);
 
 /**
  * Converts the software coordinates of a synapse row
- * on a HICANN chip to a hardware address.
+ * on an array to a hardware address.
  *
- * @param row Software coordinate on a HICANN chip
+ * @param row Software coordinate on a HICANN array
  *              of synapse row.
+ *
+ * @param synarray Synapse array on which the synapse
+ *                  row is located.
  *
  * @returns Hardware address of synapse row.
  */
-uint8_t SynapseRowOnHICANN_to_AddrOnHW(Coordinate::SynapseRowOnHICANN const& row);
+uint8_t SynapseRowOnArray_to_AddrOnHW(Coordinate::SynapseRowOnArray const& row,
+                                      Coordinate::SynapseArrayOnHICANN const& synarray);
 
 /**
  * Converts the hardware address of a synapse row
- * to software coordinates on a HICANN chip.
+ * to software coordinates on a HICANN array.
  *
  * @param addr Hardware address of synapse row.
  * @param synarray Synapse array on which the synapse
  *                  row is located.
  *
  * @returns Software address of synapse row on HICANN
- *              chip.
+ *              array.
  */
-Coordinate::SynapseRowOnHICANN AddrOnHW_to_SynapseRowOnHICANN(
+Coordinate::SynapseRowOnArray AddrOnHW_to_SynapseRowOnArray(
 	uint8_t const& addr, Coordinate::SynapseArrayOnHICANN const& synarray);
 
 /**
@@ -242,10 +246,14 @@ Coordinate::SynapseRowOnHICANN AddrOnHW_to_SynapseRowOnHICANN(
  *
  * @param reg Synapse control register to copy into
  *              supplied bitset.
+ * @param synarray Synapse Array for which row and
+ *                   last row should be formatted.
  * @param returnvalue To be alternated bitset.
  *
  */
-void synapse_ctrl_formater(HICANN::SynapseControlRegister const& reg, std::bitset<32>& returnvalue);
+void synapse_ctrl_formater(HICANN::SynapseControlRegister const& reg,
+                           Coordinate::SynapseArrayOnHICANN const& synarray,
+                           std::bitset<32>& returnvalue);
 
 /**
  * Changes a passed in bitset such that it represents

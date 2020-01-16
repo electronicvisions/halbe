@@ -136,75 +136,40 @@ TEST(RepeaterBlock, RepeaterBlockSerialization)
 	    HMF::HICANN::SRAMWriteDelay(1)));
 }
 
-TEST(SynapseControlRegister, ConstructionRowAndLastRow)
-{
-	// Assert that constructor initilaises row to the first row of the corresponding
-	// synapse array and last_row to the last
-	typedef Coordinate::SynapseRowOnHICANN row_t;
-	Coordinate::SynapseArrayOnHICANN top_array(0);
-	Coordinate::SynapseArrayOnHICANN bottom_array(1);
-	HMF::HICANN::SynapseControlRegister ctrl_top(top_array);
-	HMF::HICANN::SynapseControlRegister ctrl_bottom(bottom_array);
-
-	ASSERT_EQ(ctrl_top.get_row(), row_t(0));
-	ASSERT_EQ(ctrl_top.get_last_row(), row_t(223));
-
-	ASSERT_EQ(ctrl_bottom.get_row(), row_t(224));
-	ASSERT_EQ(ctrl_bottom.get_last_row(), row_t(447));
-}
-
 TEST(SynapseControlRegister, SetGetRow)
 {
-	typedef Coordinate::SynapseRowOnHICANN syn_row_t;
-	HMF::HICANN::SynapseControlRegister ctrl_reg_top;
-	HMF::HICANN::SynapseControlRegister ctrl_reg_bottom(Coordinate::SynapseArrayOnHICANN(1));
+	typedef Coordinate::SynapseRowOnArray syn_row_t;
+	HMF::HICANN::SynapseControlRegister ctrl_reg;
 
 	syn_row_t row(4);
-	ctrl_reg_top.set_row(row);
-	ASSERT_EQ(ctrl_reg_top.get_row(), row);
-
-	// last row may not exceed maximal value for top array
-	row = syn_row_t(224);
-	ASSERT_ANY_THROW(ctrl_reg_top.set_row(row));
+	ctrl_reg.row = row;
+	ASSERT_EQ(ctrl_reg.row, row);
 
 	// possible to set and get maximal values
-	row = syn_row_t(223);
-	ctrl_reg_top.set_row(row);
-	ASSERT_EQ(ctrl_reg_top.get_row(), row);
 	row = syn_row_t(syn_row_t::max);
-	ctrl_reg_bottom.set_row(row);
-	ASSERT_EQ(ctrl_reg_bottom.get_row(), row);
+	ctrl_reg.row = row;
+	ASSERT_EQ(ctrl_reg.row, row);
 
-	// row has to be on specified synapse array
-	row = syn_row_t(1);
-	ASSERT_ANY_THROW(ctrl_reg_bottom.set_row(row));
+	// last row may not exceed number of rows on array
+	ASSERT_ANY_THROW(ctrl_reg.row = syn_row_t(syn_row_t::end));
 }
 
 TEST(SynapseControlRegister, SetGetLastRow)
 {
-	typedef Coordinate::SynapseRowOnHICANN syn_row_t;
-	HMF::HICANN::SynapseControlRegister ctrl_reg_top;
-	HMF::HICANN::SynapseControlRegister ctrl_reg_bottom(Coordinate::SynapseArrayOnHICANN(1));
+	typedef Coordinate::SynapseRowOnArray syn_row_t;
+	HMF::HICANN::SynapseControlRegister ctrl_reg;
 
 	syn_row_t row(4);
-	ctrl_reg_top.set_last_row(row);
-	ASSERT_EQ(ctrl_reg_top.get_last_row(), row);
-
-	// last row may not exceed maximal value for top array
-	row = syn_row_t(224);
-	ASSERT_ANY_THROW(ctrl_reg_top.set_last_row(row));
+	ctrl_reg.last_row = row;
+	ASSERT_EQ(ctrl_reg.last_row, row);
 
 	// possible to set and get maximal values
-	row = syn_row_t(223);
-	ctrl_reg_top.set_last_row(row);
-	ASSERT_EQ(ctrl_reg_top.get_last_row(), row);
 	row = syn_row_t(syn_row_t::max);
-	ctrl_reg_bottom.set_last_row(row);
-	ASSERT_EQ(ctrl_reg_bottom.get_last_row(), row);
+	ctrl_reg.last_row = row;
+	ASSERT_EQ(ctrl_reg.last_row, row);
 
-	// row has to be on specified synapse array
-	row = syn_row_t(1);
-	ASSERT_ANY_THROW(ctrl_reg_bottom.set_last_row(row));
+	// last row may not exceed number of rows on array
+	ASSERT_ANY_THROW(ctrl_reg.last_row = syn_row_t(syn_row_t::end));
 }
 
 TEST(SynapseControlRegister, Comparison)

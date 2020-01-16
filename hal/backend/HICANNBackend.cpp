@@ -1636,7 +1636,7 @@ HALBE_SETTER_GUARDED(EventSetupSynapses, set_syn_ctrl,
 	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
 
 	std::bitset<32> ctrl_bitset;
-	synapse_ctrl_formater(ctrl_reg, ctrl_bitset);
+	synapse_ctrl_formater(ctrl_reg, synarray, ctrl_bitset);
 	sc.write_data(facets::SynapseControl::sc_ctrlreg, ctrl_bitset.to_ulong());
 }
 
@@ -1649,7 +1649,7 @@ HALBE_GETTER(HICANN::SynapseControlRegister, get_syn_ctrl,
 		synarray.isTop() ? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
 	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
 
-	HICANN::SynapseControlRegister returnvalue(synarray);
+	HICANN::SynapseControlRegister returnvalue;
 
 	std::bitset<32> const data = sc.read_data(facets::SynapseControl::sc_ctrlreg);
 	returnvalue.idle = data[30];
@@ -1659,9 +1659,9 @@ HALBE_GETTER(HICANN::SynapseControlRegister, get_syn_ctrl,
 	returnvalue.sel = SynapseSel(bit::crop<3>(data, 24).to_ulong());
 
 	uint8_t last_addr = bit::crop<8>(data, 16).to_ulong();
-	returnvalue.set_last_row(AddrOnHW_to_SynapseRowOnHICANN(last_addr, synarray));
+	returnvalue.last_row = AddrOnHW_to_SynapseRowOnArray(last_addr, synarray);
 	uint8_t addr = bit::crop<8>(data, 8).to_ulong();
-	returnvalue.set_row(AddrOnHW_to_SynapseRowOnHICANN(addr, synarray));
+	returnvalue.row = AddrOnHW_to_SynapseRowOnArray(addr, synarray);
 
 	returnvalue.newcmd = data[6];
 	returnvalue.continuous = data[5];
@@ -1769,7 +1769,7 @@ HALBE_GETTER(SynapseController, get_synapse_controller,
 	Handle::HICANN&, h,
 	SynapseArrayOnHICANN const&, synarray)
 {
-	HICANN::SynapseController returnvalue(synarray);
+	HICANN::SynapseController returnvalue;
 
 	ReticleControl const& reticle = *h.get_reticle();
 	HicannCtrl::Synapse const index =

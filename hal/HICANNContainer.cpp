@@ -493,48 +493,6 @@ std::ostream& operator<<(std::ostream& os, SynapseControllerTimings const& o)
 ////////////////////////////////////////////////////////////////////////////////
 // SynapseControlRegister
 
-SynapseControlRegister::SynapseControlRegister() :
-    SynapseControlRegister(Coordinate::SynapseArrayOnHICANN(Coordinate::top))
-{}
-
-SynapseControlRegister::SynapseControlRegister(Coordinate::SynapseArrayOnHICANN synarray) :
-    synapse_array(synarray)
-{
-	// set row to lowest possible row in array
-	row = SynapseRowOnHICANN(syn_row_on_array_t(syn_row_on_array_t::min), synarray);
-
-	// set last_row to highest possible row in array
-	last_row = SynapseRowOnHICANN(syn_row_on_array_t(syn_row_on_array_t::max), synarray);
-}
-
-void SynapseControlRegister::set_row(SynapseRowOnHICANN const& r)
-{
-	if (synapse_array != r.toSynapseArrayOnHICANN()) {
-		throw std::runtime_error(
-		    "SynapseControlRegister::set_row: row does not match vertical side");
-	}
-	row = r;
-}
-
-void SynapseControlRegister::set_last_row(SynapseRowOnHICANN const& r)
-{
-	if (synapse_array != r.toSynapseArrayOnHICANN()) {
-		throw std::runtime_error(
-		    "SynapseControlRegister::set_last_row: row does not match vertical side");
-	}
-	last_row = r;
-}
-
-SynapseRowOnHICANN SynapseControlRegister::get_row() const
-{
-	return row;
-}
-
-SynapseRowOnHICANN SynapseControlRegister::get_last_row() const
-{
-	return last_row;
-}
-
 bool SynapseControlRegister::operator==(SynapseControlRegister const& reg) const
 {
 	return (hate::compare_optional_equal(idle, reg.idle, true) &&
@@ -542,13 +500,12 @@ bool SynapseControlRegister::operator==(SynapseControlRegister const& reg) const
 	        scc == reg.scc &&
 	        without_reset == reg.without_reset &&
 	        sel == reg.sel &&
-	        get_last_row() == reg.get_last_row() &&
-	        get_row() == reg.get_row() &&
+	        last_row == reg.last_row &&
+	        row == reg.row &&
 	        newcmd == reg.newcmd &&
 	        continuous == reg.continuous &&
 	        encr == reg.encr &&
-	        cmd == reg.cmd &&
-	        toSynapseArrayOnHICANN() == reg.toSynapseArrayOnHICANN());
+	        cmd == reg.cmd);
 }
 
 bool SynapseControlRegister::operator!=(SynapseControlRegister const& reg) const
@@ -556,21 +513,16 @@ bool SynapseControlRegister::operator!=(SynapseControlRegister const& reg) const
 	return !(*this == reg);
 }
 
-Coordinate::SynapseArrayOnHICANN SynapseControlRegister::toSynapseArrayOnHICANN() const
-{
-	return synapse_array;
-}
 
 std::ostream& operator<<(std::ostream& os, SynapseControlRegister const& reg)
 {
-	os << reg.toSynapseArrayOnHICANN() << '\n';
 	os << "idle: " << reg.idle << '\n';
 	os << "sca: " << reg.sca << '\n';
 	os << "scc: " << reg.scc << '\n';
 	os << "without reset: " << reg.without_reset << '\n';
 	os << "sel: " << reg.sel << '\n';
-	os << "last row: " << reg.get_last_row() << '\n';
-	os << "row: " << reg.get_row() << '\n';
+	os << "last row: " << reg.last_row << '\n';
+	os << "row: " << reg.row << '\n';
 	os << "newcmd: " << reg.newcmd << '\n';
 	os << "continuous: " << reg.continuous << '\n';
 	os << "encr: " << reg.encr << '\n';
@@ -582,8 +534,7 @@ template <typename Archiver>
 void SynapseControlRegister::serialize(Archiver& ar, unsigned const int)
 {
 	using boost::serialization::make_nvp;
-	ar & make_nvp("synapse_array", synapse_array)
-	   & make_nvp("idle", idle)
+	ar & make_nvp("idle", idle)
 	   & make_nvp("sca", sca)
 	   & make_nvp("scc", scc)
 	   & make_nvp("without_reset", without_reset)
@@ -679,14 +630,6 @@ void SynapseStatusRegister::serialize(Archiver& ar, unsigned const int)
 ////////////////////////////////////////////////////////////////////////////////
 // SynapseController
 
-SynapseController::SynapseController() :
-    SynapseController(Coordinate::SynapseArrayOnHICANN(Coordinate::top))
-{}
-
-SynapseController::SynapseController(Coordinate::SynapseArrayOnHICANN synarray) :
-    ctrl_reg(synarray)
-{}
-
 bool SynapseController::operator==(SynapseController const& s) const
 {
 	return (hate::compare_optional_equal(syn_in, s.syn_in, true) &&
@@ -697,18 +640,12 @@ bool SynapseController::operator==(SynapseController const& s) const
 	        cnfg_reg == s.cnfg_reg &&
 	        hate::compare_optional_equal(status_reg, s.status_reg, true) &&
 	        lut == s.lut &&
-	        syndrv_timings == s.syndrv_timings &&
-	        toSynapseArrayOnHICANN() == s.toSynapseArrayOnHICANN());
+	        syndrv_timings == s.syndrv_timings);
 }
 
 bool SynapseController::operator!=(SynapseController const& s) const
 {
 	return !(*this == s);
-}
-
-Coordinate::SynapseArrayOnHICANN SynapseController::toSynapseArrayOnHICANN() const
-{
-	return ctrl_reg.toSynapseArrayOnHICANN();
 }
 
 template <typename Archiver>

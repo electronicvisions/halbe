@@ -905,51 +905,10 @@ public:
 class SynapseControlRegister
 {
 public:
-	typedef Coordinate::SynapseRowOnHICANN syn_row_t;
 	typedef Coordinate::SynapseRowOnArray syn_row_on_array_t;
-
-	SynapseControlRegister();
-	SynapseControlRegister(Coordinate::SynapseArrayOnHICANN synarray);
 
 	bool operator==(SynapseControlRegister const& reg) const;
 	bool operator!=(SynapseControlRegister const& reg) const;
-
-	/**
-	 * Sets the row from which the STDP evaluation starts.
-	 *
-	 * @note Automatic update of weights starts at row 0 in first iteration (bug #1969)
-	 * @param row Row to be set.
-	 */
-	void set_row(syn_row_t const& row);
-
-	/**
-	 * Sets the row until which the STDP evaluation should be performed.
-	 *
-	 * @param last_row Last row for which STDP evaluation should be performed.
-	 */
-	void set_last_row(syn_row_t const& last_row);
-
-	/**
-	 * Gets the row from which the STDP evaluation starts.
-	 *
-	 * @note Automatic update of weights starts at row 0 in first iteration (bug #1969)
-	 * @return Row from which the STDP evaluation starts.
-	 */
-	syn_row_t get_row() const;
-
-	/**
-	 * Gets the row until which the STDP evaluation should be performed.
-	 *
-	 * @return Last row for which STDP evaluation should be performed.
-	 */
-	syn_row_t get_last_row() const;
-
-	/**
-	 * Returns the synapse array of the control register.
-	 *
-	 * @return Synapse Array on HICANN.
-	 */
-	Coordinate::SynapseArrayOnHICANN toSynapseArrayOnHICANN() const;
 
 	// Idle status of synapse controller (read-only)
 	boost::optional<bool> idle;
@@ -961,7 +920,10 @@ public:
 	PYPP_INIT(bool without_reset, false);
 	// Selects column set on which the operation specified by cmd is performed
 	PYPP_INIT(SynapseSel sel, SynapseSel(0));
-
+	// address of the row to perform command on
+	syn_row_on_array_t row;
+	// last address for which to perform automatic STDP updates
+	syn_row_on_array_t last_row;
 	// Specifies whether cmd holds a new comand
 	PYPP_INIT(bool newcmd, false);
 	/**
@@ -977,10 +939,6 @@ public:
 	PYPP_INIT(SynapseControllerCmd cmd, SynapseControllerCmd::IDLE);
 
 private:
-	Coordinate::SynapseArrayOnHICANN synapse_array;
-	syn_row_t row;
-	syn_row_t last_row;
-
 	friend class boost::serialization::access;
 	template <typename Archiver>
 	void serialize(Archiver& ar, unsigned const int);
@@ -1069,8 +1027,9 @@ private:
 class SynapseController
 {
 public:
-	SynapseController();
-	SynapseController(Coordinate::SynapseArrayOnHICANN synarray);
+	// Empty constructor to prevent use of explicit constructor of member variables, such as
+	// SRAMControllerTimings, when using initializer lists.
+	SynapseController() {}
 
 	PYPP_INLINE(static size_t const, SLICES, 4);
 	PYPP_INLINE(static size_t const, SYNAPSES_PER_COLUMN_SET, 32);
@@ -1121,11 +1080,7 @@ public:
 	bool operator==(SynapseController const& s) const;
 	bool operator!=(SynapseController const& s) const;
 
-	Coordinate::SynapseArrayOnHICANN toSynapseArrayOnHICANN() const;
-
 private:
-	Coordinate::SynapseArrayOnHICANN synapse_array;
-
 	friend class boost::serialization::access;
 	template <typename Archiver>
 	void serialize(Archiver& ar, unsigned const int);
