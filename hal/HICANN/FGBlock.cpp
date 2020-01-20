@@ -1,12 +1,16 @@
 #include "hal/HICANN/FGBlock.h"
-#include "hal/Coordinate/iter_all.h"
+#include "halco/common/iter_all.h"
+#include "halco/common/geometry.h"
+#include "halco/hicann/v2/fg.h"
+#include "halco/hicann/v2/neuron.h"
 
 #include "pythonic/enumerate.h"
 
 #include <bitter/bitter.h>
 #include <string>
 
-using namespace HMF::Coordinate;
+using namespace halco::hicann::v2;
+using namespace halco::common;
 
 namespace HMF {
 namespace HICANN {
@@ -112,8 +116,8 @@ FGBlock::neuron_default = {{
 // #endif
 }};
 
-neuron_parameter getNeuronParameter(Coordinate::FGBlockOnHICANN const& b,
-		                            Coordinate::FGRowOnFGBlock const & r)
+neuron_parameter getNeuronParameter(halco::hicann::v2::FGBlockOnHICANN const& b,
+		                            halco::hicann::v2::FGRowOnFGBlock const & r)
 {
 	auto const & lut = FGBlock::getNeuronLut(b);
 	auto it = std::find(lut.begin(), lut.end(), r.value());
@@ -123,8 +127,8 @@ neuron_parameter getNeuronParameter(Coordinate::FGBlockOnHICANN const& b,
 		return static_cast<neuron_parameter>(std::distance(lut.begin(), it));
 }
 
-shared_parameter getSharedParameter(Coordinate::FGBlockOnHICANN const& b,
-		                            Coordinate::FGRowOnFGBlock const & r)
+shared_parameter getSharedParameter(halco::hicann::v2::FGBlockOnHICANN const& b,
+		                            halco::hicann::v2::FGRowOnFGBlock const & r)
 {
 	auto const & lut = FGBlock::getSharedLut(b);
 	auto it = std::find(lut.begin(), lut.end(), r.value());
@@ -293,8 +297,8 @@ bool isL1Parameter(shared_parameter p)
 	}
 }
 
-bool isPotentialL1Row(Coordinate::FGRowOnFGBlock const& row) {
-	for (auto block : Coordinate::iter_all<Coordinate::FGBlockOnHICANN>()) {
+bool isPotentialL1Row(halco::hicann::v2::FGRowOnFGBlock const& row) {
+	for (auto block : halco::common::iter_all<halco::hicann::v2::FGBlockOnHICANN>()) {
 		try {
 			if (isL1Parameter(getSharedParameter(block, row))) {
 				return true;
@@ -305,8 +309,8 @@ bool isPotentialL1Row(Coordinate::FGRowOnFGBlock const& row) {
 	return false;
 }
 
-bool isPotentialFGRow(Coordinate::FGRowOnFGBlock const& row) {
-	for (auto block : Coordinate::iter_all<Coordinate::FGBlockOnHICANN>()) {
+bool isPotentialFGRow(halco::hicann::v2::FGRowOnFGBlock const& row) {
+	for (auto block : halco::common::iter_all<halco::hicann::v2::FGBlockOnHICANN>()) {
 		try {
 			if (isFGParameter(getSharedParameter(block, row))) {
 				return true;
@@ -317,19 +321,19 @@ bool isPotentialFGRow(Coordinate::FGRowOnFGBlock const& row) {
 	return false;
 }
 
-Coordinate::FGRowOnFGBlock
-getNeuronRow(Coordinate::FGBlockOnHICANN const& b, neuron_parameter p)
+halco::hicann::v2::FGRowOnFGBlock
+getNeuronRow(halco::hicann::v2::FGBlockOnHICANN const& b, neuron_parameter p)
 {
-	return Coordinate::FGRowOnFGBlock(FGBlock::getNeuronLut(b).at(p));
+	return halco::hicann::v2::FGRowOnFGBlock(FGBlock::getNeuronLut(b).at(p));
 }
 
-Coordinate::FGRowOnFGBlock
-getSharedRow(Coordinate::FGBlockOnHICANN const& b, shared_parameter p)
+halco::hicann::v2::FGRowOnFGBlock
+getSharedRow(halco::hicann::v2::FGBlockOnHICANN const& b, shared_parameter p)
 {
-	return Coordinate::FGRowOnFGBlock(FGBlock::getSharedLut(b).at(p));
+	return halco::hicann::v2::FGRowOnFGBlock(FGBlock::getSharedLut(b).at(p));
 }
 
-FGBlock::FGBlock(Coordinate::FGBlockOnHICANN const& b) :
+FGBlock::FGBlock(halco::hicann::v2::FGBlockOnHICANN const& b) :
 	mShared(), mNeuron(), mCoordinate(b)
 {
 	setDefault(b);
@@ -371,7 +375,7 @@ void FGBlock::setRaw(size_t row, size_t column, value_type val)
 	setRaw(FGCellOnFGBlock(X(column), Y(row)), val);
 }
 
-FGBlock::value_type FGBlock::getRaw(Coordinate::FGCellOnFGBlock cell) const
+FGBlock::value_type FGBlock::getRaw(halco::hicann::v2::FGCellOnFGBlock cell) const
 {
 	if (cell.x() == X(0))
 		return mShared.at(cell.y());
@@ -379,7 +383,7 @@ FGBlock::value_type FGBlock::getRaw(Coordinate::FGCellOnFGBlock cell) const
 		return mNeuron.at(cell.x() - 1).at(cell.y());
 }
 
-void FGBlock::setRaw(Coordinate::FGCellOnFGBlock cell, value_type val)
+void FGBlock::setRaw(halco::hicann::v2::FGCellOnFGBlock cell, value_type val)
 {
 	if (cell.x() == X(0))
 		mShared.at(cell.y()) = val;
@@ -434,12 +438,12 @@ void FGBlock::setDefault(FGBlockOnHICANN const& b)
 }
 
 
-int FGBlock::getSharedHardwareIdx(Coordinate::FGBlockOnHICANN const& b, shared_parameter const& i) {
+int FGBlock::getSharedHardwareIdx(halco::hicann::v2::FGBlockOnHICANN const& b, shared_parameter const& i) {
 	return getSharedLut(b).at(i);
 }
 
 
-int FGBlock::getNeuronHardwareIdx(Coordinate::FGBlockOnHICANN const& b, neuron_parameter const& i) {
+int FGBlock::getNeuronHardwareIdx(halco::hicann::v2::FGBlockOnHICANN const& b, neuron_parameter const& i) {
 	return getNeuronLut(b).at(i);
 }
 

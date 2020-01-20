@@ -1,12 +1,13 @@
 #include <gtest/gtest.h>
 
-#include "hal/Coordinate/HMFGeometry.h"
-#include "hal/Coordinate/iter_all.h"
+#include "halco/hicann/v2/fwd.h"
+#include "halco/common/iter_all.h"
 #include "hal/FPGA/PulseAddress.h"
 
 #include <iostream>
 
-using namespace HMF::Coordinate;
+using namespace halco::hicann::v2;
+using namespace halco::common;
 
 namespace HMF {
 namespace FPGA {

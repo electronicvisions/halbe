@@ -23,6 +23,3 @@
 #include "hal/Handle/FPGAEss.h"
 #include "hal/Handle/HICANNEss.h"
 #endif
-
-// Stuff
-#include "hal/Coordinate/FormatHelper.h"

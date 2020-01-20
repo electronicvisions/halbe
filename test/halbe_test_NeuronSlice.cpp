@@ -3,7 +3,7 @@
 #include "hal/HICANN.h"
 
 using namespace std;
-using namespace geometry;
+using namespace halco::common;
 
 namespace HMF {
 
@@ -24,23 +24,23 @@ TEST_F(NeuronQuadTest, NeuronAccess) {
 	HICANN::Neuron nrn;
 	nrn.address(HICANN::L1Address(22));
 
-	nquad[Coordinate::NeuronOnQuad(X(0),Y(0))] = nrn;
-	EXPECT_EQ( (nquad[Coordinate::NeuronOnQuad(X(0),Y(0))]), nrn);
+	nquad[halco::hicann::v2::NeuronOnQuad(X(0),Y(0))] = nrn;
+	EXPECT_EQ( (nquad[halco::hicann::v2::NeuronOnQuad(X(0),Y(0))]), nrn);
 
 	// Note: Error is thrown when trying to construct coordinate (rant).
-	ASSERT_THROW(Coordinate::NeuronOnQuad::x_type x(2), overflow_error);
-	ASSERT_THROW(Coordinate::NeuronOnQuad::x_type x(3), overflow_error);
-	ASSERT_THROW(Coordinate::NeuronOnQuad::y_type x(2), overflow_error);
-	ASSERT_THROW(Coordinate::NeuronOnQuad::y_type x(3), overflow_error);
+	ASSERT_THROW(halco::hicann::v2::NeuronOnQuad::x_type x(2), overflow_error);
+	ASSERT_THROW(halco::hicann::v2::NeuronOnQuad::x_type x(3), overflow_error);
+	ASSERT_THROW(halco::hicann::v2::NeuronOnQuad::y_type x(2), overflow_error);
+	ASSERT_THROW(halco::hicann::v2::NeuronOnQuad::y_type x(3), overflow_error);
 
 
 	// setter
-	ASSERT_THROW( (nquad[Coordinate::NeuronOnQuad(X(2),Y(0))] = nrn), overflow_error);
-	ASSERT_THROW( (nquad[Coordinate::NeuronOnQuad(X(0),Y(15))] = nrn), overflow_error);
+	ASSERT_THROW( (nquad[halco::hicann::v2::NeuronOnQuad(X(2),Y(0))] = nrn), overflow_error);
+	ASSERT_THROW( (nquad[halco::hicann::v2::NeuronOnQuad(X(0),Y(15))] = nrn), overflow_error);
 
 	// getter
-	ASSERT_THROW( (nrn = nquad[Coordinate::NeuronOnQuad(X(2), Y(0))]), overflow_error);
-	ASSERT_THROW( (nrn = nquad[Coordinate::NeuronOnQuad(X(0),Y(15))]), overflow_error);
+	ASSERT_THROW( (nrn = nquad[halco::hicann::v2::NeuronOnQuad(X(2), Y(0))]), overflow_error);
+	ASSERT_THROW( (nrn = nquad[halco::hicann::v2::NeuronOnQuad(X(0),Y(15))]), overflow_error);
 }
 
 TEST_F(NeuronQuadTest, InterConnectVertical) {

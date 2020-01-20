@@ -5,15 +5,15 @@
 #include <boost/asio/ip/address_v4.hpp>
 
 #include "hal/Coordinate/HMFGrid.h"
-#include "hal/Coordinate/iter_all.h"
+#include "halco/common/iter_all.h"
 
 namespace HMF {
 
-using namespace Coordinate;
+using namespace halco::hicann::v2;
 
 namespace Handle {
 
-FPGA::FPGA(Coordinate::FPGAGlobal const c)
+FPGA::FPGA(halco::hicann::v2::FPGAGlobal const c)
     : coord(c), dnc_coords(), hicann_coords(), m_listen_global(false)
 {}
 
@@ -22,7 +22,7 @@ FPGA::~FPGA() {}
 
 
 bool FPGA::isMaster() const {
-	return coord.toFPGAOnWafer() == Coordinate::FPGAOnWafer::Master;
+	return coord.toFPGAOnWafer() == halco::hicann::v2::FPGAOnWafer::Master;
 }
 
 bool FPGA::getListenGlobalMode() const
@@ -37,7 +37,7 @@ void FPGA::setListenGlobalMode(bool const listen)
 
 size_t FPGA::hicann_count(dnc_coord_t const dnc) const {
 	size_t cnt = 0;
-	for (auto hicann : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>() )
+	for (auto hicann : halco::common::iter_all<halco::hicann::v2::HICANNOnDNC>() )
 		if (hicann_active(dnc, hicann))
 			++cnt;
 	return cnt;

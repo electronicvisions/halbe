@@ -43,8 +43,7 @@ def build(bld):
     bld(
         name='pyhalbe',
         features='py use',
-        source = bld.path.ant_glob('pyhalbe_*.py') + [
-        '_pyhalbe_coordinate.py', 'Coordinate.py'],
+        source = bld.path.ant_glob('pyhalbe_*.py'),
         relative_trick=True,
         use='pyhalbe_bindings',
         install_path='${PREFIX}/lib'

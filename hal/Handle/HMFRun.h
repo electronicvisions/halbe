@@ -4,11 +4,12 @@
 #include <bitset>
 #include <map>
 #include <string>
+#include <set>
 
 #include "pywrap/compat/cstdint.hpp"
 #include "pywrap/compat/macros.hpp"
 
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/external.h"
 
 #ifndef PYPLUSPLUS
 #include <boost/shared_ptr.hpp>
@@ -47,17 +48,17 @@ struct HICANNHw;
  * the release does not foresee to use more than one HICANN
  */
 struct PowerBackend {
-	typedef std::map<Coordinate::DNCGlobal, boost::shared_ptr<facets::ReticleControl> > container_type;
+	typedef std::map<halco::hicann::v2::DNCGlobal, boost::shared_ptr<facets::ReticleControl> > container_type;
 	container_type all_reticles;
 
 	//returns a shared_ptr to the correct reticle
-	boost::shared_ptr<facets::ReticleControl> get_reticle_ptr(Coordinate::DNCGlobal const d);
+	boost::shared_ptr<facets::ReticleControl> get_reticle_ptr(halco::hicann::v2::DNCGlobal const d);
 
 	//returns a reference to the correct reticle
-	facets::ReticleControl& get_reticle(Coordinate::DNCGlobal const d);
+	facets::ReticleControl& get_reticle(halco::hicann::v2::DNCGlobal const d);
 
 	//returns a reference to the correct reticle
-	facets::ReticleControl& get_reticle(Handle::FPGAHw const& f, Coordinate::DNCOnFPGA const d);
+	facets::ReticleControl& get_reticle(Handle::FPGAHw const& f, halco::hicann::v2::DNCOnFPGA const d);
 
 	//returns a reference to one of the reticles that a FPGA f handles
 	facets::ReticleControl& get_some_reticle(Handle::FPGAHw const& f);
@@ -66,10 +67,10 @@ struct PowerBackend {
 	//must be implemented later because all HICANNBackends of the reticle
 	//have to be deleted beforehand and this is not yet possible (stateless)
 	// TODO: fix descriptions (ECM)
-	void destroy_reticle(Coordinate::DNCGlobal const d);
+	void destroy_reticle(halco::hicann::v2::DNCGlobal const d);
 
 	//converts HICANN coordinate in JTAG-relevant reticle-intern HICANN number
-	uint8_t hicann_jtag_addr(Coordinate::HICANNGlobal const& h);
+	uint8_t hicann_jtag_addr(halco::hicann::v2::HICANNGlobal const& h);
 
 	/// returns a reference to the Host Application Layer for the given FPGA.
 	HostALController& get_host_al(Handle::FPGAHw const& f);
@@ -88,15 +89,15 @@ private:
 
 	friend class ::HMF::Handle::FPGAHw;
 	void SetupReticle(
-	    Coordinate::DNCGlobal const d,
-	    Coordinate::IPv4 fpga_ip,
+	    halco::hicann::v2::DNCGlobal const d,
+	    halco::hicann::v2::IPv4 fpga_ip,
 	    uint16_t jtag_port,
-	    Coordinate::IPv4 pmu_ip,
-	    std::set<Coordinate::HICANNOnDNC> physically_available_hicanns,
-	    std::set<Coordinate::HICANNOnDNC> highspeed_hicanns,
+	    halco::hicann::v2::IPv4 pmu_ip,
+	    std::set<halco::hicann::v2::HICANNOnDNC> physically_available_hicanns,
+	    std::set<halco::hicann::v2::HICANNOnDNC> highspeed_hicanns,
 	    bool on_wafer,
 	    bool arq_mode = true,
-	    Coordinate::JTAGFrequency jtag_freq = Coordinate::JTAGFrequency());
+	    halco::hicann::v2::JTAGFrequency jtag_freq = halco::hicann::v2::JTAGFrequency());
 };
 #endif // #ifndef PYPLUSPLUS
 

@@ -8,7 +8,7 @@
 #include "reticle_control.h"
 #include "hicann_ctrl.h"
 
-#include "hal/Coordinate/iter_all.h"
+#include "halco/common/iter_all.h"
 #include "hal/Handle/FPGAHw.h"
 #include "hal/Handle/HICANNHw.h"
 #include "hal/backend/FPGABackend.h"
@@ -26,8 +26,8 @@ void switchramtest_jtag(Handle::FPGAHw& f, ReticleControl& reticle)
 	size_t const startaddr = 0;
 	size_t const maxaddr = 111;
 	size_t const datawidth = 16;
-	for (auto d : Coordinate::iter_all<HMF::Coordinate::DNCOnFPGA>()) {
-		for (auto h : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>()) {
+	for (auto d : halco::common::iter_all<halco::hicann::v2::DNCOnFPGA>()) {
+		for (auto h : halco::common::iter_all<halco::hicann::v2::HICANNOnDNC>()) {
 			if (f.hicann_active(d, h)) {
 				// JTAG-based access... we need other hicann-system comm objects...
 				boost::scoped_ptr<S2C_JtagPhys> s2c_jtag(
@@ -76,8 +76,8 @@ void switchramtest_arq(Handle::FPGAHw& f, ReticleControl& reticle)
 	size_t const startaddr = 0;
 	size_t const maxaddr = 111;
 	size_t const datawidth = 16;
-	for (auto d : Coordinate::iter_all<HMF::Coordinate::DNCOnFPGA>()) {
-		for (auto h : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>()) {
+	for (auto d : halco::common::iter_all<halco::hicann::v2::DNCOnFPGA>()) {
+		for (auto h : halco::common::iter_all<halco::hicann::v2::HICANNOnDNC>()) {
 			if (f.hicann_highspeed(d, h)) {
 				// Now HICANN-ARQ-based access...
 				L1SwitchControl* lc =
@@ -106,14 +106,14 @@ void switchramtest_arq(Handle::FPGAHw& f, ReticleControl& reticle)
 						                          << std::hex << i << " | " << rcvaddr << " ||| "
 						                          << testdata << " | " << rcvdata);
 						std::stringstream error_msg;
-						error_msg << HMF::Coordinate::short_format(f.coordinate())
+						error_msg << halco::hicann::v2::short_format(f.coordinate())
 						          << "::reset: HICANN-ARQ-based write/read access failed";
 						throw std::runtime_error(error_msg.str().c_str());
 					}
 				}
 			} else {
 				LOG4CXX_INFO(logger, "HMF::FPGA::reset(): Skipping HICANN-ARQ-based switch RAM test on "
-					<< HMF::Coordinate::short_format(f.coordinate()) << "/" << d << "/" << h << ".");
+					<< halco::hicann::v2::short_format(f.coordinate()) << "/" << d << "/" << h << ".");
 			}
 		}
 	}

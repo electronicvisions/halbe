@@ -4,7 +4,7 @@
 #include <sstream>
 
 #include "hal/SparseSwitchMatrix.h"
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/fwd.h"
 #include "hal/HICANNContainer.h"
 #include "hal/test.h"
 
@@ -14,8 +14,8 @@ namespace HICANN {
 class SynapseSwitch :
 	public SparseSwitchMatrix<
 		SynapseSwitch, bool,
-		Coordinate::VLineOnHICANN,
-		Coordinate::SynapseSwitchRowOnHICANN::y_type,
+		halco::hicann::v2::VLineOnHICANN,
+		halco::hicann::v2::SynapseSwitchRowOnHICANN::y_type,
 		8, 4>
 {
 public:
@@ -30,32 +30,32 @@ public:
 	static bool local(x_type x, y_type y);
 
 	using SparseSwitchMatrix<
-		SynapseSwitch, bool, Coordinate::VLineOnHICANN,
-		Coordinate::SynapseSwitchRowOnHICANN::y_type, 8, 4
+		SynapseSwitch, bool, halco::hicann::v2::VLineOnHICANN,
+		halco::hicann::v2::SynapseSwitchRowOnHICANN::y_type, 8, 4
 	>::get_lines;
 
 	// returns VLines only on the side matching the side of the switch row
 	static x_lines_for_row_type
-	get_lines(Coordinate::SynapseSwitchRowOnHICANN const& s);
+	get_lines(halco::hicann::v2::SynapseSwitchRowOnHICANN const& s);
 
 	/** checks exclusiveness.
-	 * checks if for the switches on one side (geometry::left or right) in each row there
+	 * checks if for the switches on one side (halco::common::left or right) in each row there
 	 * the given maximum number of switches enabled.
-	 * checks if for the switches on one side (geometry::left or right) in each column
+	 * checks if for the switches on one side (halco::common::left or right) in each column
 	 * there the given maximum number of switches enabled.
 	 */
 	std::string check_exclusiveness(size_t max_switches_per_row,
 	                                size_t max_switches_per_column_per_side) const;
 
 	/** checks row-wise exclusiveness with config of right neigbour
-	 * checks if for the switches on one side (geometry::left or RIDE) in each row there is maximum one switch enabled.
+	 * checks if for the switches on one side (halco::common::left or RIDE) in each row there is maximum one switch enabled.
 	 * @throws std::runtime_error
 	 */
 	void check_exclusiveness(const SynapseSwitch & right_neighbour) const;
 
 	SynapseSwitchRow const&
-	get_row(Coordinate::SynapseSwitchRowOnHICANN const& drv) const;
-	void set_row(Coordinate::SynapseSwitchRowOnHICANN const& drv,
+	get_row(halco::hicann::v2::SynapseSwitchRowOnHICANN const& drv) const;
+	void set_row(halco::hicann::v2::SynapseSwitchRowOnHICANN const& drv,
 			SynapseSwitchRow const& row);
 
 private:

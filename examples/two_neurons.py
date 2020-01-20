@@ -12,9 +12,9 @@ import argparse
 import pyoneer
 from pyhalbe import *
 from pyhalbe.HICANN import *
-from pyhalbe.Coordinate import left as LEFT, right as RIGHT
-from pyhalbe.Coordinate import top as TOP, bottom as BOTTOM
-from pyhalbe.Coordinate import Enum, Y, X, IPv4, HICANNOnFPGA, DNCOnFPGA, FGBlockOnHICANN, \
+from pyhalco_hicann_v2 import left as LEFT, right as RIGHT
+from pyhalco_hicann_v2 import top as TOP, bottom as BOTTOM
+from pyhalco_hicann_v2 import Enum, Y, X, IPv4, HICANNOnFPGA, DNCOnFPGA, FGBlockOnHICANN, \
     DNCMergerOnHICANN, NeuronOnHICANN, AnalogOnHICANN, RepeaterBlockOnHICANN, \
     SendingRepeaterOnHICANN, VLineOnHICANN, SynapseSwitchRowOnHICANN, SynapseRowOnHICANN
 

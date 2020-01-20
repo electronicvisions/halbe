@@ -8,11 +8,11 @@
 
 #include "bitter/integral.h"
 
-#include "hal/Coordinate/iter_all.h"
+#include "halco/common/iter_all.h"
 
 using namespace std;
-using namespace geometry;
-using namespace ::HMF::Coordinate;
+using namespace halco::common;
+using namespace ::halco::hicann::v2;
 
 namespace HMF {
 
@@ -87,7 +87,7 @@ TEST_F(Layer2Test, HICANNLoopbackHWTest) {
 		else mer.config = HICANN::Merger::LEFT_ONLY;
 		mer.slow = false;
 		mer.loopback = !(j%2);
-		mergers[Coordinate::DNCMergerOnHICANN(j)] = mer;
+		mergers[halco::hicann::v2::DNCMergerOnHICANN(j)] = mer;
 	}
 	HICANN::set_dnc_merger(h, mergers);
 
@@ -155,7 +155,7 @@ TEST_F(Layer2Test, PlaybackTraceSimpleHWTest) {
 		else mer.config = HICANN::Merger::LEFT_ONLY;
 		mer.slow = false;
 		mer.loopback = !(j%2);
-		mergers[Coordinate::DNCMergerOnHICANN(j)] = mer;
+		mergers[halco::hicann::v2::DNCMergerOnHICANN(j)] = mer;
 	}
 	HICANN::set_dnc_merger(h, mergers);
 
@@ -218,7 +218,7 @@ TEST_F(Layer2Test, PlaybackTraceSimpleHWTest) {
 /// and of course the DDR2 Playback and trace memory
 TEST_F(Layer2Test, PlaybackTraceTwiceHWTest) {
 	size_t hicann_channel = 0;
-	auto hicann_on_dnc = Coordinate::HICANNOnDNC(Enum(hicann_channel));
+	auto hicann_on_dnc = halco::hicann::v2::HICANNOnDNC(Enum(hicann_channel));
 	// initialize HICANN LVDS Link
 	HICANN::init(*f.get(d, hicann_on_dnc), false);
 
@@ -231,7 +231,7 @@ TEST_F(Layer2Test, PlaybackTraceTwiceHWTest) {
 		else mer.config = HICANN::Merger::LEFT_ONLY;
 		mer.slow = false;
 		mer.loopback = !(j%2);
-		mergers[Coordinate::DNCMergerOnHICANN(j)] = mer;
+		mergers[halco::hicann::v2::DNCMergerOnHICANN(j)] = mer;
 	}
 	HICANN::set_dnc_merger(h, mergers);
 

@@ -7,7 +7,7 @@
 class HWRealtimeLatencyMeasurementTool {
 
 public :
-	HWRealtimeLatencyMeasurementTool(HMF::Handle::FPGAHw &f, HMF::Coordinate::DNCOnFPGA const);
+	HWRealtimeLatencyMeasurementTool(HMF::Handle::FPGAHw &f, halco::hicann::v2::DNCOnFPGA const);
 
 	void configureHardware();
 	void setHicannLoopback(HMF::Handle::HICANN &);
@@ -16,7 +16,7 @@ public :
 private:
 
 	HMF::Handle::FPGA &f;
-	HMF::Coordinate::DNCOnFPGA dnc;
+	halco::hicann::v2::DNCOnFPGA dnc;
 	HMF::Handle::HICANN &h;
 
 	// TODO: only use FPGABackend realtime interface

@@ -11,8 +11,8 @@
 #include "hal/Handle/Base.h"
 #include "hal/Handle/HICANN.h"
 
-#include "hal/Coordinate/HMFGeometry.h"
-#include "hal/Coordinate/typed_array.h"
+#include "halco/hicann/v2/external.h"
+#include "halco/common/typed_array.h"
 
 // fwd decl
 struct SpinnController;
@@ -28,8 +28,8 @@ struct HICANN;
 // Base class for FPGAs
 struct FPGA : public Base
 {
-	typedef Coordinate::DNCOnFPGA dnc_coord_t;
-	typedef Coordinate::HICANNOnDNC hicann_coord_t;
+	typedef halco::hicann::v2::DNCOnFPGA dnc_coord_t;
+	typedef halco::hicann::v2::HICANNOnDNC hicann_coord_t;
 	typedef boost::shared_ptr<HICANN> hicann_handle_t;
 
 	/// Dummy destructor needed by unique_ptr member.
@@ -48,25 +48,25 @@ struct FPGA : public Base
 	bool dnc_active(dnc_coord_t const d) const;
 
 	/// Returns the coordinate.
-	Coordinate::FPGAGlobal const & coordinate() const {
+	halco::hicann::v2::FPGAGlobal const & coordinate() const {
 		return coord;
 	}
 
 	/// Returns the wafer coordinate.
-	Coordinate::Wafer wafer() const {
+	halco::hicann::v2::Wafer wafer() const {
 		return coord.toWafer();
 	}
 
 	/// Translates from local DNC coordinate to global DNC coordinate
-	Coordinate::DNCGlobal dnc(dnc_coord_t const d) const {
-		using namespace Coordinate;
+	halco::hicann::v2::DNCGlobal dnc(dnc_coord_t const d) const {
+		using namespace halco::hicann::v2;
 		FPGAGlobal fpga = coordinate();
 		return DNCGlobal(d.toDNCOnWafer(fpga), fpga.toWafer());
 	}
 
 	/// Translates from local DNC and HICANN coordinates to global HICANN coordinate
-	Coordinate::HICANNGlobal hicann(dnc_coord_t const d, hicann_coord_t const h) const {
-		using namespace Coordinate;
+	halco::hicann::v2::HICANNGlobal hicann(dnc_coord_t const d, hicann_coord_t const h) const {
+		using namespace halco::hicann::v2;
 		DNCOnWafer dnc = d.toDNCOnWafer(coordinate());
 		HICANNOnWafer hicann = h.toHICANNOnWafer(dnc);
 		return HICANNGlobal(hicann, coordinate().toWafer());
@@ -77,7 +77,7 @@ struct FPGA : public Base
 	bool operator!=(FPGA const& other) const { return !(*this == other); }
 
 	/// Cast operator to its coordinate.
-	operator Coordinate::FPGAGlobal const & () const {
+	operator halco::hicann::v2::FPGAGlobal const & () const {
 		return coordinate();
 	}
 
@@ -87,7 +87,7 @@ struct FPGA : public Base
 
 	/// Returns a HICANN handle that representes a connection to a HICANN that
 	/// is accessible from this FPGA.
-	hicann_handle_t get(Coordinate::HICANNOnWafer const& hicann);
+	hicann_handle_t get(halco::hicann::v2::HICANNOnWafer const& hicann);
 
 	template <typename FPGAType>
 	FPGAType & cast_to();
@@ -112,7 +112,7 @@ struct FPGA : public Base
 #endif
 
 protected:
-	FPGA(Coordinate::FPGAGlobal const c);
+	FPGA(halco::hicann::v2::FPGAGlobal const c);
 
 	/// Mark the DNC as active
 	void activate_dnc(const dnc_coord_t & dnc);
@@ -122,35 +122,35 @@ protected:
 
 private:
 #ifndef PYPLUSPLUS
-	virtual hicann_handle_t create_hicann(Coordinate::HICANNGlobal const& h, bool request_highspeed = true) = 0;
+	virtual hicann_handle_t create_hicann(halco::hicann::v2::HICANNGlobal const& h, bool request_highspeed = true) = 0;
 #endif
 
 	// FPGA coordinate
-	Coordinate::FPGAGlobal const coord;
+	halco::hicann::v2::FPGAGlobal const coord;
 
 	// Active DNCs
 	std::bitset<hicann_coord_t::enum_type::size> active_dncs;
 
 	// attached DNCs
-	std::array<Coordinate::DNCGlobal, dnc_coord_t::size> const dnc_coords;
+	std::array<halco::hicann::v2::DNCGlobal, dnc_coord_t::size> const dnc_coords;
 
 	// attached HICANNs
-	std::array< std::array<Coordinate::HICANNGlobal, hicann_coord_t::enum_type::size>, dnc_coord_t::end> const hicann_coords;
+	std::array< std::array<halco::hicann::v2::HICANNGlobal, hicann_coord_t::enum_type::size>, dnc_coord_t::end> const hicann_coords;
 
 	// FPGA operates in listen global Mode, i.e. synchronized multi FPGA Experiment
 	bool m_listen_global;
 
 	// attached HICANNs
 	// FIXME: this array should be list of actually used hicanns and not all available hicanns
-	Coordinate::typed_array<Coordinate::typed_array<hicann_handle_t, hicann_coord_t>, dnc_coord_t>
+	halco::common::typed_array<halco::common::typed_array<hicann_handle_t, hicann_coord_t>, dnc_coord_t>
 	    hicanns;
 
 	// HICANNs where a high-speed connection is required
-	Coordinate::typed_array<Coordinate::typed_array<hicann_handle_t, hicann_coord_t>, dnc_coord_t>
+	halco::common::typed_array<halco::common::typed_array<hicann_handle_t, hicann_coord_t>, dnc_coord_t>
 	    highspeed_hicanns;
 
 	// HICANNs that can be used (e.g. return correct JTAG id)
-	Coordinate::typed_array<Coordinate::typed_array<hicann_handle_t, hicann_coord_t>, dnc_coord_t>
+	halco::common::typed_array<halco::common::typed_array<hicann_handle_t, hicann_coord_t>, dnc_coord_t>
 	    usable_hicanns;
 };
 
@@ -181,13 +181,13 @@ public:
 		return boost::dynamic_pointer_cast<HICANNHandle>(FPGA::get(d, h));
 	}
 
-	boost::shared_ptr<HICANNHandle> get(Coordinate::HICANNGlobal const& h)
+	boost::shared_ptr<HICANNHandle> get(halco::hicann::v2::HICANNGlobal const& h)
 	{
 		return boost::dynamic_pointer_cast<HICANNHandle>(FPGA::get(h));
 	}
 
 protected:
-	FPGAMixin(Coordinate::FPGAGlobal const& c) : FPGA(c) {}
+	FPGAMixin(halco::hicann::v2::FPGAGlobal const& c) : FPGA(c) {}
 };
 
 } // namespace Handle

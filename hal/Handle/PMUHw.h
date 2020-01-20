@@ -12,11 +12,11 @@ struct PMUHw:
 		PMU()
 	{}
 
-	explicit PMUHw(Coordinate::IPv4 const & ip) :
+	explicit PMUHw(halco::hicann::v2::IPv4 const & ip) :
 		PMU(ip)
 	{}
 
-	PMUHw(Coordinate::PMU const & c, Coordinate::IPv4 const & ip) :
+	PMUHw(halco::hicann::v2::PMU const & c, halco::hicann::v2::IPv4 const & ip) :
 		PMU(c, ip)
 	{}
 };

@@ -1,11 +1,10 @@
 #include <iostream>
 #include <chrono>
 #include <cmath>
-
-#include "hal/Coordinate/FormatHelper.h"
+#include "halco/hicann/v2/format_helper.h"
 #include "hal/backend/HICANNBackendHelper.h"
 #include "hal/HICANN/FGInstruction.h"
-#include "hal/Coordinate/iter_all.h"
+#include "halco/common/iter_all.h"
 
 // TODO: ugly includes from hicann-system!
 #include "fpga_control.h"          //FPGA control class
@@ -19,7 +18,8 @@
 #include "dncif_control.h"         //DNC interface control
 
 using namespace facets;
-using namespace HMF::Coordinate;
+using namespace halco::hicann::v2;
+using namespace halco::common;
 
 static log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger("halbe.backend.hicann");
 
@@ -27,7 +27,7 @@ namespace HMF {
 namespace HICANN {
 
 void set_decoder_double_row_impl(
-	HMF::Coordinate::SynapseDriverOnHICANN const& s, HMF::HICANN::DecoderDoubleRow const& data,
+	halco::hicann::v2::SynapseDriverOnHICANN const& s, HMF::HICANN::DecoderDoubleRow const& data,
 	std::function<void(sc_write_data const&)> callback)
 {
 	using namespace facets;
@@ -90,7 +90,7 @@ void set_decoder_double_row_impl(
 }
 
 void set_weights_row_impl(
-	HMF::Coordinate::SynapseRowOnHICANN const& s, HMF::HICANN::WeightRow const& weights,
+	halco::hicann::v2::SynapseRowOnHICANN const& s, HMF::HICANN::WeightRow const& weights,
 	std::function<void(sc_write_data const&)> callback)
 {
 	using namespace facets;
@@ -108,14 +108,14 @@ void set_weights_row_impl(
 	// block instance
 	uint32_t addr = 0;
 	HicannCtrl::Synapse index;
-	const HMF::Coordinate::SynapseDriverOnHICANN drv = s.toSynapseDriverOnHICANN();
+	const halco::hicann::v2::SynapseDriverOnHICANN drv = s.toSynapseDriverOnHICANN();
 
 	if (drv.line() < 112) { // upper half of ANNCORE
-		addr = 223 - (drv.line() * 2) - (s.toRowOnSynapseDriver() == HMF::Coordinate::top ? 0 : 1);
+		addr = 223 - (drv.line() * 2) - (s.toRowOnSynapseDriver() == halco::common::top ? 0 : 1);
 		index = HicannCtrl::SYNAPSE_TOP;
 	} else { // lower half of ANNCORE
 		addr = (drv.line() - 112) * 2 +
-		       (s.toRowOnSynapseDriver() == HMF::Coordinate::top ? 0 : 1); /// top/bottom here is
+		       (s.toRowOnSynapseDriver() == halco::common::top ? 0 : 1); /// top/bottom here is
 		                                                                   /// geometrical, not
 		                                                                   /// hardware!
 		index = HicannCtrl::SYNAPSE_BOTTOM;
@@ -142,7 +142,7 @@ void set_weights_row_impl(
 
 void wait_by_dummy(
 	Handle::HICANN& h,
-	Coordinate::SynapseArrayOnHICANN const& synarray,
+	halco::hicann::v2::SynapseArrayOnHICANN const& synarray,
 	HICANN::SynapseConfigurationRegister const& cnfg_reg,
 	size_t num_cycles)
 {
@@ -727,11 +727,11 @@ void set_repeater_direction(
 	}
 }
 
-geometry::SideHorizontal get_repeater_direction(
+halco::common::SideHorizontal get_repeater_direction(
 	HLineOnHICANN const x,
 	std::bitset<8> const data)
 {
-	geometry::SideHorizontal returnvalue;
+	halco::common::SideHorizontal returnvalue;
 
 	if (x % 2) {
 		if (data.test(4)) returnvalue = left;  //leftwards
@@ -745,11 +745,11 @@ geometry::SideHorizontal get_repeater_direction(
 	return returnvalue;
 }
 
-geometry::SideVertical get_repeater_direction(
+halco::common::SideVertical get_repeater_direction(
 	VLineOnHICANN const x,
 	std::bitset<8> const data)
 {
-	geometry::SideVertical returnvalue;
+	halco::common::SideVertical returnvalue;
 
 	if (x < 128) { //left HICANN side
 		if (x % 2) {
@@ -806,21 +806,21 @@ size_t translate_neuron_merger(size_t const merger)
 	return _lut[merger];
 }
 
-uint8_t SynapseRowOnArray_to_AddrOnHW(Coordinate::SynapseRowOnArray const& row,
-                                      Coordinate::SynapseArrayOnHICANN const& synarray)
+uint8_t SynapseRowOnArray_to_AddrOnHW(halco::hicann::v2::SynapseRowOnArray const& row,
+                                      halco::hicann::v2::SynapseArrayOnHICANN const& synarray)
 {
-	return synarray.isTop() ? Coordinate::SynapseRowOnArray::max - row : row;
+	return synarray.isTop() ? halco::hicann::v2::SynapseRowOnArray::max - row : row;
 }
 
-Coordinate::SynapseRowOnArray AddrOnHW_to_SynapseRowOnArray(
-    uint8_t const& addr, Coordinate::SynapseArrayOnHICANN const& synarray)
+halco::hicann::v2::SynapseRowOnArray AddrOnHW_to_SynapseRowOnArray(
+    uint8_t const& addr, halco::hicann::v2::SynapseArrayOnHICANN const& synarray)
 {
-	return Coordinate::SynapseRowOnArray(synarray.isTop() ?
-		Coordinate::SynapseRowOnArray::max - addr : addr);
+	return halco::hicann::v2::SynapseRowOnArray(synarray.isTop() ?
+		halco::hicann::v2::SynapseRowOnArray::max - addr : addr);
 }
 
 void synapse_ctrl_formater(HICANN::SynapseControlRegister const& reg,
-                           Coordinate::SynapseArrayOnHICANN const& synarray,
+                           halco::hicann::v2::SynapseArrayOnHICANN const& synarray,
                            std::bitset<32>& returnvalue)
 {
 	// bit 31: reserverd

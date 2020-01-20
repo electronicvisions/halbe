@@ -1,6 +1,6 @@
 #include "hal/HICANN/RowConfig.h"
 
-using namespace geometry;
+using namespace halco::common;
 
 namespace HMF {
 namespace HICANN {

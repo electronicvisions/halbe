@@ -1,4 +1,5 @@
 #include "hal/HICANN/L1Address.h"
+#include "halco/hicann/v2/l1.h"
 
 #include <bitter/integral.h>
 

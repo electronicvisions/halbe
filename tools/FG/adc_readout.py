@@ -4,7 +4,7 @@
 
 import time
 import pycalibtic
-import Coordinate
+import pyhalco_hicann_v2 as Coordinate
 from pyhalbe import ADC, Handle
 
 class ADCReadout(object):

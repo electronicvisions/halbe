@@ -3,8 +3,9 @@
 #include <boost/serialization/nvp.hpp>
 #include <boost/serialization/serialization.hpp>
 
-#include "hal/Coordinate/geometry.h"
-#include "hal/Coordinate/typed_array.h"
+#include "halco/hicann/v2/fwd.h"
+#include "halco/common/geometry.h"
+#include "halco/common/typed_array.h"
 #include "hal/HICANN/FGBlock.h"
 
 
@@ -41,7 +42,7 @@ struct FGErrorResult
 	///
 	/// @return the cell address of incorrectly programmed voltage
 	///
-	HMF::Coordinate::X get_cell() const;
+	halco::common::X get_cell() const;
 
 	///
 	/// @return controler busy flag
@@ -71,8 +72,8 @@ private:
 struct FGErrorResultRow {
 	FGErrorResultRow();
 
-	FGErrorResult const& operator[] (HMF::Coordinate::X const& fg_col_index) const;
-	FGErrorResult&       operator[] (HMF::Coordinate::X const& fg_col_index);
+	FGErrorResult const& operator[] (halco::common::X const& fg_col_index) const;
+	FGErrorResult&       operator[] (halco::common::X const& fg_col_index);
 
 	friend std::ostream& operator<< (std::ostream& os, FGErrorResultRow const& fgerr);
 
@@ -92,13 +93,13 @@ private:
 struct FGErrorResultQuadRow {
 	FGErrorResultQuadRow();
 
-	FGErrorResultRow const& operator[] (Coordinate::FGBlockOnHICANN const& blk) const;
-	FGErrorResultRow&       operator[] (Coordinate::FGBlockOnHICANN const& blk);
+	FGErrorResultRow const& operator[] (halco::hicann::v2::FGBlockOnHICANN const& blk) const;
+	FGErrorResultRow&       operator[] (halco::hicann::v2::FGBlockOnHICANN const& blk);
 
 	friend std::ostream& operator<< (std::ostream& os, FGErrorResultQuadRow const& fgeqr);
 
 private:
-	Coordinate::typed_array<FGErrorResultRow, Coordinate::FGBlockOnHICANN> m_quad_row_results;
+	halco::common::typed_array<FGErrorResultRow, halco::hicann::v2::FGBlockOnHICANN> m_quad_row_results;
 
 	friend class boost::serialization::access;
 	template<typename Archiver>

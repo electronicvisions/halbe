@@ -6,17 +6,17 @@
 
 #include "hal/backend/HMFBackend.h"
 #include "hal/HICANN.h"
-#include "hal/Coordinate/iter_all.h"
+#include "halco/common/iter_all.h"
 
-using namespace geometry;
-using namespace ::HMF::Coordinate;
+using namespace halco::common;
+using namespace ::halco::hicann::v2;
 
 namespace HMF {
 namespace HICANN {
 
 TEST(Crossbar, Exists) {
-	typedef Coordinate::HLineOnHICANN H;
-	typedef Coordinate::VLineOnHICANN V;
+	typedef halco::hicann::v2::HLineOnHICANN H;
+	typedef halco::hicann::v2::VLineOnHICANN V;
 
 	Crossbar crossbar;
 	// left 
@@ -74,8 +74,8 @@ TEST(Crossbar, Exists) {
 }
 
 TEST(Crossbar, IsEmptyInitially) {
-	typedef Coordinate::HLineOnHICANN H;
-	typedef Coordinate::VLineOnHICANN V;
+	typedef halco::hicann::v2::HLineOnHICANN H;
+	typedef halco::hicann::v2::VLineOnHICANN V;
 
 	Crossbar crossbar;
 	for ( size_t x=0; x < Crossbar::x_type::end; ++x) {
@@ -88,8 +88,8 @@ TEST(Crossbar, IsEmptyInitially) {
 }
 
 TEST(Crossbar, GetSet) {
-	typedef Coordinate::HLineOnHICANN H;
-	typedef Coordinate::VLineOnHICANN V;
+	typedef halco::hicann::v2::HLineOnHICANN H;
+	typedef halco::hicann::v2::VLineOnHICANN V;
 
 	Crossbar crossbar;
 	// set and get
@@ -114,15 +114,15 @@ TEST(Crossbar, GetSet) {
 }
 
 TEST(Crossbar, GetRowConfig) {
-	typedef Coordinate::HLineOnHICANN H;
-	typedef Coordinate::VLineOnHICANN V;
+	typedef halco::hicann::v2::HLineOnHICANN H;
+	typedef halco::hicann::v2::VLineOnHICANN V;
 
 	Crossbar crossbar;
 	crossbar.set(V(0), H(62), true);
 
 	// left
 	{
-		auto row_config = crossbar.get_row(Coordinate::HLineOnHICANN(62), left);
+		auto row_config = crossbar.get_row(halco::hicann::v2::HLineOnHICANN(62), left);
 		EXPECT_EQ(4, row_config.size());
 		EXPECT_TRUE(row_config[0]);
 		EXPECT_FALSE(row_config[1]);
@@ -133,7 +133,7 @@ TEST(Crossbar, GetRowConfig) {
 	// right
 	crossbar.set(V(128+32), H(0), true);
 	{
-		auto row_config = crossbar.get_row(Coordinate::HLineOnHICANN(0), right);
+		auto row_config = crossbar.get_row(halco::hicann::v2::HLineOnHICANN(0), right);
 		EXPECT_EQ(4, row_config.size());
 		EXPECT_FALSE(row_config[0]);
 		EXPECT_TRUE(row_config[1]);
@@ -143,8 +143,8 @@ TEST(Crossbar, GetRowConfig) {
 }
 
 TEST(Crossbar, CheckExclusiveness) {
-	typedef Coordinate::HLineOnHICANN H;
-	typedef Coordinate::VLineOnHICANN V;
+	typedef halco::hicann::v2::HLineOnHICANN H;
+	typedef halco::hicann::v2::VLineOnHICANN V;
 
 	Crossbar c1, c2;
 
@@ -173,7 +173,7 @@ TEST(Crossbar, CheckExclusiveness) {
 
 TEST(Crossbar, GetLines)
 {
-	using namespace HMF::Coordinate;
+	using namespace halco::hicann::v2;
 
 	for (unsigned ii = 0; ii < HLineOnHICANN::end; ++ii)
 	{
@@ -235,8 +235,8 @@ TEST(Crossbar, EqualOperator)
 }
 
 TEST(SynapseSwitch, Exists) {
-	typedef Coordinate::VLineOnHICANN V;
-	typedef Coordinate::SynapseSwitchRowOnHICANN::y_type H;
+	typedef halco::hicann::v2::VLineOnHICANN V;
+	typedef halco::hicann::v2::SynapseSwitchRowOnHICANN::y_type H;
 
 	SynapseSwitch s;
 
@@ -342,8 +342,8 @@ TEST(SynapseSwitch, Exists) {
 }
 
 TEST(SynapseSwitch, IsEmptyInitially) {
-	typedef Coordinate::VLineOnHICANN V;
-	typedef Coordinate::SynapseSwitchRowOnHICANN::y_type H;
+	typedef halco::hicann::v2::VLineOnHICANN V;
+	typedef halco::hicann::v2::SynapseSwitchRowOnHICANN::y_type H;
 
 	SynapseSwitch s;
 	for ( size_t x=0; x < V::end; ++x) {
@@ -356,8 +356,8 @@ TEST(SynapseSwitch, IsEmptyInitially) {
 }
 
 TEST(SynapseSwitch, GetSet) {
-	typedef Coordinate::VLineOnHICANN V;
-	typedef Coordinate::SynapseSwitchRowOnHICANN::y_type H;
+	typedef halco::hicann::v2::VLineOnHICANN V;
+	typedef halco::hicann::v2::SynapseSwitchRowOnHICANN::y_type H;
 
 	SynapseSwitch s;
 	// TODO
@@ -384,15 +384,15 @@ TEST(SynapseSwitch, GetSet) {
 }
 
 TEST(SynapseSwitch, GetRowConfig) {
-	typedef Coordinate::VLineOnHICANN V;
-	typedef Coordinate::SynapseSwitchRowOnHICANN::y_type H;
+	typedef halco::hicann::v2::VLineOnHICANN V;
+	typedef halco::hicann::v2::SynapseSwitchRowOnHICANN::y_type H;
 
 	SynapseSwitch s;
 	// top left
 	s.set(V(96), H(0), true);
 	{
 		size_t pos_true = 12;
-		auto row_config = s.get_row(Coordinate::SynapseSwitchRowOnHICANN(Y(0),left));
+		auto row_config = s.get_row(halco::hicann::v2::SynapseSwitchRowOnHICANN(Y(0),left));
 		EXPECT_EQ(16, row_config.size());
 		for (size_t pos = 0; pos < row_config.size(); ++pos) {
 			if (pos == pos_true)
@@ -406,7 +406,7 @@ TEST(SynapseSwitch, GetRowConfig) {
 	s.set(V(54), H(116), true);
 	{
 		size_t pos_true = 6;
-		auto row_config = s.get_row(Coordinate::SynapseSwitchRowOnHICANN(Y(116),left));
+		auto row_config = s.get_row(halco::hicann::v2::SynapseSwitchRowOnHICANN(Y(116),left));
 		EXPECT_EQ(16, row_config.size());
 		for (size_t pos = 0; pos < row_config.size(); ++pos) {
 			if (pos == pos_true)
@@ -420,7 +420,7 @@ TEST(SynapseSwitch, GetRowConfig) {
 	s.set(V(137), H(11), true);
 	{
 		size_t pos_true = 1;
-		auto row_config = s.get_row(Coordinate::SynapseSwitchRowOnHICANN(Y(11),right));
+		auto row_config = s.get_row(halco::hicann::v2::SynapseSwitchRowOnHICANN(Y(11),right));
 		EXPECT_EQ(16, row_config.size());
 		for (size_t pos = 0; pos < row_config.size(); ++pos) {
 			if (pos == pos_true)
@@ -434,7 +434,7 @@ TEST(SynapseSwitch, GetRowConfig) {
 	s.set(V(128 + 2*32 + 16 + 2), H(112+24), true);
 	{
 		size_t pos_true = 10;
-		auto row_config = s.get_row(Coordinate::SynapseSwitchRowOnHICANN(Y(112+24),right));
+		auto row_config = s.get_row(halco::hicann::v2::SynapseSwitchRowOnHICANN(Y(112+24),right));
 		EXPECT_EQ(16, row_config.size());
 		for (size_t pos = 0; pos < row_config.size(); ++pos) {
 			if (pos == pos_true)
@@ -446,8 +446,8 @@ TEST(SynapseSwitch, GetRowConfig) {
 }
 
 TEST(SynapseSwitch, CheckExclusiveness) {
-	typedef Coordinate::VLineOnHICANN V;
-	typedef Coordinate::SynapseSwitchRowOnHICANN::y_type H;
+	typedef halco::hicann::v2::VLineOnHICANN V;
+	typedef halco::hicann::v2::SynapseSwitchRowOnHICANN::y_type H;
 
 	SynapseSwitch s1, s2;
 
@@ -489,7 +489,7 @@ TEST(SynapseSwitch, CheckExclusiveness) {
 
 TEST(SynapseSwitch, GetLines)
 {
-	using namespace HMF::Coordinate;
+	using namespace halco::hicann::v2;
 	typedef std::set<unsigned> us_t;
 
 	std::map<SynapseSwitchRowOnHICANN::y_type, us_t> slines;
@@ -517,7 +517,7 @@ TEST(SynapseSwitch, GetLines)
 
 TEST(SynapseSwitch, GetLinesFromRows)
 {
-	using namespace HMF::Coordinate;
+	using namespace halco::hicann::v2;
 	typedef std::set<unsigned> us_t;
 
 	std::map<SynapseSwitchRowOnHICANN, us_t> slines;

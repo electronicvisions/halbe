@@ -1,6 +1,11 @@
 #pragma once
 
-#include "hal/Coordinate/HMFGeometry.h"
+#ifndef PYPLUSPLUS
+#include <array>
+#endif
+#include <bitset>
+
+#include "halco/hicann/v2/fwd.h"
 #include "pywrap/compat/rant.hpp"
 
 namespace HMF {
@@ -16,8 +21,8 @@ struct FGRow
 
 	void setShared(value_type value);
 	value_type getShared() const;
-	void setNeuron(Coordinate::NeuronOnFGBlock column, value_type value);
-	value_type getNeuron(Coordinate::NeuronOnFGBlock column) const;
+	void setNeuron(halco::hicann::v2::NeuronOnFGBlock column, value_type value);
+	value_type getNeuron(halco::hicann::v2::NeuronOnFGBlock column) const;
 
 	friend bool operator== (FGRow const & a, FGRow const & b);
 	friend bool operator!= (FGRow const & a, FGRow const & b);
@@ -32,9 +37,12 @@ struct FGRow
 #endif // PYPLUSPLUS
 private:
 	rant::integral_range<value_type, 1023> mShared;
+#ifndef PYPLUSPLUS
 	std::array<rant::integral_range<value_type, 1023>, fg_columns-1> mNeuron;
+#endif // PYPLUSPLUS
 };
 
+#ifndef PYPLUSPLUS
 template<typename Archiver>
 void FGRow::serialize(Archiver & ar, unsigned int const)
 {
@@ -42,6 +50,7 @@ void FGRow::serialize(Archiver & ar, unsigned int const)
 	ar & make_nvp("shared", mShared)
 	   & make_nvp("neuron", mNeuron);
 }
+#endif
 
 } // HICANN
 } // HMF

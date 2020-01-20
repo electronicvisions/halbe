@@ -1,7 +1,12 @@
 #include "hal/HICANN/FGControl.h"
 #include "pythonic/enumerate.h"
 
-using namespace HMF::Coordinate;
+#include "halco/common/geometry.h"
+#include "halco/hicann/v2/fg.h"
+#include "halco/hicann/v2/neuron.h"
+
+using namespace halco::hicann::v2;
+using namespace halco::common;
 
 namespace HMF {
 namespace HICANN {
@@ -65,12 +70,12 @@ size_t FGControl::size() const
 	return mBlock.size();
 }
 
-FGBlock& FGControl::operator[] (Coordinate::FGBlockOnHICANN const& b)
+FGBlock& FGControl::operator[] (halco::hicann::v2::FGBlockOnHICANN const& b)
 {
 	return mBlock[b.toEnum()];
 }
 
-FGBlock const& FGControl::operator[] (Coordinate::FGBlockOnHICANN const& b) const
+FGBlock const& FGControl::operator[] (halco::hicann::v2::FGBlockOnHICANN const& b) const
 {
 	return mBlock[b.toEnum()];
 }

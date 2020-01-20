@@ -39,7 +39,6 @@ messages.disable(messages.W1066)  # Not exposed typedefs
 # Collect namespaces
 ns_hmf        = mb.namespace("::HMF")
 ns_hmf_hicann = mb.namespace("::HMF::HICANN")
-ns_coordinate = mb.namespace("::HMF::Coordinate")
 ns_realtime   = mb.namespace("::Realtime")
 included_ns = [ns_hmf, ns_realtime]
 
@@ -48,12 +47,6 @@ for ns in ['::boost::serialization', '::boost::archive', '::boost::mpi']:
         mb.namespace(ns).exclude()
     except matchers.declaration_not_found_t:
         pass
-
-
-def ignore(c):
-    m = matchers.namespace_contains_matcher_t
-    return m(ns_coordinate.name)(c)
-
 
 def get_fops(name="operator<<"):
     return [tc.decl_string for tc in [op.get_target_class() for op in mb.free_operators() if op.name == name] if tc]
@@ -91,8 +84,6 @@ for ns in included_ns:
     namespaces.extend_array_operators(ns)
 
     for c in ns.classes(allow_empty=True):
-        if ignore(c):
-            continue
 
         c.include()
         for base in classes.get_all_bases(c):
@@ -160,8 +151,6 @@ for ns in included_ns:
 mb.classes(matchers.match_std_container_t("hash"), allow_empty=True).exclude()
 
 ns_util.add_namespace(mb.namespace("std"))
-
-ns_coordinate.exclude()
 
 # include base classes
 for cl in mb.classes():

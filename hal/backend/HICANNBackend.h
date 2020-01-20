@@ -2,7 +2,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/fwd.h"
 #include "hal/HICANN.h"
 
 namespace HMF {
@@ -21,14 +21,14 @@ namespace HICANN {
  */
 void set_crossbar_switch_row(
 	Handle::HICANN & h,
-	Coordinate::HLineOnHICANN const& y,
-	Coordinate::Side const& s,
+	halco::hicann::v2::HLineOnHICANN const& y,
+	halco::common::Side const& s,
 	CrossbarRow const& switches);
 
 CrossbarRow get_crossbar_switch_row(
 	Handle::HICANN & h,
-	Coordinate::HLineOnHICANN const& y,
-	Coordinate::Side const& s);
+	halco::hicann::v2::HLineOnHICANN const& y,
+	halco::common::Side const& s);
 
 
 /**
@@ -41,12 +41,12 @@ CrossbarRow get_crossbar_switch_row(
  */
 void set_syndriver_switch_row(
 	Handle::HICANN & h,
-	Coordinate::SynapseSwitchRowOnHICANN const& s,
+	halco::hicann::v2::SynapseSwitchRowOnHICANN const& s,
 	SynapseSwitchRow const& switches);
 
 SynapseSwitchRow get_syndriver_switch_row(
 	Handle::HICANN & h,
-	Coordinate::SynapseSwitchRowOnHICANN const& s);
+	halco::hicann::v2::SynapseSwitchRowOnHICANN const& s);
 
 
 
@@ -61,7 +61,7 @@ SynapseSwitchRow get_syndriver_switch_row(
  */
 void set_weights_row(
 	Handle::HICANN & h,
-	Coordinate::SynapseRowOnHICANN const& s,
+	halco::hicann::v2::SynapseRowOnHICANN const& s,
 	WeightRow const& weights);
 
 #ifndef PYPLUSPLUS
@@ -74,13 +74,13 @@ void set_weights_row(
  */
 void set_weights_row(
 	std::vector<boost::shared_ptr<Handle::HICANN> > handles,
-	Coordinate::SynapseRowOnHICANN const& s,
+	halco::hicann::v2::SynapseRowOnHICANN const& s,
 	std::vector<WeightRow> const& data);
 #endif // !PYPLUSPLUS
 
 WeightRow get_weights_row(
 	Handle::HICANN & h,
-	Coordinate::SynapseRowOnHICANN const& s);
+	halco::hicann::v2::SynapseRowOnHICANN const& s);
 
 
 /**
@@ -91,7 +91,7 @@ WeightRow get_weights_row(
  */
 void set_decoder_double_row(
 	Handle::HICANN & h,
-	Coordinate::SynapseDriverOnHICANN const& s,
+	halco::hicann::v2::SynapseDriverOnHICANN const& s,
 	DecoderDoubleRow const& data);
 
 #ifndef PYPLUSPLUS
@@ -104,13 +104,13 @@ void set_decoder_double_row(
  */
 void set_decoder_double_row(
 	std::vector<boost::shared_ptr<Handle::HICANN> > handles,
-	Coordinate::SynapseDriverOnHICANN const& syndrv,
+	halco::hicann::v2::SynapseDriverOnHICANN const& syndrv,
 	std::vector<DecoderDoubleRow> const& data);
 #endif // !PYPLUSPLUS
 
 DecoderDoubleRow get_decoder_double_row(
 	Handle::HICANN & h,
-	Coordinate::SynapseDriverOnHICANN const& s);
+	halco::hicann::v2::SynapseDriverOnHICANN const& s);
 
 
 /**
@@ -129,12 +129,12 @@ DecoderDoubleRow get_decoder_double_row(
  */
 void set_synapse_driver(
 	Handle::HICANN & h,
-	Coordinate::SynapseDriverOnHICANN const& s,
+	halco::hicann::v2::SynapseDriverOnHICANN const& s,
 	SynapseDriver const& drv_row);
 
 SynapseDriver get_synapse_driver(
 	Handle::HICANN & h,
-	Coordinate::SynapseDriverOnHICANN const& s);
+	halco::hicann::v2::SynapseDriverOnHICANN const& s);
 
 
 
@@ -150,7 +150,7 @@ SynapseDriver get_synapse_driver(
  */
 void set_denmem_quad(
 	Handle::HICANN & h,
-	Coordinate::QuadOnHICANN const& qb,
+	halco::hicann::v2::QuadOnHICANN const& qb,
 	NeuronQuad const& nquad);
 
 /**
@@ -163,7 +163,7 @@ void set_denmem_quad(
  */
 NeuronQuad get_denmem_quad(
 	Handle::HICANN & h,
-	Coordinate::QuadOnHICANN const& qb);
+	halco::hicann::v2::QuadOnHICANN const& qb);
 
 
 /**
@@ -182,7 +182,7 @@ NeuronConfig get_neuron_config(Handle::HICANN & h);
 /**
  * Block and wait until floating gate block(s) become(s) idle.
  */
-HICANN::FGErrorResultRow wait_fg(Handle::HICANN & h, Coordinate::FGBlockOnHICANN const & b);
+HICANN::FGErrorResultRow wait_fg(Handle::HICANN & h, halco::hicann::v2::FGBlockOnHICANN const & b);
 HICANN::FGErrorResultQuadRow wait_fg(Handle::HICANN & h);
 
 /**
@@ -193,9 +193,9 @@ HICANN::FGErrorResultQuadRow wait_fg(Handle::HICANN & h);
  * @note As the FGBlockOnHICANN struct has the FGBlockOnHICANN coordinate, it is not neccessary to
  *       give it to the function. Use FGControl::extract_block to get FGBlockOnHICANN right
  */
-void set_fg_values(Handle::HICANN & h, Coordinate::FGBlockOnHICANN const& b, FGBlock const& fgb);
+void set_fg_values(Handle::HICANN & h, halco::hicann::v2::FGBlockOnHICANN const& b, FGBlock const& fgb);
 void set_fg_values(Handle::HICANN & h, FGControl const& fg);
-FGBlock get_fg_values(Handle::HICANN & h, Coordinate::FGBlockOnHICANN const& b);
+FGBlock get_fg_values(Handle::HICANN & h, halco::hicann::v2::FGBlockOnHICANN const& b);
 
 /**
  * Writes floating gate values for a row on all blocks in parallel
@@ -213,7 +213,7 @@ FGBlock get_fg_values(Handle::HICANN & h, Coordinate::FGBlockOnHICANN const& b);
  * @return FG controller error results for all 4 rows of the 4 blocks (if
  *         blocking == true, else no-error result))
  */
-HICANN::FGErrorResultQuadRow set_fg_row_values(Handle::HICANN & h, Coordinate::FGRowOnFGBlock row,
+HICANN::FGErrorResultQuadRow set_fg_row_values(Handle::HICANN & h, halco::hicann::v2::FGRowOnFGBlock row,
 	FGControl const& fg, bool const writeDown, bool const blocking = true);
 
 /**
@@ -254,11 +254,11 @@ HICANN::FGErrorResultQuadRow set_fg_row_values(
  *         blocking == true, else no-error result))
  */
 HICANN::FGErrorResultQuadRow set_fg_row_values(Handle::HICANN & h,
-	Coordinate::FGBlockOnHICANN block, Coordinate::FGRowOnFGBlock row,
+	halco::hicann::v2::FGBlockOnHICANN block, halco::hicann::v2::FGRowOnFGBlock row,
 	FGRow const& fg, bool const writeDown, bool const blocking = true);
 
 // TODO change to something like:
-// void set_fg_values(Handle::HICANN & h, Coordinate::FGBlockOnHICANN const& addr, FGControll );
+// void set_fg_values(Handle::HICANN & h, halco::hicann::v2::FGBlockOnHICANN const& addr, FGControll );
 
 /**
  * Sets the config of the floating gate controller
@@ -267,14 +267,14 @@ HICANN::FGErrorResultQuadRow set_fg_row_values(Handle::HICANN & h,
  * @param block to configure
  *
  */
-void set_fg_config(Handle::HICANN & h, Coordinate::FGBlockOnHICANN const& block, const FGConfig & config);
-FGConfig get_fg_config(Handle::HICANN & h, Coordinate::FGBlockOnHICANN const& b);
+void set_fg_config(Handle::HICANN & h, halco::hicann::v2::FGBlockOnHICANN const& block, const FGConfig & config);
+FGConfig get_fg_config(Handle::HICANN & h, halco::hicann::v2::FGBlockOnHICANN const& b);
 
 // the following commands configure the FGBlock to connect a specific FGCell to
 // the input of the corresponding analog out.
-void set_fg_cell(Handle::HICANN & h, Coordinate::NeuronOnHICANN const& n, neuron_parameter const&  p);
-void set_fg_cell(Handle::HICANN & h, Coordinate::FGBlockOnHICANN const& b, shared_parameter const& p);
-void set_fg_cell(Handle::HICANN & h, Coordinate::FGBlockOnHICANN const& b, Coordinate::FGCellOnFGBlock const& c);
+void set_fg_cell(Handle::HICANN & h, halco::hicann::v2::NeuronOnHICANN const& n, neuron_parameter const&  p);
+void set_fg_cell(Handle::HICANN & h, halco::hicann::v2::FGBlockOnHICANN const& b, shared_parameter const& p);
+void set_fg_cell(Handle::HICANN & h, halco::hicann::v2::FGBlockOnHICANN const& b, halco::hicann::v2::FGCellOnFGBlock const& c);
 
 /**
  * Activates neuron stimulation by using current generator of the FGBlockOnHICANN module.
@@ -287,8 +287,8 @@ void set_fg_cell(Handle::HICANN & h, Coordinate::FGBlockOnHICANN const& b, Coord
  * @note As the FGStimulus struct has the FGBlockOnHICANN coordinate, it is not neccessary to
  *       give it to the function. Use FGControl::extract_stimulus to get FGStimulus right
  */
-void set_current_stimulus(Handle::HICANN & h, Coordinate::FGBlockOnHICANN const& b, FGStimulus const& stim);
-FGStimulus get_current_stimulus(Handle::HICANN & h, Coordinate::FGBlockOnHICANN const& b);
+void set_current_stimulus(Handle::HICANN & h, halco::hicann::v2::FGBlockOnHICANN const& b, FGStimulus const& stim);
+FGStimulus get_current_stimulus(Handle::HICANN & h, halco::hicann::v2::FGBlockOnHICANN const& b);
 
 
 
@@ -302,11 +302,11 @@ FGStimulus get_current_stimulus(Handle::HICANN & h, Coordinate::FGBlockOnHICANN 
  */
 void set_repeater(
 	Handle::HICANN & h,
-	Coordinate::VRepeaterOnHICANN const& r,
+	halco::hicann::v2::VRepeaterOnHICANN const& r,
 	VerticalRepeater const& rc);
 VerticalRepeater get_repeater(
 	Handle::HICANN & h,
-	Coordinate::VRepeaterOnHICANN const& r);
+	halco::hicann::v2::VRepeaterOnHICANN const& r);
 
 
 /**
@@ -317,11 +317,11 @@ VerticalRepeater get_repeater(
  */
 void set_repeater(
 	Handle::HICANN & h,
-	Coordinate::HRepeaterOnHICANN const& r,
+	halco::hicann::v2::HRepeaterOnHICANN const& r,
 	HorizontalRepeater const& rc);
 HorizontalRepeater get_repeater(
 	Handle::HICANN & h,
-	Coordinate::HRepeaterOnHICANN const& r);
+	halco::hicann::v2::HRepeaterOnHICANN const& r);
 
 
 /**
@@ -333,7 +333,7 @@ HorizontalRepeater get_repeater(
  */
 void set_repeater_block(
 	Handle::HICANN & h,
-	Coordinate::RepeaterBlockOnHICANN const& addr,
+	halco::hicann::v2::RepeaterBlockOnHICANN const& addr,
 	RepeaterBlock const& rbc);
 
 
@@ -364,7 +364,7 @@ void set_repeater_block(
  */
 RepeaterBlock get_repeater_block(
 	Handle::HICANN & h,
-	Coordinate::RepeaterBlockOnHICANN const& addr);
+	halco::hicann::v2::RepeaterBlockOnHICANN const& addr);
 
 /**
  * Writes STDP look up tables (LUT) to the according registers (LUT) on hardware.
@@ -375,7 +375,7 @@ RepeaterBlock get_repeater_block(
  */
 void set_stdp_lut(
 	Handle::HICANN& h,
-	Coordinate::SynapseArrayOnHICANN const& synarray,
+	halco::hicann::v2::SynapseArrayOnHICANN const& synarray,
 	HICANN::STDPLUT const& lut);
 
 /**
@@ -386,7 +386,7 @@ void set_stdp_lut(
  *
  * @return STDP LUT.
  */
-HICANN::STDPLUT get_stdp_lut(Handle::HICANN& h, Coordinate::SynapseArrayOnHICANN const& synarray);
+HICANN::STDPLUT get_stdp_lut(Handle::HICANN& h, halco::hicann::v2::SynapseArrayOnHICANN const& synarray);
 
 /**
  * Writes reset pattern to according register (SYNNRST)
@@ -401,7 +401,7 @@ HICANN::STDPLUT get_stdp_lut(Handle::HICANN& h, Coordinate::SynapseArrayOnHICANN
  */
 void set_syn_rst(
 	Handle::HICANN& h,
-	Coordinate::SynapseArrayOnHICANN const& synarray,
+	halco::hicann::v2::SynapseArrayOnHICANN const& synarray,
 	HICANN::SynapseController::syn_rst_t const& syn_rst);
 
 /**
@@ -415,7 +415,7 @@ void set_syn_rst(
  * @return Reset pattern.
  */
 HICANN::SynapseController::syn_rst_t get_syn_rst(
-	Handle::HICANN& h, Coordinate::SynapseArrayOnHICANN const& synarray);
+	Handle::HICANN& h, halco::hicann::v2::SynapseArrayOnHICANN const& synarray);
 
 /**
  * Writes synapse control statement to the according register
@@ -427,7 +427,7 @@ HICANN::SynapseController::syn_rst_t get_syn_rst(
  */
 void set_syn_ctrl(
 	Handle::HICANN& h,
-	Coordinate::SynapseArrayOnHICANN const& synarray,
+	halco::hicann::v2::SynapseArrayOnHICANN const& synarray,
 	HICANN::SynapseControlRegister const& ctrl_reg);
 
 /**
@@ -439,7 +439,7 @@ void set_syn_ctrl(
  * @return Synapse control statement.
  */
 HICANN::SynapseControlRegister get_syn_ctrl(
-	Handle::HICANN& h, Coordinate::SynapseArrayOnHICANN const& synarray);
+	Handle::HICANN& h, halco::hicann::v2::SynapseArrayOnHICANN const& synarray);
 
 /**
  * Writes synapse configuration statement to the according register
@@ -451,7 +451,7 @@ HICANN::SynapseControlRegister get_syn_ctrl(
  */
 void set_syn_cnfg(
 	Handle::HICANN& h,
-	Coordinate::SynapseArrayOnHICANN const& synarray,
+	halco::hicann::v2::SynapseArrayOnHICANN const& synarray,
 	HICANN::SynapseConfigurationRegister const& cnfg_reg);
 
 /**
@@ -464,7 +464,7 @@ void set_syn_cnfg(
  * @return Synapse configuration statement.
  */
 HICANN::SynapseConfigurationRegister get_syn_cnfg(
-	Handle::HICANN& h, Coordinate::SynapseArrayOnHICANN const& synarray);
+	Handle::HICANN& h, halco::hicann::v2::SynapseArrayOnHICANN const& synarray);
 
 /**
  * Reads status registers (STATUS) from hardware.
@@ -476,7 +476,7 @@ HICANN::SynapseConfigurationRegister get_syn_cnfg(
  *
  */
 HICANN::SynapseStatusRegister get_syn_status(
-	Handle::HICANN& h, Coordinate::SynapseArrayOnHICANN const& synarray);
+	Handle::HICANN& h, halco::hicann::v2::SynapseArrayOnHICANN const& synarray);
 
 /**
  * Sets synapse control, configuration, STDP LUT and
@@ -489,7 +489,7 @@ HICANN::SynapseStatusRegister get_syn_status(
  */
 void set_synapse_controller(
 	Handle::HICANN& h,
-	Coordinate::SynapseArrayOnHICANN const& synarray,
+	halco::hicann::v2::SynapseArrayOnHICANN const& synarray,
 	HICANN::SynapseController const& synapse_controller);
 
 /**
@@ -503,7 +503,7 @@ void set_synapse_controller(
  * @return Synapse controller.
  */
 HICANN::SynapseController get_synapse_controller(
-	Handle::HICANN& h, Coordinate::SynapseArrayOnHICANN const& synarray);
+	Handle::HICANN& h, halco::hicann::v2::SynapseArrayOnHICANN const& synarray);
 
 // Merger Tree
 

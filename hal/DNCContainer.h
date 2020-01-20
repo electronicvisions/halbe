@@ -9,6 +9,8 @@
 
 #include "hal/HICANN/GbitLink.h"
 
+#include "halco/hicann/v2/fwd.h"
+
 namespace HMF {
 namespace DNC {
 
@@ -19,8 +21,8 @@ using HICANN::GbitLink;
 struct GbitReticle {
 	typedef std::array<GbitLink, 8> data_type;
 public:
-	GbitLink&       operator[] (Coordinate::HICANNOnDNC const & hicann_on_reticle);
-	GbitLink const& operator[] (Coordinate::HICANNOnDNC const & hicann_on_reticle) const;
+	GbitLink&       operator[] (halco::hicann::v2::HICANNOnDNC const & hicann_on_reticle);
+	GbitLink const& operator[] (halco::hicann::v2::HICANNOnDNC const & hicann_on_reticle) const;
 
 	bool operator==(const GbitReticle & other) const;
 	bool operator!=(const GbitReticle& other) const { return !(*this == other); }
@@ -47,8 +49,8 @@ std::ostream& operator<< (std::ostream& o, GbitReticle const& gr);
 struct Loopback {
 	typedef std::array<bool, 8> data_type;
 public:
-	bool&       operator[] (Coordinate::HICANNOnDNC const & hicann_on_reticle);
-	bool const& operator[] (Coordinate::HICANNOnDNC const & hicann_on_reticle) const;
+	bool&       operator[] (halco::hicann::v2::HICANNOnDNC const & hicann_on_reticle);
+	bool const& operator[] (halco::hicann::v2::HICANNOnDNC const & hicann_on_reticle) const;
 
 	bool operator==(const Loopback & other) const;
 	bool operator!=(const Loopback& other) const { return !(*this == other); }

@@ -3,7 +3,7 @@
 #include <boost/operators.hpp>
 
 #include "hal/Handle/Base.h"
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/external.h"
 
 namespace HMF {
 namespace Handle {
@@ -15,11 +15,11 @@ struct PMU
 	, public boost::less_than_comparable<PMU>
 {
 	PMU();
-	explicit PMU(Coordinate::IPv4 const &); // TODO: remove this!
-	PMU(Coordinate::PMU const &, Coordinate::IPv4 const &);
+	explicit PMU(halco::hicann::v2::IPv4 const &); // TODO: remove this!
+	PMU(halco::hicann::v2::PMU const &, halco::hicann::v2::IPv4 const &);
 
 	/// Returns the ip.
-	Coordinate::IPv4 const & ip() const;
+	halco::hicann::v2::IPv4 const & ip() const;
 
 	/// Compare operator checks coordinates
 	bool operator<(PMU const& b) const;
@@ -28,16 +28,16 @@ struct PMU
 	bool operator==(PMU const& b) const;
 
 	/// Cast operator to its IP.
-	operator Coordinate::IPv4 const & () const;
+	operator halco::hicann::v2::IPv4 const & () const;
 
-	Coordinate::PMU coordinate() const;
+	halco::hicann::v2::PMU coordinate() const;
 
 private:
 	// PMU coordinate
-	Coordinate::PMU const coord;
+	halco::hicann::v2::PMU const coord;
 
 	// IP of the power board
-	Coordinate::IPv4 const pwr_ip;
+	halco::hicann::v2::IPv4 const pwr_ip;
 };
 
 } // namespace Handle

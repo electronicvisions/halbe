@@ -4,7 +4,7 @@
 #include <boost/serialization/bitset.hpp>
 
 #include "pywrap/compat/macros.hpp"
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/fwd.h"
 #include "hal/HICANN/RowConfig.h"
 
 namespace HMF {
@@ -56,8 +56,8 @@ public:
 	bool operator==(SynapseDriver const& b) const;
 	bool operator!=(SynapseDriver const& b) const;
 
-	RowConfig const& operator[] (Coordinate::RowOnSynapseDriver const&) const;
-	RowConfig&       operator[] (Coordinate::RowOnSynapseDriver const&);
+	RowConfig const& operator[] (halco::hicann::v2::RowOnSynapseDriver const&) const;
+	RowConfig&       operator[] (halco::hicann::v2::RowOnSynapseDriver const&);
 
 	// FIXME: shouldn't be public. However, many tests use them directly. fix in future
 	std::bitset<num_cap> stp_cap;            //!< select size of capacitor in STP circuit

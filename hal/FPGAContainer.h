@@ -1,7 +1,7 @@
 #pragma once
 
 #include "HMFCommon.h"
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/fwd.h"
 
 #include <bitset>
 #include <vector>
@@ -32,7 +32,7 @@ using ::HMF::HICANN::L1Address;
 /// A input address for the Spinnaker IF of the FPGA.
 /// i.e. an address, that is received and processed further by the FPGA
 class SpinnInputAddress_t :
-	public Coordinate::detail::RantWrapper<SpinnInputAddress_t, uint16_t, 1023, 0>
+	public halco::common::detail::RantWrapper<SpinnInputAddress_t, uint16_t, 1023, 0>
 {
 public:
 	PYPP_CONSTEXPR explicit SpinnInputAddress_t(uint16_t const & val = 0) : rant_t(val) {}
@@ -47,7 +47,7 @@ public:
 ///  The 24-bit used here comply with the new UDP-PulsePacket standard developed in CapaoCaccia 2013
 ///  For Details see https://capocaccia.ethz.ch/capo/wiki/2013/immns13#UDPStandard
 class SpinnOutputAddress_t :
-	public Coordinate::detail::RantWrapper<SpinnOutputAddress_t, uint32_t, (1<<24)-1, 0>
+	public halco::common::detail::RantWrapper<SpinnOutputAddress_t, uint32_t, (1<<24)-1, 0>
 {
 public:
 	PYPP_CONSTEXPR explicit SpinnOutputAddress_t(uint32_t const & val = 0) : rant_t(val) {}
@@ -63,8 +63,8 @@ public:
 	bool getActive() const {return _active;}
 	void setActive(bool active) {_active=active;}
 
-	Coordinate::IPv4 getTargetIP() const {return _target_ip;}
-	void setTargetIP(Coordinate::IPv4 target_ip) {_target_ip=target_ip;}
+	halco::hicann::v2::IPv4 getTargetIP() const {return _target_ip;}
+	void setTargetIP(halco::hicann::v2::IPv4 target_ip) {_target_ip=target_ip;}
 
 	uint16_t getTargetPort() const {return _target_port;}
 	void setTargetPort(uint16_t target_port) {_target_port=target_port;}
@@ -74,7 +74,7 @@ public:
 
 private:
 	bool             _active;
-	Coordinate::IPv4 _target_ip;
+	halco::hicann::v2::IPv4 _target_ip;
 	uint16_t         _target_port;
 
 	friend class boost::serialization::access;
@@ -285,7 +285,7 @@ public:
 
 	uint32_t seed; //24 bit seed actually
 	uint16_t rate; //14 bit period between events in cycles (FPGA cycles!!!)
-	Coordinate::HICANNOnDNC hicann_number; //FPGA BEG can serve only one HICANN
+	halco::hicann::v2::HICANNOnDNC hicann_number; //FPGA BEG can serve only one HICANN
 	//BEG can randomly generate addresses in the range, defined below
 	uint8_t first_address;   //first address of a range
 	uint8_t last_address;    //last address of a range
@@ -501,8 +501,8 @@ private:
 
 namespace std {
 
-HALBE_GEOMETRY_HASH_CLASS(HMF::FPGA::SpinnInputAddress_t)
-HALBE_GEOMETRY_HASH_CLASS(HMF::FPGA::SpinnOutputAddress_t)
+HALCO_GEOMETRY_HASH_CLASS(HMF::FPGA::SpinnInputAddress_t)
+HALCO_GEOMETRY_HASH_CLASS(HMF::FPGA::SpinnOutputAddress_t)
 
 } // namespace std
 

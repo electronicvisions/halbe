@@ -3,7 +3,7 @@
 #include "test/hwtest.h"
 #include "test/NeuronBuilderHelper.h"
 #include "hal/backend/HICANNBackendHelper.h"
-#include "hal/Coordinate/iter_all.h"
+#include "halco/common/iter_all.h"
 
 //necessary for the direct control of low-level functions of the hardware
 #include "reticle_control.h"       //reticle control class
@@ -25,7 +25,8 @@
 #define HCREP facets::HicannCtrl::Repeater
 #define HCSYN facets::HicannCtrl::Synapse
 
-using namespace HMF::Coordinate;
+using namespace halco::hicann::v2;
+using namespace halco::common;
 using namespace facets;
 
 using std::endl;
@@ -1013,8 +1014,8 @@ TYPED_TEST(HICANNBackendTest, WriteSynapseDriverHWTest) {
 	driver.stp_enable           = 0;
 	driver.stp_mode             = 1;
 
-	HICANN::set_synapse_driver(this->h, SynapseDriverOnHICANN(Y(25), geometry::left), driver);
-	HICANN::set_synapse_driver(this->h, SynapseDriverOnHICANN(Y(121), geometry::right), driver);
+	HICANN::set_synapse_driver(this->h, SynapseDriverOnHICANN(Y(25), halco::common::left), driver);
+	HICANN::set_synapse_driver(this->h, SynapseDriverOnHICANN(Y(121), halco::common::right), driver);
 
 	if (auto * reticle = this->get_reticle()) { // Test only for a real hardware test
 		RET->getSC(HCSYN::SYNAPSE_TOP).read_driver(172, cfgbot, pdrvbot, gmaxbot, cfgtop, pdrvtop, gmaxtop);
@@ -1340,15 +1341,15 @@ TYPED_TEST(HICANNBackendTest, WriteNeuronControlHWTest) {
 
 	///testing DNC mergers
 	HICANN::DNCMergerLine dtree = HICANN::DNCMergerLine();
-	dtree[Coordinate::DNCMergerOnHICANN{0}].config = HICANN::Merger::LEFT_ONLY;
-	dtree[Coordinate::DNCMergerOnHICANN{1}].config = HICANN::Merger::LEFT_ONLY;
-	dtree[Coordinate::DNCMergerOnHICANN{2}].config = HICANN::Merger::RIGHT_ONLY;
-	dtree[Coordinate::DNCMergerOnHICANN{5}].config = HICANN::Merger::RIGHT_ONLY;
-	dtree[Coordinate::DNCMergerOnHICANN{0}].slow   = true;
-	dtree[Coordinate::DNCMergerOnHICANN{6}].slow   = true;
-	dtree[Coordinate::DNCMergerOnHICANN{7}].slow   = true;
-	dtree[Coordinate::DNCMergerOnHICANN{0}].loopback = true;
-	dtree[Coordinate::DNCMergerOnHICANN{5}].loopback = true;
+	dtree[halco::hicann::v2::DNCMergerOnHICANN{0}].config = HICANN::Merger::LEFT_ONLY;
+	dtree[halco::hicann::v2::DNCMergerOnHICANN{1}].config = HICANN::Merger::LEFT_ONLY;
+	dtree[halco::hicann::v2::DNCMergerOnHICANN{2}].config = HICANN::Merger::RIGHT_ONLY;
+	dtree[halco::hicann::v2::DNCMergerOnHICANN{5}].config = HICANN::Merger::RIGHT_ONLY;
+	dtree[halco::hicann::v2::DNCMergerOnHICANN{0}].slow   = true;
+	dtree[halco::hicann::v2::DNCMergerOnHICANN{6}].slow   = true;
+	dtree[halco::hicann::v2::DNCMergerOnHICANN{7}].slow   = true;
+	dtree[halco::hicann::v2::DNCMergerOnHICANN{0}].loopback = true;
+	dtree[halco::hicann::v2::DNCMergerOnHICANN{5}].loopback = true;
 
 	HICANN::set_dnc_merger(this->h, dtree);
 	if (auto * reticle = this->get_reticle()) { // Test only for a real hardware test

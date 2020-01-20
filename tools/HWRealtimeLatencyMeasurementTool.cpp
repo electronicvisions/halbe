@@ -27,18 +27,18 @@ extern "C" {
 namespace po = boost::program_options;
 
 
-HWRealtimeLatencyMeasurementTool::HWRealtimeLatencyMeasurementTool(HMF::Handle::FPGAHw &f, HMF::Coordinate::DNCOnFPGA const d) :
+HWRealtimeLatencyMeasurementTool::HWRealtimeLatencyMeasurementTool(HMF::Handle::FPGAHw &f, halco::hicann::v2::DNCOnFPGA const d) :
 	f(f),
 	dnc(d),
-	h(*f.get(dnc, HMF::Coordinate::HICANNOnDNC(geometry::Enum(0)))),
+	h(*f.get(dnc, halco::hicann::v2::HICANNOnDNC(halco::common::Enum(0)))),
 	rc(f.get_realtime_comm()),
 	packets(100000)
 {
 	for (size_t i = 0; i < 64*4; i++) {
 		addresses.emplace_back(std::make_pair(HMF::FPGA::SpinnInputAddress_t(i), HMF::FPGA::PulseAddress(
-						HMF::Coordinate::DNCOnFPGA(dnc),
-						HMF::Coordinate::HICANNOnDNC(h.to_HICANNOnDNC()),
-						HMF::Coordinate::GbitLinkOnHICANN(i/64 * 2),
+						halco::hicann::v2::DNCOnFPGA(dnc),
+						halco::hicann::v2::HICANNOnDNC(h.to_HICANNOnDNC()),
+						halco::hicann::v2::GbitLinkOnHICANN(i/64 * 2),
 						HMF::HICANN::Neuron::address_t(i % 64))));
 	}
 	HWRealtimeLatencyMeasurementTool::configureHardware();
@@ -50,7 +50,7 @@ void HWRealtimeLatencyMeasurementTool::configureHardware() {
 	std::cout << "# configuring hardware ..." << std::endl;
 
 	// DNC & Hicann
-	HMF::Handle::HICANN& h(*f.get(dnc, HMF::Coordinate::HICANNOnDNC(geometry::Enum(0))));
+	HMF::Handle::HICANN& h(*f.get(dnc, halco::hicann::v2::HICANNOnDNC(halco::common::Enum(0))));
 
 	// Reset FPGA and all the other shit
 	HMF::FPGA::reset(f);
@@ -99,7 +99,7 @@ void HWRealtimeLatencyMeasurementTool::setHicannLoopback(HMF::Handle::HICANN &h)
 		}
 		mer.slow = false;
 		mer.loopback = (j%2)==0; // 0->1, 2->3 etc...
-		mergers[HMF::Coordinate::DNCMergerOnHICANN(j)] = mer;
+		mergers[halco::hicann::v2::DNCMergerOnHICANN(j)] = mer;
 	}
 
 	HMF::HICANN::set_dnc_merger(h, mergers);
@@ -156,7 +156,7 @@ void HWRealtimeLatencyMeasurementTool::measuringLoop() {
 		HMF::FPGA::PulseAddress exp_pa(addresses[idx].second);
 		auto c = exp_pa.getChannel();
 		// exp_pa.setChannel(c.flip(0));
-		exp_pa.setChannel( HMF::Coordinate::GbitLinkOnHICANN(static_cast<uint8_t>(c/2)*2 + !(c%2)));
+		exp_pa.setChannel( halco::hicann::v2::GbitLinkOnHICANN(static_cast<uint8_t>(c/2)*2 + !(c%2)));
 		HMF::FPGA::PulseAddress tmp(sp.label);
 		if (tmp != exp_pa) {
 			std::stringstream ss;
@@ -206,7 +206,7 @@ void HWRealtimeLatencyMeasurementTool::measuringLoop() {
 int main(int argc, char * argv[]) {
 
 	std::string fpga_ip, pmu_ip, on;
-	geometry::Enum d, w;
+	halco::common::Enum d, w;
 
 	// options
 	po::options_description desc("Allowed options");
@@ -216,9 +216,9 @@ int main(int argc, char * argv[]) {
 			 "specify FPGA ip")
 		("on",          po::value<std::string>(&on)->default_value("vertical"),
 			 "specify hardware backend [[w]afer,[v]ertical]")
-		("dnc",       po::value<geometry::Enum>(&d)->default_value(geometry::Enum(1)),
+		("dnc",       po::value<halco::common::Enum>(&d)->default_value(halco::common::Enum(1)),
 			 "specify DNC (FPGA-local enum)")
-		("wafer",     po::value<geometry::Enum>(&w)->default_value(geometry::Enum(0)),
+		("wafer",     po::value<halco::common::Enum>(&w)->default_value(halco::common::Enum(0)),
 			 "specify Wafer number)")
 		("pmu_ip",          po::value<std::string>(&pmu_ip)->default_value("0.0.0.0"),
 			 "specify PMU ip")
@@ -248,14 +248,14 @@ int main(int argc, char * argv[]) {
 
 	bool on_wafer = (on.at(0) == 'w' || on.at(0) == 'W');
 
-	auto gfpga = HMF::Coordinate::FPGAGlobal(
-		HMF::Coordinate::FPGAOnWafer(), HMF::Coordinate::Wafer(w));
+	auto gfpga = halco::hicann::v2::FPGAGlobal(
+		halco::hicann::v2::FPGAOnWafer(), halco::hicann::v2::Wafer(w));
 
 	// create FPGAHandle
-	HMF::Handle::FPGAHw f(gfpga, HMF::Coordinate::IPv4::from_string(fpga_ip), HMF::Coordinate::DNCOnFPGA(d), HMF::Coordinate::IPv4::from_string(pmu_ip), on_wafer);
+	HMF::Handle::FPGAHw f(gfpga, halco::hicann::v2::IPv4::from_string(fpga_ip), halco::hicann::v2::DNCOnFPGA(d), halco::hicann::v2::IPv4::from_string(pmu_ip), on_wafer);
 
 	// create tool object and measure latency
-	HWRealtimeLatencyMeasurementTool t(f, HMF::Coordinate::DNCOnFPGA(d));
+	HWRealtimeLatencyMeasurementTool t(f, halco::hicann::v2::DNCOnFPGA(d));
 
 	t.HWRealtimeLatencyMeasurementTool::measuringLoop();
 

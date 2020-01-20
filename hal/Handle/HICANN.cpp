@@ -4,7 +4,7 @@
 namespace HMF {
 namespace Handle {
 
-HICANN::HICANN(const Coordinate::HICANNGlobal & h, bool request_highspeed) :
+HICANN::HICANN(const halco::hicann::v2::HICANNGlobal & h, bool request_highspeed) :
 	coord(h), m_highspeed(request_highspeed)
 {}
 

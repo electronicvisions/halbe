@@ -5,8 +5,8 @@
 #include <boost/make_shared.hpp>
 
 #include "hal/Coordinate/HMFGrid.h"
-#include "hal/Coordinate/iter_all.h"
-#include "hal/Coordinate/FormatHelper.h"
+#include "halco/common/iter_all.h"
+#include "halco/hicann/v2/format_helper.h"
 
 #include "spinn_controller.h"
 #include "RealtimeComm.h"
@@ -23,16 +23,16 @@ static uint16_t const pulse_port = 1851;
 struct FPGAHw::FPGAHandlePIMPL {
 	FPGAHandlePIMPL(
 	    FPGAHw& f,
-	    Coordinate::DNCOnFPGA const d,
+	    halco::hicann::v2::DNCOnFPGA const d,
 	    bool on_wafer,
-	    std::set<Coordinate::HICANNOnDNC> physically_available_hicanns,
-	    std::set<Coordinate::HICANNOnDNC> highspeed_hicanns,
-	    std::set<Coordinate::HICANNOnDNC> usable_hicanns,
-	    Coordinate::IPv4 pmu_ip,
-	    Coordinate::JTAGFrequency jtag_frequency)
+	    std::set<halco::hicann::v2::HICANNOnDNC> physically_available_hicanns,
+	    std::set<halco::hicann::v2::HICANNOnDNC> highspeed_hicanns,
+	    std::set<halco::hicann::v2::HICANNOnDNC> usable_hicanns,
+	    halco::hicann::v2::IPv4 pmu_ip,
+	    halco::hicann::v2::JTAGFrequency jtag_frequency)
 	    : fpga(f),
 	      dnc(d),
-	      fpga_jtag_port(Coordinate::UDPPort(jtag_base_port + d.value())),
+	      fpga_jtag_port(halco::hicann::v2::UDPPort(jtag_base_port + d.value())),
 	      on_wafer(on_wafer),
 	      myPowerBackend(std::unique_ptr<PowerBackend>(new PowerBackend())),
 	      physically_available_hicanns(physically_available_hicanns),
@@ -44,7 +44,7 @@ struct FPGAHw::FPGAHandlePIMPL {
 
 	void init() {
 		if (!fpga.license_valid()) {
-			throw std::runtime_error("Missing license for " + Coordinate::short_format(fpga.coordinate()));
+			throw std::runtime_error("Missing license for " + halco::hicann::v2::short_format(fpga.coordinate()));
 		}
 		setup();
 		fpga.activate_dnc(dnc);
@@ -70,26 +70,26 @@ struct FPGAHw::FPGAHandlePIMPL {
 
 
 	Handle::FPGAHw & fpga;
-	Coordinate::DNCOnFPGA const dnc;
-	Coordinate::UDPPort const fpga_jtag_port;
+	halco::hicann::v2::DNCOnFPGA const dnc;
+	halco::hicann::v2::UDPPort const fpga_jtag_port;
 	bool const on_wafer;
 	std::unique_ptr<HMF::PowerBackend> myPowerBackend;
-	std::set<Coordinate::HICANNOnDNC> physically_available_hicanns;
-	std::set<Coordinate::HICANNOnDNC> highspeed_hicanns;
-	std::set<Coordinate::HICANNOnDNC> usable_hicanns;
-	Coordinate::IPv4 pmu_ip;
+	std::set<halco::hicann::v2::HICANNOnDNC> physically_available_hicanns;
+	std::set<halco::hicann::v2::HICANNOnDNC> highspeed_hicanns;
+	std::set<halco::hicann::v2::HICANNOnDNC> usable_hicanns;
+	halco::hicann::v2::IPv4 pmu_ip;
 
 
 	// setup defaults
 	bool const highspeed_mode = true;
 	bool const arq_mode = true;
 	static uint16_t const jtag_base_port = 1700;
-	Coordinate::JTAGFrequency jtag_frequency;
+	halco::hicann::v2::JTAGFrequency jtag_frequency;
 };
 // end of ugly PIMPLed stuff
 
 bool FPGAHw::HandleParameter::on_wafer(){
-	if (setup == Coordinate::SetupType::VSetup || setup == Coordinate::SetupType::CubeSetup)
+	if (setup == halco::hicann::v2::SetupType::VSetup || setup == halco::hicann::v2::SetupType::CubeSetup)
 		return false;
 	return true;
 }
@@ -111,19 +111,19 @@ FPGAHw::FPGAHw(HandleParameter handleparam)
 	pimpl->init();
 }
 
-FPGAHw::FPGAHw(Coordinate::FPGAGlobal const c, Coordinate::IPv4 const fpga_ip,
-               Coordinate::DNCOnFPGA const d, Coordinate::IPv4 const pmu_ip, bool on_wafer, size_t num_hicanns,
-               Coordinate::JTAGFrequency jtag_frequency) :
+FPGAHw::FPGAHw(halco::hicann::v2::FPGAGlobal const c, halco::hicann::v2::IPv4 const fpga_ip,
+               halco::hicann::v2::DNCOnFPGA const d, halco::hicann::v2::IPv4 const pmu_ip, bool on_wafer, size_t num_hicanns,
+               halco::hicann::v2::JTAGFrequency jtag_frequency) :
 		FPGA(c),
 		Base(c),
 		fpga_ip(fpga_ip),
 		jtag_frequency(jtag_frequency)
 {
 	//FIXME: UGLY but could not find other way to initlize available hicanns set for pimpl
-	std::set<Coordinate::HICANNOnDNC> avail_hicanns;
-	for (auto hicann : Coordinate::iter_all<Coordinate::HICANNOnDNC>()) {
+	std::set<halco::hicann::v2::HICANNOnDNC> avail_hicanns;
+	for (auto hicann : halco::common::iter_all<halco::hicann::v2::HICANNOnDNC>()) {
 		if (hicann.toEnum()<num_hicanns)
-			avail_hicanns.insert(HMF::Coordinate::HICANNOnDNC(hicann));
+			avail_hicanns.insert(halco::hicann::v2::HICANNOnDNC(hicann));
 	}
 	// FIXME: does not support non-highspeed hicanns
 	std::unique_ptr<FPGAHandlePIMPL> tempptr(new FPGAHandlePIMPL(
@@ -142,7 +142,7 @@ PowerBackend & FPGAHw::getPowerBackend() const {
 // Why no init in ctor?
 SpinnController& FPGAHw::get_spinn_controller() const {
 	if (!spinn_controller) {
-		if (ip() != Coordinate::IPv4()) {
+		if (ip() != halco::hicann::v2::IPv4()) {
 			const_cast<FPGAHw*>(this)->spinn_controller.reset(
 					new SpinnController(ip().to_ulong(), config_port, pulse_port));
 		} else {
@@ -160,9 +160,9 @@ RealtimeComm& FPGAHw::get_realtime_comm() const {
 	return *realtime_comm.get();
 }
 
-auto FPGAHw::create_hicann(Coordinate::HICANNGlobal const& h, bool request_highspeed) -> hicann_handle_t
+auto FPGAHw::create_hicann(halco::hicann::v2::HICANNGlobal const& h, bool request_highspeed) -> hicann_handle_t
 {
-	Coordinate::DNCGlobal dnc{h.toDNCGlobal(), coordinate().toWafer()};
+	halco::hicann::v2::DNCGlobal dnc{h.toDNCGlobal(), coordinate().toWafer()};
 	if (h.toWafer() != coordinate().toWafer())
 		throw std::runtime_error("HICANN is not on the same wafer");
 
@@ -185,16 +185,16 @@ auto FPGAHw::create_hicann(Coordinate::HICANNGlobal const& h, bool request_highs
 	return boost::make_shared<HICANNHw>(h, getPowerBackend().get_reticle_ptr(dnc), jtag_addr, request_highspeed);
 }
 
-boost::shared_ptr<facets::ReticleControl> FPGAHw::get_reticle(const Coordinate::DNCOnFPGA & d)
+boost::shared_ptr<facets::ReticleControl> FPGAHw::get_reticle(const halco::hicann::v2::DNCOnFPGA & d)
 {
 	PowerBackend & pb = getPowerBackend();
-	Coordinate::DNCGlobal dnc_global(d.toDNCOnWafer(coordinate()), coordinate().toWafer());
+	halco::hicann::v2::DNCGlobal dnc_global(d.toDNCOnWafer(coordinate()), coordinate().toWafer());
 	return pb.get_reticle_ptr(dnc_global);
 }
 
-boost::shared_ptr<FPGAHw> createFPGAHw(Coordinate::FPGAGlobal const c,
-		Coordinate::IPv4 const fpga_ip, Coordinate::DNCOnFPGA const d, Coordinate::IPv4 const pmu_ip,
-		bool on_wafer, size_t num_hicanns, Coordinate::JTAGFrequency jtag_frequency)
+boost::shared_ptr<FPGAHw> createFPGAHw(halco::hicann::v2::FPGAGlobal const c,
+		halco::hicann::v2::IPv4 const fpga_ip, halco::hicann::v2::DNCOnFPGA const d, halco::hicann::v2::IPv4 const pmu_ip,
+		bool on_wafer, size_t num_hicanns, halco::hicann::v2::JTAGFrequency jtag_frequency)
 {
 	boost::shared_ptr<FPGAHw> ptr{new FPGAHw(c, fpga_ip, d, pmu_ip, on_wafer, num_hicanns, jtag_frequency)};
 	return ptr;
@@ -210,7 +210,7 @@ void freeFPGAHw(boost::shared_ptr<FPGAHw> & handle)
 
 std::optional<FPGA::license_t> FPGAHw::expected_license() const
 {
-	return Coordinate::slurm_license(coordinate());
+	return halco::hicann::v2::slurm_license(coordinate());
 }
 
 bool FPGAHw::license_valid() const

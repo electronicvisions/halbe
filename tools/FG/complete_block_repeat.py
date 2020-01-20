@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import unittest
 from HWTest import HWTest
+from pyhalco_common import Enum
+import pyhalco_hicann_v2
 import pyhalbe as ph
 import time as t
 import numpy as np
@@ -78,7 +80,7 @@ class FloatingGateTest(HWTest,FGTest):
         self.init_adc()
 
         fg_block_num = 0
-        fg_block_coord = ph.Coordinate.FGBlockOnHICANN(ph.Coordinate.Enum(fg_block_num))
+        fg_block_coord = pyhalco_hicann_v2.FGBlockOnHICANN(Enum(fg_block_num))
 
         # start with default FGControl
         fgc = ph.HICANN.FGControl()

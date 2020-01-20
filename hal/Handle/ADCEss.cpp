@@ -10,18 +10,18 @@ HAL2ESS & ADCEss::ess()
 	return *(mEss->getESS());
 }
 
-std::pair<Coordinate::DNCOnWafer, Coordinate::AnalogOnHICANN>
+std::pair<halco::hicann::v2::DNCOnWafer, halco::hicann::v2::AnalogOnHICANN>
 ADCEss::getESSAnalog() const
 {
     //convert the coordinate value from string to int
     const size_t adc_coord_int = std::stoi(coordinate().get_serial());
-    Coordinate::AnalogOnHICANN analog( adc_coord_int % 2);
-    Coordinate::Enum dncEnum( adc_coord_int / 2);
-    return std::make_pair( Coordinate::DNCOnWafer(dncEnum), analog);
+    halco::hicann::v2::AnalogOnHICANN analog( adc_coord_int % 2);
+    halco::common::Enum dncEnum( adc_coord_int / 2);
+    return std::make_pair( halco::hicann::v2::DNCOnWafer(dncEnum), analog);
 }
 
 HMF::ADC::USBSerial
-ADCEss::getVirtualADCCoordinate(Coordinate::DNCOnWafer dnc, Coordinate::AnalogOnHICANN analog)
+ADCEss::getVirtualADCCoordinate(halco::hicann::v2::DNCOnWafer dnc, halco::hicann::v2::AnalogOnHICANN analog)
 {
     size_t const adc_coord_int      = 2*dnc.toEnum().value() + analog.value();
     std::string const adc_coord_str = std::to_string(adc_coord_int);

@@ -1,7 +1,8 @@
 import time as t
 import numpy as np
 from pyhalbe import *
-from pyhalbe.Coordinate import Enum
+import pyhalco_hicann_v2 as Coordinate
+from pyhalco_common import Enum
 from HWTest import HWTest
 from matplotlib import pylab
 from scipy import ndimage
@@ -13,7 +14,7 @@ def LoadResetFGParameters():
     fgc = HICANN.FGControl()
 
     for ii in range(512):
-        neuron_number = Coordinate.Enum(ii)
+        neuron_number = Enum(ii)
         fgc.setNeuron(Coordinate.NeuronOnHICANN(neuron_number), HICANN.neuron_parameter.E_l,        400)
         fgc.setNeuron(Coordinate.NeuronOnHICANN(neuron_number), HICANN.neuron_parameter.E_syni,     200)
         fgc.setNeuron(Coordinate.NeuronOnHICANN(neuron_number), HICANN.neuron_parameter.E_synx,     600)
@@ -69,7 +70,7 @@ def LoadDefaultFGParameters():
     fgc = HICANN.FGControl()
     # "default" FG parameters for all neurons first
     for ii in range(512):
-        neuron_number = Coordinate.Enum(ii)
+        neuron_number = Enum(ii)
         fgc.setNeuron(Coordinate.NeuronOnHICANN(neuron_number), HICANN.neuron_parameter.E_l,        400)#! lowest potential, under reset, so there are no spikes under background
         fgc.setNeuron(Coordinate.NeuronOnHICANN(neuron_number), HICANN.neuron_parameter.E_syni,     200)#! big PSPs linear
         fgc.setNeuron(Coordinate.NeuronOnHICANN(neuron_number), HICANN.neuron_parameter.E_synx,     600)#! big PSPs linear
@@ -457,7 +458,7 @@ def StartFPGABEG(h, d, f, period, first_addr, last_addr, random, channel):
     link = HICANN.GbitLink()
     for i in range(8): link.dirs[i] = HICANN.GbitLink.Direction.TO_HICANN #all links
     for i in range(8):
-        gbit[Coordinate.HICANNOnDNC(Coordinate.Enum(i))] = link
+        gbit[Coordinate.HICANNOnDNC(Enum(i))] = link
     HICANN.set_gbit_link(h, link)
     DNC.set_hicann_directions(h.to_DNCGlobal(), gbit)
 
@@ -486,7 +487,7 @@ def StopFPGABEG(h, d, f):
 
     for i in range(8): link.dirs[i] = HICANN.GbitLink.Direction.OFF
     for i in range(8):
-        gbit[Coordinate.HICANNOnDNC(Coordinate.Enum(i))] = link
+        gbit[Coordinate.HICANNOnDNC(Enum(i))] = link
     HICANN.set_gbit_link(h, link)
     DNC.set_hicann_directions(h.to_DNCGlobal(), gbit)
     HICANN.flush(h) #flush to hardware

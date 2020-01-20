@@ -32,19 +32,12 @@ messages.disable(messages.W1066) # Not exposed typedefs
 
 # Collect namespaces
 ns_hmf        = mb.namespace("::HMF")
-ns_coordinate = mb.namespace("::HMF::Coordinate")
 included_ns = [ns_hmf]
 
 for ns in ['::boost::serialization', '::boost::archive', '::boost::mpi']:
     try:
         mb.namespace(ns).exclude()
     except matchers.declaration_not_found_t: pass
-
-
-def ignore(c):
-    m = matchers.namespace_contains_matcher_t
-    return m(ns_coordinate.name)(c)
-
 
 # Special fix up
 containers.extend_std_containers(mb)
@@ -76,8 +69,6 @@ for ns in included_ns:
     namespaces.extend_array_operators(ns)
 
     for c in ns.classes(allow_empty=True):
-        if ignore(c):
-            continue
 
         c.include()
         # propagate "explictness" to python :)

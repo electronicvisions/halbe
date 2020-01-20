@@ -2,12 +2,15 @@
 
 #include "bitter/integral.h"
 
+#include "halco/common/geometry.h"
+
 #include <iomanip>
 
 namespace HMF {
 namespace FPGA {
 
-using namespace ::HMF::Coordinate;
+using namespace halco::hicann::v2;
+using namespace halco::common;
 
 const PulseAddress::label_t PulseAddress::default_label;
 

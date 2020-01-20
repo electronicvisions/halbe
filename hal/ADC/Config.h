@@ -1,5 +1,6 @@
 #pragma once
-#include "hal/Coordinate/HMFGeometry.h"
+#include <stdint.h>
+#include "halco/hicann/v2/external.h"
 
 namespace HMF {
 namespace ADC {
@@ -13,22 +14,22 @@ namespace ADC {
 		Config();
 		Config(
 			samples_type samples,
-			Coordinate::ChannelOnADC input,
-			Coordinate::TriggerOnADC trigger);
+			halco::hicann::v2::ChannelOnADC input,
+			halco::hicann::v2::TriggerOnADC trigger);
 
-		Coordinate::ChannelOnADC input() const;
-		Coordinate::TriggerOnADC trigger() const;
+		halco::hicann::v2::ChannelOnADC input() const;
+		halco::hicann::v2::TriggerOnADC trigger() const;
 		samples_type samples() const;
 		bool operator==(const Config & other) const;
 		bool operator!=(const Config& other) const { return !(*this == other); }
 
-		void set_input(const Coordinate::ChannelOnADC & channel);
-		void set_trigger(const Coordinate::TriggerOnADC & trigger);
+		void set_input(const halco::hicann::v2::ChannelOnADC & channel);
+		void set_trigger(const halco::hicann::v2::TriggerOnADC & trigger);
 		void set_samples(samples_type samples);
 	private:
 		samples_type mSamples;
-		Coordinate::ChannelOnADC mInput;
-		Coordinate::TriggerOnADC mTrigger;
+		halco::hicann::v2::ChannelOnADC mInput;
+		halco::hicann::v2::TriggerOnADC mTrigger;
 
 		friend class boost::serialization::access;
 		template<typename Archiver>

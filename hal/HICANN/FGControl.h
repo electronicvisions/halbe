@@ -1,5 +1,6 @@
 #pragma once
 
+#include "halco/hicann/v2/fwd.h"
 #include "hal/HICANN/FGBlock.h"
 
 namespace HMF {
@@ -10,17 +11,17 @@ struct FGControl
 	typedef FGBlock::value_type value_type;
 
 	///neuron parameter access
-	value_type getNeuron(Coordinate::NeuronOnHICANN const& nrn,
+	value_type getNeuron(halco::hicann::v2::NeuronOnHICANN const& nrn,
 						 neuron_parameter const np) const;
-	void setNeuron(Coordinate::NeuronOnHICANN const& nrn,
+	void setNeuron(halco::hicann::v2::NeuronOnHICANN const& nrn,
 				   HICANN::neuron_parameter const np,
 				   value_type const& value);
 
 
 	///shared parameter access through HMF::HICANN::FGBlockOnHICANN coordinate
-	value_type getShared(Coordinate::FGBlockOnHICANN const& b,
+	value_type getShared(halco::hicann::v2::FGBlockOnHICANN const& b,
 						 HICANN::shared_parameter const np) const;
-	void setShared(Coordinate::FGBlockOnHICANN const b,
+	void setShared(halco::hicann::v2::FGBlockOnHICANN const b,
 				   HICANN::shared_parameter const np,
 				   value_type const& value);
 
@@ -34,18 +35,19 @@ struct FGControl
 
 	size_t size() const;
 
-	FGBlock&       operator[] (Coordinate::FGBlockOnHICANN const& b);
-	FGBlock const& operator[] (Coordinate::FGBlockOnHICANN const& b) const;
+	FGBlock&       operator[] (halco::hicann::v2::FGBlockOnHICANN const& b);
+	FGBlock const& operator[] (halco::hicann::v2::FGBlockOnHICANN const& b) const;
 
 #ifndef PYPLUSPLUS
-	FGBlock& getBlock(Coordinate::FGBlockOnHICANN const& b);
+	FGBlock& getBlock(halco::hicann::v2::FGBlockOnHICANN const& b);
 #endif // PYPLUSPLUS
-	FGBlock const& getBlock(Coordinate::FGBlockOnHICANN const& b) const;
-	void setBlock(Coordinate::FGBlockOnHICANN const& b, FGBlock const& fg);
+	FGBlock const& getBlock(halco::hicann::v2::FGBlockOnHICANN const& b) const;
+	void setBlock(halco::hicann::v2::FGBlockOnHICANN const& b, FGBlock const& fg);
 
 private:
-	FGBlock& _getBlock(Coordinate::FGBlockOnHICANN const& b);
+	FGBlock& _getBlock(halco::hicann::v2::FGBlockOnHICANN const& b);
 
+#ifndef PYPLUSPLUS
 	std::array<FGBlock, FGBlock::fg_blocks> mBlock;
 
 	friend class boost::serialization::access;
@@ -55,6 +57,7 @@ private:
 		using namespace boost::serialization;
 		ar & make_nvp("blocks", mBlock);
 	}
+#endif
 
 	friend std::ostream& operator<<(std::ostream& os, FGControl const& fgc);
 };

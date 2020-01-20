@@ -4,7 +4,7 @@ import numpy as np
 
 from HWTest import HWTest
 from pyhalbe import (Coordinate, HICANN, Handle, ADC, FPGA)
-from pyhalbe.Coordinate import top, bottom, left, right, X, Y, Enum
+from pyhalco_common import top, bottom, left, right, X, Y, Enum
 
 
 #ishell = lambda *v, **k: None

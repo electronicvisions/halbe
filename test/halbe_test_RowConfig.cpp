@@ -3,7 +3,7 @@
 #include "hal/HICANN/RowConfig.h"
 
 using namespace ::HMF::HICANN;
-using namespace ::HMF::Coordinate;
+using namespace halco::common;
 
 TEST(RowConfig, GmaxDiv)
 {

@@ -22,11 +22,11 @@ struct ADCEss : public ADC
 	HAL2ESS & ess();
 #endif
 
-    std::pair<Coordinate::DNCOnWafer, Coordinate::AnalogOnHICANN>
+    std::pair<halco::hicann::v2::DNCOnWafer, halco::hicann::v2::AnalogOnHICANN>
     getESSAnalog() const;
 
     static HMF::ADC::USBSerial
-    getVirtualADCCoordinate(Coordinate::DNCOnWafer dnc, Coordinate::AnalogOnHICANN analog);
+    getVirtualADCCoordinate(halco::hicann::v2::DNCOnWafer dnc, halco::hicann::v2::AnalogOnHICANN analog);
 
     virtual bool isESS() const;
 private:

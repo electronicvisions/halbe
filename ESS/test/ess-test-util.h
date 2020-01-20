@@ -3,7 +3,7 @@
 
 #include "logger.h"
 
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/fwd.h"
 #include "hal/Handle/FPGAEss.h"
 #include "hal/Handle/Ess.h"
 #include "ESS/halbe_to_ess.h"

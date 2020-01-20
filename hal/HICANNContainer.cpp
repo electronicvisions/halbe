@@ -10,7 +10,8 @@
 
 #include "hate/optional.h"
 
-using namespace HMF::Coordinate;
+using namespace halco::hicann::v2;
+using namespace halco::common;
 
 namespace HMF {
 namespace HICANN {
@@ -340,7 +341,7 @@ bool Analog::operator !=(Analog const& rhs) const
 	return !(*this == rhs);
 }
 
-size_t Analog::mult(Coordinate::AnalogOnHICANN const s) const
+size_t Analog::mult(halco::hicann::v2::AnalogOnHICANN const s) const
 {
 	return (s+1)%2;
 }
@@ -424,10 +425,10 @@ std::ostream& operator<<(std::ostream& os, RepeaterBlock const& o)
 	os << "  start_tdi = " << o.start_tdi << std::endl;
 	os << "  start_tdo = " << o.start_tdo << std::endl;
 	os << "  full_flag = " << o.full_flag << std::endl;
-	os << "  tdi_data (0) = " << o.tdi_data[HMF::Coordinate::TestPortOnRepeaterBlock(0)];
-	os << "  tdi_data (1) = " << o.tdi_data[HMF::Coordinate::TestPortOnRepeaterBlock(1)];
-	os << "  tdo_data (0) = " << o.tdo_data[HMF::Coordinate::TestPortOnRepeaterBlock(0)];
-	os << "  tdo_data (1) = " << o.tdo_data[HMF::Coordinate::TestPortOnRepeaterBlock(1)];
+	os << "  tdi_data (0) = " << o.tdi_data[halco::hicann::v2::TestPortOnRepeaterBlock(0)];
+	os << "  tdi_data (1) = " << o.tdi_data[halco::hicann::v2::TestPortOnRepeaterBlock(1)];
+	os << "  tdo_data (0) = " << o.tdo_data[halco::hicann::v2::TestPortOnRepeaterBlock(0)];
+	os << "  tdo_data (1) = " << o.tdo_data[halco::hicann::v2::TestPortOnRepeaterBlock(1)];
 	os << "  SRAM timings = " << o.timings;
 	return os;
 }
@@ -512,7 +513,6 @@ bool SynapseControlRegister::operator!=(SynapseControlRegister const& reg) const
 {
 	return !(*this == reg);
 }
-
 
 std::ostream& operator<<(std::ostream& os, SynapseControlRegister const& reg)
 {

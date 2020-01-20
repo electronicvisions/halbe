@@ -1,8 +1,9 @@
 #pragma once
 
 #include "hal/test.h"
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/fg.h"
 #include "hal/HICANN/FGRow.h"
+#include "pywrap/compat/macros.hpp"
 #include "pywrap/compat/rant.hpp"
 
 namespace HMF {
@@ -75,14 +76,14 @@ enum neuron_parameter {
 extern int const not_connected;
 
 // CK: TODO move to Coordinates?
-neuron_parameter getNeuronParameter(Coordinate::FGBlockOnHICANN const& b,
-		                            Coordinate::FGRowOnFGBlock const & r);
-shared_parameter getSharedParameter(Coordinate::FGBlockOnHICANN const& b,
-		                            Coordinate::FGRowOnFGBlock const & r);
-Coordinate::FGRowOnFGBlock
-getNeuronRow(Coordinate::FGBlockOnHICANN const& b, neuron_parameter p);
-Coordinate::FGRowOnFGBlock
-getSharedRow(Coordinate::FGBlockOnHICANN const& b, shared_parameter p);
+neuron_parameter getNeuronParameter(halco::hicann::v2::FGBlockOnHICANN const& b,
+		                            halco::hicann::v2::FGRowOnFGBlock const & r);
+shared_parameter getSharedParameter(halco::hicann::v2::FGBlockOnHICANN const& b,
+		                            halco::hicann::v2::FGRowOnFGBlock const & r);
+halco::hicann::v2::FGRowOnFGBlock
+getNeuronRow(halco::hicann::v2::FGBlockOnHICANN const& b, neuron_parameter p);
+halco::hicann::v2::FGRowOnFGBlock
+getSharedRow(halco::hicann::v2::FGBlockOnHICANN const& b, shared_parameter p);
 
 /// Check if the given parameter is a current
 bool isCurrentParameter(neuron_parameter p);
@@ -99,9 +100,9 @@ bool isFGParameter(shared_parameter p);
 bool isL1Parameter(shared_parameter p);
 
 /// Check if row on any block is essential for floating gates
-bool isPotentialFGRow(Coordinate::FGRowOnFGBlock const&);
+bool isPotentialFGRow(halco::hicann::v2::FGRowOnFGBlock const&);
 /// Check if row on any block is essential for L1
-bool isPotentialL1Row(Coordinate::FGRowOnFGBlock const&);
+bool isPotentialL1Row(halco::hicann::v2::FGRowOnFGBlock const&);
 
 std::string to_string(neuron_parameter p);
 std::string to_string(shared_parameter p);
@@ -114,14 +115,14 @@ struct FGBlock
 
 	typedef uint16_t value_type;
 
-	FGBlock(Coordinate::FGBlockOnHICANN const& b);
+	FGBlock(halco::hicann::v2::FGBlockOnHICANN const& b);
 	PYPP_DEFAULT(FGBlock());
 	PYPP_DEFAULT(FGBlock(FGBlock const&));
 	PYPP_DEFAULT(FGBlock& operator=(FGBlock const&));
 
-	value_type getShared(Coordinate::FGBlockOnHICANN const& b,
+	value_type getShared(halco::hicann::v2::FGBlockOnHICANN const& b,
 						 shared_parameter param) const;
-	void setShared(Coordinate::FGBlockOnHICANN const& b,
+	void setShared(halco::hicann::v2::FGBlockOnHICANN const& b,
 				   shared_parameter param,
 				   value_type const& val);
 
@@ -133,14 +134,14 @@ struct FGBlock
 	value_type getRaw(size_t row, size_t column) const;
 	void setRaw(size_t row, size_t column, value_type val);
 
-	value_type getRaw(Coordinate::FGCellOnFGBlock cell) const;
-	void setRaw(Coordinate::FGCellOnFGBlock , value_type val);
+	value_type getRaw(halco::hicann::v2::FGCellOnFGBlock cell) const;
+	void setRaw(halco::hicann::v2::FGCellOnFGBlock , value_type val);
 
-	value_type getNeuron(Coordinate::FGBlockOnHICANN const& b,
-						 Coordinate::NeuronOnFGBlock const& nrn,
+	value_type getNeuron(halco::hicann::v2::FGBlockOnHICANN const& b,
+						 halco::hicann::v2::NeuronOnFGBlock const& nrn,
 						 neuron_parameter np) const;
-	void setNeuron(Coordinate::FGBlockOnHICANN const& b,
-				   Coordinate::NeuronOnFGBlock const& nrn,
+	void setNeuron(halco::hicann::v2::FGBlockOnHICANN const& b,
+				   halco::hicann::v2::NeuronOnFGBlock const& nrn,
 				   neuron_parameter np,
 				   value_type const& val);
 
@@ -148,12 +149,12 @@ struct FGBlock
 	value_type getNeuronRaw(size_t col, size_t row) const;
 	void setNeuronRaw(size_t col, size_t row, value_type const& val);
 
-	FGRow getFGRow(Coordinate::FGRowOnFGBlock row) const;
+	FGRow getFGRow(halco::hicann::v2::FGRowOnFGBlock row) const;
 
-	void setDefault(Coordinate::FGBlockOnHICANN const& b);
+	void setDefault(halco::hicann::v2::FGBlockOnHICANN const& b);
 
-	static int getSharedHardwareIdx(Coordinate::FGBlockOnHICANN const&, shared_parameter const&);
-	static int getNeuronHardwareIdx(Coordinate::FGBlockOnHICANN const&, neuron_parameter const&);
+	static int getSharedHardwareIdx(halco::hicann::v2::FGBlockOnHICANN const&, shared_parameter const&);
+	static int getNeuronHardwareIdx(halco::hicann::v2::FGBlockOnHICANN const&, neuron_parameter const&);
 
 	bool operator== (FGBlock const& rhs) const;
 	bool operator!= (FGBlock const& rhs) const;
@@ -179,25 +180,26 @@ private:
 	static neuron_lut_t const neuron_lut_right;
 
 public:
-	static bool is_left(Coordinate::FGBlockOnHICANN const& b);
+	static bool is_left(halco::hicann::v2::FGBlockOnHICANN const& b);
 
-	static shared_lut_t const& getSharedLut(Coordinate::FGBlockOnHICANN const& b);
-	static neuron_lut_t const& getNeuronLut(Coordinate::FGBlockOnHICANN const& b);
+	static shared_lut_t const& getSharedLut(halco::hicann::v2::FGBlockOnHICANN const& b);
+	static neuron_lut_t const& getNeuronLut(halco::hicann::v2::FGBlockOnHICANN const& b);
 
 	std::array<std::bitset<20>, 65>
-	set_formatter(Coordinate::FGBlockOnHICANN const& b,
+	set_formatter(halco::hicann::v2::FGBlockOnHICANN const& b,
 			  rant::integral_range<size_t, 23> const& row) const;
+
+	typedef std::array<rant::integral_range<value_type, 1023>, fg_lines> fg_t;
 #endif // PYPLUSPLUS
 
 	friend std::ostream& operator<< (std::ostream& os, FGBlock const& fgb);
 
-	typedef std::array<rant::integral_range<value_type, 1023>, fg_lines> fg_t;
-
 private:
+#ifndef PYPLUSPLUS
 	fg_t mShared;
 	std::array<fg_t, fg_columns-1> mNeuron;
-
-	Coordinate::FGBlockOnHICANN mCoordinate;
+#endif
+	halco::hicann::v2::FGBlockOnHICANN mCoordinate;
 
 	friend class boost::serialization::access;
 	template<typename Archiver>
@@ -209,6 +211,7 @@ private:
 };
 
 
+#ifndef PYPLUSPLUS
 template<typename Archiver>
 void FGBlock::serialize(Archiver & ar, unsigned int const)
 {
@@ -216,6 +219,7 @@ void FGBlock::serialize(Archiver & ar, unsigned int const)
 	ar & make_nvp("shared", mShared)
 	   & make_nvp("neuron", mNeuron);
 }
+#endif
 
 } // HICANN
 } // HMF

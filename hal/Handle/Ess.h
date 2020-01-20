@@ -3,7 +3,7 @@
 #include <string>
 
 #include "hal/Handle/Base.h"
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/wafer.h"
 #include "euter/cellparameters.h"
 
 namespace HMF {
@@ -14,7 +14,7 @@ namespace Handle {
 
 struct Ess : public Base {
 	//Constructor
-	Ess(Coordinate::Wafer wafer = Coordinate::Wafer(), std::string filepath = "");
+	Ess(halco::hicann::v2::Wafer wafer = halco::hicann::v2::Wafer(), std::string filepath = "");
 	~Ess();
 	//API
 	//set duration, run the simulation and reset it
@@ -38,12 +38,12 @@ struct Ess : public Base {
 	//initializes the Ess without running it, needed for tests
 	void initialize();
     //adds the hicann coordinate so it is simulated
-    void add_hicann(Coordinate::HICANNOnWafer hicann);
+    void add_hicann(halco::hicann::v2::HICANNOnWafer hicann);
 
 	/// Returns the wafer coordinate
-	Coordinate::Wafer wafer() const { return mWafer; }
+	halco::hicann::v2::Wafer wafer() const { return mWafer; }
 
-	typedef std::map<HMF::Coordinate::NeuronGlobal,
+	typedef std::map<halco::hicann::v2::NeuronGlobal,
 			PyNNParameters::EIF_cond_exp_isfa_ista> ParameterMap;
 	void overwriteNeuronParameters(ParameterMap const& map);
 
@@ -52,7 +52,7 @@ struct Ess : public Base {
 #endif
 private:
 	/// Wafer coordinate of ESS
-	Coordinate::Wafer mWafer;
+	halco::hicann::v2::Wafer mWafer;
 #ifndef PYPLUSPLUS
 	std::unique_ptr<HAL2ESS> mEss;
 #endif

@@ -2,10 +2,11 @@
 
 #include "hal/backend/HICANNBackendHelper.h"
 #include "test/NeuronBuilderHelper.h"
-
+#include "halco/hicann/v2/neuron.h"
 
 using namespace HMF::HICANN;
-using namespace HMF::Coordinate;
+using namespace halco::hicann::v2;
+using namespace halco::common;
 
 #define SET_NEURON(ii, ...) \
 	{ \
@@ -27,7 +28,7 @@ std::array<std::bitset<25>, 4> format(NeuronQuad const& quad)
 	for(size_t ii=0; ii<4; ++ii)
 	{
 		data[ii] = denmen_quad_formatter(
-			Coordinate::NeuronOnQuad(Enum(ii)),
+			halco::hicann::v2::NeuronOnQuad(Enum(ii)),
 			quad);
 	}
 	return data;

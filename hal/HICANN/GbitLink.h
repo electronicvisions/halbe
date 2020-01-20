@@ -6,7 +6,7 @@
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/bitset.hpp>
 
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/fwd.h"
 #include "hal/HICANN/L1Address.h"
 
 namespace HMF {
@@ -31,8 +31,8 @@ struct GbitLink //DNC<->HICANN channels
 
 	GbitLink();
 
-	Direction & operator[](const Coordinate::GbitLinkOnHICANN & ii);
-	const Direction & operator[](const Coordinate::GbitLinkOnHICANN & ii) const;
+	Direction & operator[](const halco::hicann::v2::GbitLinkOnHICANN & ii);
+	const Direction & operator[](const halco::hicann::v2::GbitLinkOnHICANN & ii) const;
 
 	bool operator ==(GbitLink const& b) const
 	    { return dirs==b.dirs && timestamp_enable==b.timestamp_enable; }

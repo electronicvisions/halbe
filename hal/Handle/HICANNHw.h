@@ -30,7 +30,7 @@ struct HICANNHw : public HICANN
 	uint8_t jtag_addr() const;
 
 	/// Construct a HICANN that is connected to FPGA f
-	HICANNHw(Coordinate::HICANNGlobal const& h,
+	HICANNHw(halco::hicann::v2::HICANNGlobal const& h,
 	         const boost::shared_ptr<facets::ReticleControl>& rc, uint8_t jtag_addr,
 	         bool request_highspeed);
 

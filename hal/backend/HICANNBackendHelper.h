@@ -37,11 +37,11 @@ struct sc_write_data
 typedef std::vector<sc_write_data> sc_write_data_queue_t;
 
 void set_decoder_double_row_impl(
-	HMF::Coordinate::SynapseDriverOnHICANN const& s, HMF::HICANN::DecoderDoubleRow const& data,
+	halco::hicann::v2::SynapseDriverOnHICANN const& s, HMF::HICANN::DecoderDoubleRow const& data,
 	std::function<void(sc_write_data const&)> callback);
 
 void set_weights_row_impl(
-	HMF::Coordinate::SynapseRowOnHICANN const& s, HMF::HICANN::WeightRow const& weights,
+	halco::hicann::v2::SynapseRowOnHICANN const& s, HMF::HICANN::WeightRow const& weights,
 	std::function<void(sc_write_data const&)> callback);
 
 /**
@@ -59,7 +59,7 @@ void set_weights_row_impl(
  */
 void wait_by_dummy(
 	Handle::HICANN& h,
-	Coordinate::SynapseArrayOnHICANN const& synarray,
+	halco::hicann::v2::SynapseArrayOnHICANN const& synarray,
 	HICANN::SynapseConfigurationRegister const& cnfg_reg,
 	size_t num_cycles);
 
@@ -83,12 +83,12 @@ size_t denmem_iomap(std::bitset<4> const inout);
  * @note the top right neuron requires special attention
  */
 std::bitset<25> denmen_quad_formatter(
-	Coordinate::NeuronOnQuad const& neuron,
+	halco::hicann::v2::NeuronOnQuad const& neuron,
 	NeuronQuad const& nquad);
 
 void denmem_quad_reader(
 	std::bitset<25> const& data,
-	Coordinate::NeuronOnQuad const& n,
+	halco::hicann::v2::NeuronOnQuad const& n,
 	NeuronQuad& quad);
 
 /** returns a line of top decoders to be written to hardware. already includes reverting the bits */
@@ -130,29 +130,29 @@ decode_preouts(
 	std::bitset<16> const top);
 
 /** transforms coordinate to the physical address of the repeater */
-facets::ci_addr_t to_repaddr(Coordinate::VLineOnHICANN const x);
+facets::ci_addr_t to_repaddr(halco::hicann::v2::VLineOnHICANN const x);
 
 /** transforms coordinate to the physical address of the repeater */
-facets::ci_addr_t to_repaddr(Coordinate::HLineOnHICANN const y);
+facets::ci_addr_t to_repaddr(halco::hicann::v2::HLineOnHICANN const y);
 
 /** transforms coordinate to the address of a repeater block */
 facets::HicannCtrl::Repeater
-to_repblock(Coordinate::VLineOnHICANN const x);
+to_repblock(halco::hicann::v2::VLineOnHICANN const x);
 
 /** transforms coordinate to the address of a repeater block */
 facets::HicannCtrl::Repeater
-to_repblock(Coordinate::HLineOnHICANN const y);
+to_repblock(halco::hicann::v2::HLineOnHICANN const y);
 
 /** transforms gray code to binary, needed for repeater test_input readout */
 std::bitset<10> gray_to_binary(std::bitset<10> const gray);
 
 facets::ci_data_t fg_read_answer(
 	Handle::HICANNHw & h,
-	Coordinate::FGBlockOnHICANN const& b);
+	halco::hicann::v2::FGBlockOnHICANN const& b);
 
 FGErrorResultRow fg_log_error(
 	Handle::HICANNHw & h,
-	Coordinate::FGBlockOnHICANN const& b,
+	halco::hicann::v2::FGBlockOnHICANN const& b,
 	int row,
 	facets::ci_data_t value);
 
@@ -168,7 +168,7 @@ FGErrorResultRow fg_log_error(
  */
 FGErrorResultRow fg_busy_wait(
 	Handle::HICANNHw & h,
-	Coordinate::FGBlockOnHICANN const& b,
+	halco::hicann::v2::FGBlockOnHICANN const& b,
 	int row = -1);
 
 /**
@@ -190,12 +190,12 @@ uint32_t fg_instruction(
 	uint8_t line);
 
 void set_repeater_direction(
-	Coordinate::HLineOnHICANN const x,
+	halco::hicann::v2::HLineOnHICANN const x,
 	HICANN::HorizontalRepeater const& rc,
 	std::bitset<8>& data);
 
 void set_repeater_direction(
-	Coordinate::VLineOnHICANN const x,
+	halco::hicann::v2::VLineOnHICANN const x,
 	HICANN::VerticalRepeater const& rc,
 	std::bitset<8>& data);
 
@@ -207,12 +207,12 @@ void set_repeater_helper(
 	facets::HicannCtrl::Repeater const index,
 	facets::ci_addr_t const addr);
 
-geometry::SideHorizontal get_repeater_direction(
-	Coordinate::HLineOnHICANN const x,
+halco::common::SideHorizontal get_repeater_direction(
+	halco::hicann::v2::HLineOnHICANN const x,
 	std::bitset<8> const data);
 
-geometry::SideVertical get_repeater_direction(
-	Coordinate::VLineOnHICANN const x,
+halco::common::SideVertical get_repeater_direction(
+	halco::hicann::v2::VLineOnHICANN const x,
 	std::bitset<8> const data);
 
 void repeater_config_formater(
@@ -242,9 +242,8 @@ size_t translate_neuron_merger(size_t const merger);
  *
  * @returns Hardware address of synapse row.
  */
-uint8_t SynapseRowOnArray_to_AddrOnHW(Coordinate::SynapseRowOnArray const& row,
-                                      Coordinate::SynapseArrayOnHICANN const& synarray);
-
+uint8_t SynapseRowOnArray_to_AddrOnHW(halco::hicann::v2::SynapseRowOnArray const& row,
+                                      halco::hicann::v2::SynapseArrayOnHICANN const& synarray);
 /**
  * Converts the hardware address of a synapse row
  * to software coordinates on a HICANN array.
@@ -256,8 +255,8 @@ uint8_t SynapseRowOnArray_to_AddrOnHW(Coordinate::SynapseRowOnArray const& row,
  * @returns Software address of synapse row on HICANN
  *              array.
  */
-Coordinate::SynapseRowOnArray AddrOnHW_to_SynapseRowOnArray(
-	uint8_t const& addr, Coordinate::SynapseArrayOnHICANN const& synarray);
+halco::hicann::v2::SynapseRowOnArray AddrOnHW_to_SynapseRowOnArray(
+	uint8_t const& addr, halco::hicann::v2::SynapseArrayOnHICANN const& synarray);
 
 /**
  * Changes a passed in bitset such that it represents
@@ -271,7 +270,7 @@ Coordinate::SynapseRowOnArray AddrOnHW_to_SynapseRowOnArray(
  *
  */
 void synapse_ctrl_formater(HICANN::SynapseControlRegister const& reg,
-                           Coordinate::SynapseArrayOnHICANN const& synarray,
+                           halco::hicann::v2::SynapseArrayOnHICANN const& synarray,
                            std::bitset<32>& returnvalue);
 
 /**

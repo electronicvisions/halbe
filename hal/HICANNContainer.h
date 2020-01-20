@@ -7,11 +7,15 @@
 
 #include "pywrap/compat/macros.hpp"
 
-#include "hal/Coordinate/geometry.h"
+#include "halco/common/geometry.h"
 #include "hal/strong_typedef.h"
 #include "hal/HMFCommon.h"
-#include "hal/Coordinate/HMFGeometry.h"
-#include "hal/Coordinate/typed_array.h"
+#include "halco/hicann/v2/fwd.h"
+#include "halco/hicann/v2/synapse.h"
+#include "halco/hicann/v2/fg.h"
+#include "halco/hicann/v2/l1.h"
+#include "halco/hicann/v2/external.h"
+#include "halco/common/typed_array.h"
 
 #include "hal/HICANN/DriverDecoder.h"
 #include "hal/HICANN/SynapseDecoder.h"
@@ -30,7 +34,7 @@ namespace HICANN {
 STRONG_TYPEDEF_NO_CONSTEXPR(FGRow4, std::array<FGRow BOOST_PP_COMMA() 4>)
 
 STRONG_TYPEDEF_CONSTEXPR(FGRowOnFGBlock4,
-                         std::array<Coordinate::FGRowOnFGBlock BOOST_PP_COMMA() 4>,
+                         std::array<halco::hicann::v2::FGRowOnFGBlock BOOST_PP_COMMA() 4>,
                          PYPP_CONSTEXPR)
 
 STRONG_TYPEDEF_CONSTEXPR(CrossbarRow, std::array<bool BOOST_PP_COMMA() 4>, PYPP_CONSTEXPR)
@@ -39,7 +43,7 @@ STRONG_TYPEDEF_CONSTEXPR(SynapseSwitchRow, std::array<bool BOOST_PP_COMMA() 4 * 
                          PYPP_CONSTEXPR)
 
 class SynapseWeight :
-	public Coordinate::detail::RantWrapper<SynapseWeight, uint8_t, 15, 0>
+	public halco::common::detail::RantWrapper<SynapseWeight, uint8_t, 15, 0>
 {
 public:
 	explicit PYPP_CONSTEXPR SynapseWeight(uint8_t val = 0) : rant_t(val) {}
@@ -60,13 +64,13 @@ STRONG_TYPEDEF_CONSTEXPR(DecoderDoubleRow, std::array<DecoderRow BOOST_PP_COMMA(
                          PYPP_CONSTEXPR)
 
 class BkgRandomISI
-    : public Coordinate::detail::RantWrapper<BkgRandomISI, size_t, 32768, 4> {
+    : public halco::common::detail::RantWrapper<BkgRandomISI, size_t, 32768, 4> {
 public:
 	explicit PYPP_CONSTEXPR BkgRandomISI(size_t val) : rant_t(val) {}
 };
 
 class BkgRegularISI
-    : public Coordinate::detail::RantWrapper<BkgRegularISI, size_t, 65536, 2> {
+    : public halco::common::detail::RantWrapper<BkgRegularISI, size_t, 65536, 2> {
 public:
 	explicit PYPP_CONSTEXPR BkgRegularISI(size_t val) : rant_t(val) {}
 };
@@ -246,7 +250,7 @@ private:
  */
 struct NeuronQuad
 {
-	typedef HMF::Coordinate::NeuronOnQuad coord_t;
+	typedef halco::hicann::v2::NeuronOnQuad coord_t;
 
 private:
 	static const size_t num_cols = coord_t::x_type::end;
@@ -320,19 +324,19 @@ void set_neuron_configIMPL(HMF::Handle::HICANNHw &, NeuronConfig const &);
 NeuronConfig get_neuron_configIMPL(HMF::Handle::HICANNHw &);
 
 class SRAMReadDelay
-    : public Coordinate::detail::RantWrapper<SRAMReadDelay, size_t, 255, 1> {
+    : public halco::common::detail::RantWrapper<SRAMReadDelay, size_t, 255, 1> {
 public:
 	explicit PYPP_CONSTEXPR SRAMReadDelay(size_t val) : rant_t(val) {}
 };
 
 class SRAMSetupPrecharge
-    : public Coordinate::detail::RantWrapper<SRAMSetupPrecharge, size_t, 15, 0> {
+    : public halco::common::detail::RantWrapper<SRAMSetupPrecharge, size_t, 15, 0> {
 public:
 	explicit PYPP_CONSTEXPR SRAMSetupPrecharge(size_t val) : rant_t(val) {}
 };
 
 class SRAMWriteDelay
-    : public Coordinate::detail::RantWrapper<SRAMWriteDelay, size_t, 15, 0> {
+    : public halco::common::detail::RantWrapper<SRAMWriteDelay, size_t, 15, 0> {
 public:
 	explicit PYPP_CONSTEXPR SRAMWriteDelay(size_t val) : rant_t(val) {}
 };
@@ -370,14 +374,14 @@ private:
 
 /**
  * Shared Neuron Configuration.
- * Holds the switches, which are shared for each VerticalSide(geometry::top and geometry::bottom)
+ * Holds the switches, which are shared for each VerticalSide(halco::common::top and halco::common::bottom)
  */
 struct NeuronConfig
 {
 public:
 	static const size_t number_sides=2;       //top and bottom neurons have different config possibilities
 
-	//correct bit is chosen via geometry::SideVertical (geometry::top or geometry::bottom)
+	//correct bit is chosen via halco::common::SideVertical (halco::common::top or halco::common::bottom)
 	std::bitset<number_sides> bigcap;         //!< use big capacity for all neurons of the HALF block (default: 1)
 	std::bitset<number_sides> slow_I_radapt;  //!< slow bits for I_radapt (default: 0)
 	std::bitset<number_sides> fast_I_radapt;  //!< fast bits for I_radapt (default: 0)
@@ -538,9 +542,9 @@ protected:
  * Use as forwarding repeater:
  *     VerticalRepeater vr;
  *     // set direction to be 'to the bottom'
- *     vr.setForwarding(geometry::bottom)
+ *     vr.setForwarding(halco::common::bottom)
  *     // or set direction to be 'to the top'
- *     vr.setForwarding(geometry::top)
+ *     vr.setForwarding(halco::common::top)
  *
  * TODO: give an example on how to use INPUT rsp OUTPUT with different settings for direction.
  */
@@ -559,7 +563,7 @@ public:
 		setTop(false);
 		setBottom(false); }
 	//!< forwarding in a certain direction
-	void setForwarding(geometry::SideVertical d) {
+	void setForwarding(halco::common::SideVertical d) {
 		setMode(FORWARDING);
 		mDirection = 0;
 		mDirection[d] = true; }
@@ -567,13 +571,13 @@ public:
 	void setInput() {
 		setMode(INPUTONLY); }
 	//!< recording input, while transmitting in certain direction
-	void setInput(geometry::SideVertical d) {
+	void setInput(halco::common::SideVertical d) {
 		setMode(INPUT);
 		mDirection = 0;
 		mDirection[d] = true; }
 	//!< enables test/SPL1-output, setting output in both directions is ALLOWED
 	//!< (function has to be called 2 times with both different arguments)
-	void setOutput(geometry::SideVertical d, bool value = true) {
+	void setOutput(halco::common::SideVertical d, bool value = true) {
 		//reset directions if previous state was not OUTPUT
 		if (getMode() != OUTPUT) { setMode(OUTPUT); mDirection = 0; }
 		mDirection[d] = value;
@@ -615,9 +619,9 @@ protected:
  * Use as forwarding repeater:
  *     HorizontalRepeater hr;
  *     // set direction to be 'to the right'
- *     hr.setForwarding(geometry::right)
+ *     hr.setForwarding(halco::common::right)
  *     // or set direction to be 'to the left'
- *     hr.setForwarding(geometry::left)
+ *     hr.setForwarding(halco::common::left)
  *
  * Use as sending repeater:
  *     HorizontalRepeater hr;
@@ -626,12 +630,12 @@ protected:
 	friend std::ostream& operator<<(std::ostream& os, HorizontalRepeater const& a);
 
  *     // enable output on this hicann
- *     nr.setOutput(geometry::right);
+ *     nr.setOutput(halco::common::right);
  *     // enable output on left neighbour hicann
- *     nr.setOutput(geometry::left);
+ *     nr.setOutput(halco::common::left);
  *     // enable output on this and on left neighbour hicann
- *     nr.setOutput(geometry::left);
- *     nr.setOutput(geometry::right);
+ *     nr.setOutput(halco::common::left);
+ *     nr.setOutput(halco::common::right);
  *
  * @note some horizontal repeater are sending repeaters (see coordinate definition
  * for HRepeaterOnHICANNand SendingRepeaterOnHICANN).
@@ -652,7 +656,7 @@ public:
 		setLeft(false);
 		setRight(false); }
 	//!< forwarding in a certain direction
-	void setForwarding(geometry::SideHorizontal d) {
+	void setForwarding(halco::common::SideHorizontal d) {
 		setMode(FORWARDING);
 		mDirection = 0;
 		mDirection[d] = true; }
@@ -660,13 +664,13 @@ public:
 	void setInput() {
 		setMode(INPUTONLY); }
 	//!< recording input, while transmitting in certain direction
-	void setInput(geometry::SideHorizontal d) {
+	void setInput(halco::common::SideHorizontal d) {
 		setMode(INPUT);
 		mDirection = 0;
 		mDirection[d] = true; }
 	//!< enables test/SPL1-output, setting output in both directions is ALLOWED
 	//!< (function has to be called 2 times with both different arguments)
-	void setOutput(geometry::SideHorizontal d, bool value = true) {
+	void setOutput(halco::common::SideHorizontal d, bool value = true) {
 		//reset directions if previous state was not OUTPUT
 		if (getMode() != OUTPUT) { setMode(OUTPUT); mDirection = 0; }
 		mDirection[d] = value;
@@ -699,25 +703,25 @@ protected:
 };
 
 class SynapseWriteDelay
-    : public Coordinate::detail::RantWrapper<SynapseWriteDelay, size_t, 3, 0> {
+    : public halco::common::detail::RantWrapper<SynapseWriteDelay, size_t, 3, 0> {
 public:
 	explicit PYPP_CONSTEXPR SynapseWriteDelay(size_t val) : rant_t(val) {}
 };
 
 class SynapseOutputDelay
-    : public Coordinate::detail::RantWrapper<SynapseOutputDelay, size_t, 15, 0> {
+    : public halco::common::detail::RantWrapper<SynapseOutputDelay, size_t, 15, 0> {
 public:
 	explicit PYPP_CONSTEXPR SynapseOutputDelay(size_t val) : rant_t(val) {}
 };
 
 class SynapseSetupPrecharge
-    : public Coordinate::detail::RantWrapper<SynapseSetupPrecharge, size_t, 15, 0> {
+    : public halco::common::detail::RantWrapper<SynapseSetupPrecharge, size_t, 15, 0> {
 public:
 	explicit PYPP_CONSTEXPR SynapseSetupPrecharge(size_t val) : rant_t(val) {}
 };
 
 class SynapseEnableDelay
-    : public Coordinate::detail::RantWrapper<SynapseEnableDelay, size_t, 15, 0> {
+    : public halco::common::detail::RantWrapper<SynapseEnableDelay, size_t, 15, 0> {
 public:
 	explicit PYPP_CONSTEXPR SynapseEnableDelay(size_t val) : rant_t(val) {}
 };
@@ -799,12 +803,12 @@ public:
 	bool                     drvresetb;
 	bool                     dllresetb;
 	std::bitset<2>           fextcap;
-	std::bitset<HMF::Coordinate::TestPortOnRepeaterBlock::end> start_tdi;
-	std::bitset<HMF::Coordinate::TestPortOnRepeaterBlock::end> start_tdo;
-	std::bitset<HMF::Coordinate::TestPortOnRepeaterBlock::end> full_flag;
-	//each block has a capacity of HMF::Coordinate::TestPortOnRepeaterBlock::end*3 incoming/outgoing events (output is looped)
-	std::array<std::array<TestEvent, 3>, HMF::Coordinate::TestPortOnRepeaterBlock::end> tdi_data; // incoming data
-	std::array<std::array<TestEvent, 3>, HMF::Coordinate::TestPortOnRepeaterBlock::end> tdo_data; // outgoing data
+	std::bitset<halco::hicann::v2::TestPortOnRepeaterBlock::end> start_tdi;
+	std::bitset<halco::hicann::v2::TestPortOnRepeaterBlock::end> start_tdo;
+	std::bitset<halco::hicann::v2::TestPortOnRepeaterBlock::end> full_flag;
+	//each block has a capacity of halco::hicann::v2::TestPortOnRepeaterBlock::end*3 incoming/outgoing events (output is looped)
+	std::array<std::array<TestEvent, 3>, halco::hicann::v2::TestPortOnRepeaterBlock::end> tdi_data; // incoming data
+	std::array<std::array<TestEvent, 3>, halco::hicann::v2::TestPortOnRepeaterBlock::end> tdo_data; // outgoing data
 	SRAMControllerTimings timings;
 
 	bool operator == ( const RepeaterBlock & o) const
@@ -884,19 +888,19 @@ PYPP_CLASS_ENUM(SynapseControllerCmd)
 	// note: no command number 8
 };
 
-class SynapseSel : public Coordinate::detail::RantWrapper<SynapseSel, size_t, 7, 0>
+class SynapseSel : public halco::common::detail::RantWrapper<SynapseSel, size_t, 7, 0>
 {
 public:
 	explicit PYPP_CONSTEXPR SynapseSel(size_t val = 0) : rant_t(val) {}
 };
 
-class SynapseGen : public Coordinate::detail::RantWrapper<SynapseGen, size_t, 15, 0>
+class SynapseGen : public halco::common::detail::RantWrapper<SynapseGen, size_t, 15, 0>
 {
 public:
 	explicit PYPP_CONSTEXPR SynapseGen(size_t val = 0) : rant_t(val) {}
 };
 
-class SynapseDllresetb : public Coordinate::detail::RantWrapper<SynapseDllresetb, size_t, 3, 0>
+class SynapseDllresetb : public halco::common::detail::RantWrapper<SynapseDllresetb, size_t, 3, 0>
 {
 public:
 	explicit PYPP_CONSTEXPR SynapseDllresetb(size_t val = 3) : rant_t(val) {}
@@ -905,7 +909,7 @@ public:
 class SynapseControlRegister
 {
 public:
-	typedef Coordinate::SynapseRowOnArray syn_row_on_array_t;
+	typedef halco::hicann::v2::SynapseRowOnArray syn_row_on_array_t;
 
 	bool operator==(SynapseControlRegister const& reg) const;
 	bool operator!=(SynapseControlRegister const& reg) const;
@@ -1005,7 +1009,7 @@ private:
 
 struct STDPLUT
 {
-	typedef Coordinate::typed_array<SynapseWeight, SynapseWeight> LUT;
+	typedef halco::common::typed_array<SynapseWeight, SynapseWeight> LUT;
 
 	STDPLUT();
 
@@ -1033,7 +1037,7 @@ public:
 
 	PYPP_INLINE(static size_t const, SLICES, 4);
 	PYPP_INLINE(static size_t const, SYNAPSES_PER_COLUMN_SET, 32);
-	PYPP_INLINE(static size_t const, SYNAPSES_PER_ROW, Coordinate::SynapseOnHICANN::x_type::end);
+	PYPP_INLINE(static size_t const, SYNAPSES_PER_ROW, halco::hicann::v2::SynapseOnHICANN::x_type::end);
 	PYPP_INLINE(static size_t const, N_COLUMN_SET, SYNAPSES_PER_ROW / SYNAPSES_PER_COLUMN_SET);
 	PYPP_INLINE(static size_t const, SYNAPSES_PER_SLICE, SYNAPSES_PER_ROW / SLICES);
 	PYPP_INLINE(static size_t const,
@@ -1093,13 +1097,13 @@ STRONG_TYPEDEF_CONSTEXPR(TestEvent_3,
                          PYPP_CONSTEXPR)
 
 #define HMF_ANALOG_ACCESS(NAME) \
-	bool get_ ## NAME (Coordinate::AnalogOnHICANN const side) const { \
+	bool get_ ## NAME (halco::hicann::v2::AnalogOnHICANN const side) const { \
 		if(config.count() > 4) { \
 			throw std::logic_error("config.count > 4 not allowed"); \
 		} \
 		return config[mult(side) * 10 + NAME]; \
 	} \
-	void set_ ## NAME (Coordinate::AnalogOnHICANN const side) { \
+	void set_ ## NAME (halco::hicann::v2::AnalogOnHICANN const side) { \
 		for (size_t ii=0; ii<10; ++ii) { \
 			config[mult(side) * 10 + ii] = false; \
 		} \
@@ -1137,16 +1141,16 @@ public:
 		dll_voltage       = 9,
 		none              = 10;
 
-	bool enabled(Coordinate::AnalogOnHICANN const side) const
+	bool enabled(halco::hicann::v2::AnalogOnHICANN const side) const
 	{
 		return config[20+mult(side)];
 	}
 
-	void enable (Coordinate::AnalogOnHICANN const side) { config[20+mult(side)] = true; }
-	void disable(Coordinate::AnalogOnHICANN const side) { config[20+mult(side)] = false; }
+	void enable (halco::hicann::v2::AnalogOnHICANN const side) { config[20+mult(side)] = true; }
+	void disable(halco::hicann::v2::AnalogOnHICANN const side) { config[20+mult(side)] = false; }
 
 	/// Setter an getter:
-	/// set_fg_left(geometry::top) set left floating gate to geometry::top analog out and enable it
+	/// set_fg_left(halco::common::top) set left floating gate to halco::common::top analog out and enable it
 	HMF_ANALOG_ACCESS(dll_voltage)
 	HMF_ANALOG_ACCESS(preout)
 	HMF_ANALOG_ACCESS(fireline_neuron0) // TODO: in set_analog halbe function check which analog
@@ -1164,7 +1168,7 @@ private:
 	friend Analog HICANN::get_analogIMPL(Handle::HICANNHw & h);
 
 	std::bitset<22>&       getConfig()       { return config; }
-	size_t mult(Coordinate::AnalogOnHICANN const s) const;
+	size_t mult(halco::hicann::v2::AnalogOnHICANN const s) const;
 
 	std::bitset<22> config;
 
@@ -1225,20 +1229,20 @@ BOOST_CLASS_EXPORT_KEY(HMF::HICANN::SynapseController)
 
 namespace std {
 
-HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseWeight)
-HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::BkgRandomISI)
-HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::BkgRegularISI)
-HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SRAMReadDelay)
-HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SRAMSetupPrecharge)
-HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SRAMWriteDelay)
+HALCO_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseWeight)
+HALCO_GEOMETRY_HASH_CLASS(HMF::HICANN::BkgRandomISI)
+HALCO_GEOMETRY_HASH_CLASS(HMF::HICANN::BkgRegularISI)
+HALCO_GEOMETRY_HASH_CLASS(HMF::HICANN::SRAMReadDelay)
+HALCO_GEOMETRY_HASH_CLASS(HMF::HICANN::SRAMSetupPrecharge)
+HALCO_GEOMETRY_HASH_CLASS(HMF::HICANN::SRAMWriteDelay)
 
-HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseEnableDelay)
-HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseSel)
-HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseGen)
-HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseDllresetb)
-HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseSetupPrecharge)
-HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseWriteDelay)
-HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseOutputDelay)
+HALCO_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseEnableDelay)
+HALCO_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseSel)
+HALCO_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseGen)
+HALCO_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseDllresetb)
+HALCO_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseSetupPrecharge)
+HALCO_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseWriteDelay)
+HALCO_GEOMETRY_HASH_CLASS(HMF::HICANN::SynapseOutputDelay)
 
 
 } // namespace std

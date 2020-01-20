@@ -5,8 +5,8 @@
 
 #include "hal/backend/FPGABackend.h"
 #include "hal/HICANN/FGInstruction.h"
-#include "hal/Coordinate/iter_all.h"
-#include "hal/Coordinate/FormatHelper.h"
+#include "halco/common/iter_all.h"
+#include "halco/hicann/v2/format_helper.h"
 
 // handles 
 #include "hal/backend/dispatch.h"
@@ -30,7 +30,8 @@
 
 using namespace facets;
 using namespace bit;
-using namespace HMF::Coordinate;
+using namespace halco::hicann::v2;
+using namespace halco::common;
 
 static log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger("halbe.backend.hicann");
 
@@ -184,7 +185,7 @@ HALBE_SETTER_GUARDED(EventSetupSynapses,
 HALBE_SETTER_GUARDED(EventSetupSynapses,
 	set_weights_row,
 	std::vector<boost::shared_ptr<Handle::HICANN> >, handles,
-	Coordinate::SynapseRowOnHICANN const&, s,
+	halco::hicann::v2::SynapseRowOnHICANN const&, s,
 	std::vector<WeightRow> const&, data)
 {
 	const size_t n_hicanns = handles.size();
@@ -299,7 +300,7 @@ HALBE_SETTER_GUARDED(EventSetupSynapses,
 HALBE_SETTER_GUARDED(EventSetupSynapses,
 	set_decoder_double_row,
 	std::vector<boost::shared_ptr<Handle::HICANN> >, handles,
-	Coordinate::SynapseDriverOnHICANN const&, syndrv,
+	halco::hicann::v2::SynapseDriverOnHICANN const&, syndrv,
 	std::vector<DecoderDoubleRow> const&, data)
 {
 	const size_t n_hicanns = handles.size();
@@ -803,7 +804,7 @@ HALBE_SETTER_GUARDED_RETURNS(HICANN::FGErrorResultQuadRow,
 	EventSetupFG,
 	set_fg_row_values,
 	Handle::HICANN &, h,
-	Coordinate::FGRowOnFGBlock, row,
+	halco::hicann::v2::FGRowOnFGBlock, row,
 	FGControl const&, fg,
 	bool const, writeDown,
 	bool const, blocking)
@@ -884,8 +885,8 @@ HALBE_SETTER_GUARDED_RETURNS(HICANN::FGErrorResultQuadRow,
 	EventSetupFG,
 	set_fg_row_values,
 	Handle::HICANN &, h,
-	Coordinate::FGBlockOnHICANN, block,
-	Coordinate::FGRowOnFGBlock, row,
+	halco::hicann::v2::FGBlockOnHICANN, block,
+	halco::hicann::v2::FGRowOnFGBlock, row,
 	FGRow const&, fg,
 	bool const, writeDown,
 	bool const, blocking)
@@ -923,7 +924,7 @@ HALBE_SETTER_GUARDED_RETURNS(HICANN::FGErrorResultQuadRow,
 HALBE_SETTER_GUARDED(EventSetupFG,
 	set_fg_config,
 	Handle::HICANN &, h,
-	Coordinate::FGBlockOnHICANN const &, block,
+	halco::hicann::v2::FGBlockOnHICANN const &, block,
 	const FGConfig &, config)
 {
 	ReticleControl& reticle = *h.get_reticle();
@@ -1279,13 +1280,13 @@ HALBE_SETTER_GUARDED(EventSetupL1,
 	HICANN::DNCMergerLine const&, m)
 {
 	ReticleControl& reticle = *h.get_reticle();
-	static const size_t num_merger = Coordinate::DNCMergerOnHICANN::size;
+	static const size_t num_merger = halco::hicann::v2::DNCMergerOnHICANN::size;
 
 	std::bitset<num_merger> enable = 0, select = 0, slow = 0, loopback = 0;
 
 	//swap the numbers of mergers according to new coordinates
 	for (uint8_t ii = 0; ii < num_merger; ii++) {
-		Coordinate::DNCMergerOnHICANN mer{ii};
+		halco::hicann::v2::DNCMergerOnHICANN mer{ii};
 		select[translate_dnc_merger(mer)] = m[mer].config[Merger::select_bit];
 		enable[translate_dnc_merger(mer)] = m[mer].config[Merger::enable_bit];
 		slow[translate_dnc_merger(mer)]   = m[mer].slow;
@@ -1309,7 +1310,7 @@ HALBE_GETTER(DNCMergerLine, get_dnc_merger,
 	Handle::HICANN &, h)
 {
 	ReticleControl& reticle = *h.get_reticle();
-	static const size_t num_merger = Coordinate::DNCMergerOnHICANN::size;
+	static const size_t num_merger = halco::hicann::v2::DNCMergerOnHICANN::size;
 
 	DNCMergerLine returnvalue;
 
@@ -1329,7 +1330,7 @@ HALBE_GETTER(DNCMergerLine, get_dnc_merger,
 
 	//reverse-swap the numbers of mergers according to new coordinates
 	for (uint8_t ii = 0; ii < num_merger; ii++) {
-		Coordinate::DNCMergerOnHICANN mer{ii};
+		halco::hicann::v2::DNCMergerOnHICANN mer{ii};
 		returnvalue[mer].config[Merger::select_bit] = select[translate_dnc_merger(mer)];
 		returnvalue[mer].config[Merger::enable_bit] = enable[translate_dnc_merger(mer)];
 		returnvalue[mer].slow = slow[translate_dnc_merger(mer)];

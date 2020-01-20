@@ -5,8 +5,10 @@
 #include "hal/HICANN/FGConfig.h"
 #include "hal/HICANN/FGControl.h"
 
+#include "halco/hicann/v2/neuron.h"
 
-using namespace HMF::Coordinate;
+using namespace halco::hicann::v2;
+using namespace halco::common;
 using namespace std;
 
 namespace HMF {
@@ -140,10 +142,10 @@ TEST(FGBlock, Dimensions)
 		FGBlock block;
 
 		if (b.toEnum() == 0 || b.toEnum() == 2) {
-			ASSERT_EQ(geometry::left, b.x());
+			ASSERT_EQ(halco::common::left, b.x());
 			ASSERT_TRUE(block.is_left(b));
 		} else {
-			ASSERT_EQ(geometry::right, b.x());
+			ASSERT_EQ(halco::common::right, b.x());
 			ASSERT_FALSE(block.is_left(b));
 		}
 	}

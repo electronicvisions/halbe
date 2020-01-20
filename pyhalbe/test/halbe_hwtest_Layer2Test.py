@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from HWTest import HWTest
 from pyhalbe import *
+from pyhalco_common import Enum
+import pyhalco_hicann_v2 as Coordinate
 import unittest
 import time
 
@@ -53,7 +55,7 @@ class Layer2HWTests(HWTest):
         # no timestamp handling
         # all directions set TO_HICANN, to make sure there are no spikes interfering from the HICANNs
         for i in range(8):
-            hc = Coordinate.HICANNOnDNC(Coordinate.Enum(i))
+            hc = Coordinate.HICANNOnDNC(Enum(i))
             gbit[hc].timestamp_enable = False
             for j in range(8):
 			    gbit[hc].dirs[j] = HICANN.GbitLink.Direction.TO_HICANN

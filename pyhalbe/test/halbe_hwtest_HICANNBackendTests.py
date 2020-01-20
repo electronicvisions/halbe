@@ -4,8 +4,8 @@ from HWTest import HWTest
 from pyhalbe import *
 import time as t
 
-import Coordinate
-from Coordinate import Enum
+import pyhalco_hicann_v2 as Coordinate
+from pyhalco_common import Enum, X, Y
 
 class HICANNBackendHWTests(HWTest):
     def test_HICANNInit(self):
@@ -31,7 +31,7 @@ class HICANNBackendHWTests(HWTest):
         nrn.enable_current_input(True)
 
         nquad = HICANN.NeuronQuad()
-        nquad[Coordinate.NeuronOnQuad(Coordinate.X(0), Coordinate.Y(0))] = nrn
+        nquad[Coordinate.NeuronOnQuad(X(0), Y(0))] = nrn
 
         HICANN.set_denmem_quad(self.h, Coordinate.QuadOnHICANN(0), nquad)
 
@@ -57,7 +57,7 @@ class HICANNBackendHWTests(HWTest):
         stimulus.setContinuous(True)
         stimulus[:40] = [800] * 40
         stimulus[40:] = [0] * (len(stimulus) - 40)
-        HICANN.set_current_stimulus(self.h, Coordinate.FGBlockOnHICANN(Coordinate.Enum(0)), stimulus)
+        HICANN.set_current_stimulus(self.h, Coordinate.FGBlockOnHICANN(Enum(0)), stimulus)
 
         # READOUT PULSES!
         #configure merger tree, phase
@@ -101,7 +101,7 @@ class HICANNBackendHWTests(HWTest):
 
         #turn off links
         gl.dirs[0] = HICANN.GbitLink.Direction.OFF
-        gr[Coordinate.HICANNOnDNC(Coordinate.Enum(0))] = gl
+        gr[Coordinate.HICANNOnDNC(Enum(0))] = gl
         HICANN.set_gbit_link(self.h, gl)
         DNC.set_hicann_directions(self.fpga, self.dnc, gr)
         HICANN.flush(self.h)
@@ -280,7 +280,7 @@ class HICANNBackendHWTests(HWTest):
 
         for i in range(8): link.dirs[i] = HICANN.GbitLink.Direction.OFF
         for i in range(8):
-            gbit[Coordinate.HICANNOnDNC(Coordinate.Enum(i))] = link
+            gbit[Coordinate.HICANNOnDNC(Enum(i))] = link
 
         HICANN.set_gbit_link(self.h, link)
         DNC.set_hicann_directions(self.fpga, self.dnc, gbit)

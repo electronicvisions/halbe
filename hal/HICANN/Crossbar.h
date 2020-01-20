@@ -4,7 +4,7 @@
 
 #include "hal/SparseSwitchMatrix.h"
 #include "hal/HICANNContainer.h"
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/fwd.h"
 #include "hal/test.h"
 
 namespace HMF {
@@ -13,8 +13,8 @@ namespace HICANN {
 class Crossbar :
 	public SparseSwitchMatrix<
 		Crossbar, bool,
-		Coordinate::VLineOnHICANN,
-		Coordinate::HLineOnHICANN,
+		halco::hicann::v2::VLineOnHICANN,
+		halco::hicann::v2::HLineOnHICANN,
 		8, 1>
 {
 public:
@@ -25,8 +25,8 @@ public:
 	                                size_t max_switches_per_column) const;
 
 	CrossbarRow const&
-	get_row(Coordinate::HLineOnHICANN y, geometry::Side s) const;
-	void set_row(Coordinate::HLineOnHICANN y, geometry::Side s, CrossbarRow const&);
+	get_row(halco::hicann::v2::HLineOnHICANN y, halco::common::Side s) const;
+	void set_row(halco::hicann::v2::HLineOnHICANN y, halco::common::Side s, CrossbarRow const&);
 
 private:
 	FRIEND_TEST(HMFConfig, Crossbar);

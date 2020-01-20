@@ -286,7 +286,7 @@ BackgroundGenerator::BackgroundGenerator() :
 	poisson(false),
 	seed(1),
 	rate(0),
-	hicann_number(geometry::Enum(0)),
+	hicann_number(halco::common::Enum(0)),
 	first_address(0),
 	last_address(0),
 	channels(0)

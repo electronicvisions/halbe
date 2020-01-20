@@ -4,7 +4,7 @@ pyhalbe.so will load this module and execute patch() during initialization
 
 import sys
 import pyhalco_common
-import Coordinate
+import pyhalco_hicann_v2
 
 
 def patch(module):
@@ -24,10 +24,3 @@ def patch(module):
                     obj.__name__ = name
                 except AttributeError:
                     pass
-
-    # Add Coordinate as pyhalbe.Coordiante to be compatible with older pickles
-    sys.modules['pyhalbe.Coordinate'] = Coordinate
-    module.Coordinate = Coordinate
-
-import pyhalbe.ADC as ADC
-Coordinate.ADC = ADC.USBSerial

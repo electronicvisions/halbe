@@ -17,14 +17,15 @@ class HWTest(PyhalbeTest):
             self.ON_WAFER = False
             self.WAFER  = 0
 
-        from pyhalbe import Handle, Coordinate, HICANN, FPGA, Coordinate, Debug
+        import pyhalco_hicann_v2 as Coordinate
+        from pyhalbe import Handle, HICANN, FPGA, Debug
         # The module pyhalbe.apicheck wraps pyhalbe for hardware-less
         # apichecks. It will be enabled only if the environment variable
         # PYHALBE_API_CHECK is set to true. The attribute "enabled" will be set
         # accordingly. KHS.
         import pyhalbe_apicheck as apicheck
 
-        Enum = Coordinate.Enum
+        from pyhalco_common import Enum
         highspeed = True
         arq = True
         hicann_num = 1

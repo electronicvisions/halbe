@@ -1,4 +1,6 @@
 #include "hal/ADC/Config.h"
+#include "halco/hicann/v2/external.h"
+
 namespace HMF {
 namespace ADC {
 
@@ -10,8 +12,8 @@ namespace ADC {
 	}
 
 	Config::Config(samples_type samples,
-	               Coordinate::ChannelOnADC input,
-	               Coordinate::TriggerOnADC trigger) :
+	               halco::hicann::v2::ChannelOnADC input,
+	               halco::hicann::v2::TriggerOnADC trigger) :
 		mInput(input), mTrigger(trigger)
 	{
 		set_samples(samples);
@@ -19,17 +21,17 @@ namespace ADC {
 
 	Config::Config() :
 		mSamples(0),
-		mInput(Coordinate::ChannelOnADC(0)),
-		mTrigger(Coordinate::TriggerOnADC(0))
+		mInput(halco::hicann::v2::ChannelOnADC(0)),
+		mTrigger(halco::hicann::v2::TriggerOnADC(0))
 	{
 	}
 
-	Coordinate::ChannelOnADC Config::input() const
+	halco::hicann::v2::ChannelOnADC Config::input() const
 	{
 		return mInput;
 	}
 
-	Coordinate::TriggerOnADC Config::trigger() const
+	halco::hicann::v2::TriggerOnADC Config::trigger() const
 	{
 		return mTrigger;
 	}
@@ -39,11 +41,11 @@ namespace ADC {
 		return mSamples;
 	}
 
-	void Config::set_input(const Coordinate::ChannelOnADC & channel)
+	void Config::set_input(const halco::hicann::v2::ChannelOnADC & channel)
 	{
 		mInput = channel;
 	}
-	void Config::set_trigger(const Coordinate::TriggerOnADC & trigger)
+	void Config::set_trigger(const halco::hicann::v2::TriggerOnADC & trigger)
 	{
 		mTrigger = trigger;
 	}

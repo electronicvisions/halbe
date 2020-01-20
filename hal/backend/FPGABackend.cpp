@@ -7,8 +7,8 @@
 
 #include <boost/config.hpp>
 
-#include "hal/Coordinate/FormatHelper.h"
-#include "hal/Coordinate/iter_all.h"
+#include "halco/hicann/v2/format_helper.h"
+#include "halco/common/iter_all.h"
 #include "hal/backend/DNCBackend.h"
 #include "hal/backend/FPGABackendHelper.h"
 #include "hal/backend/HICANNBackendHelper.h"
@@ -49,8 +49,8 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 	std::bitset<8> hicann_in_hs_order;
 	// generate bool set indicating highspeed-required hicanns
 	std::bitset<8> highspeed_hicanns_in_hs_order;
-	for (auto dnc : Coordinate::iter_all<HMF::Coordinate::DNCOnFPGA>()) {
-		for (auto hicann : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>()) {
+	for (auto dnc : halco::common::iter_all<halco::hicann::v2::DNCOnFPGA>()) {
+		for (auto hicann : halco::common::iter_all<halco::hicann::v2::HICANNOnDNC>()) {
 			if (f.hicann_active(dnc, hicann)) {
 				hicann_in_hs_order[hicann.toHighspeedLinkOnDNC()] = true;
 			}
@@ -65,7 +65,7 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 	if (!jtag_p2fa) {
 		throw std::runtime_error(
 		    "HMF::FPGA::reset: Only HICANN-ARQ comm model is currently supported: " +
-		    HMF::Coordinate::short_format(f.coordinate()));
+		    halco::hicann::v2::short_format(f.coordinate()));
 	}
 
 	if (r.PLL_frequency != ((r.PLL_frequency / 25) * 25)
@@ -107,7 +107,7 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 		size_t const dropped_packets = jtag_p2fa->getHostAL()->getARQStream()->drop_receive_queue();
 		if (dropped_packets != 0) {
 			LOG4CXX_ERROR(
-			    logger, HMF::Coordinate::short_format(f.coordinate())
+			    logger, halco::hicann::v2::short_format(f.coordinate())
 			                << "::reset: Dropped " << dropped_packets << " packet(s) (cf. #2889)");
 		}
 
@@ -120,8 +120,8 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 		}
 
 		{ // Read and verify JTAG IDs
-			for (auto dnc : Coordinate::iter_all<HMF::Coordinate::DNCOnFPGA>()) {
-				for (auto hicann : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>()) {
+			for (auto dnc : halco::common::iter_all<halco::hicann::v2::DNCOnFPGA>()) {
+				for (auto hicann : halco::common::iter_all<halco::hicann::v2::HICANNOnDNC>()) {
 					if (f.hicann_active(dnc, hicann)) {
 						auto jtag_pos_hicann =
 						    f.getPowerBackend().hicann_jtag_addr(f.get(dnc, hicann)->coordinate());
@@ -129,10 +129,10 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 						if (read_hicann_id != HICANN_JTAG_ID) {
 							std::stringstream error_msg;
 							error_msg
-							    << HMF::Coordinate::short_format(f.coordinate())
+							    << halco::hicann::v2::short_format(f.coordinate())
 							    << "::reset: Read wrong (0x" << std::hex << read_hicann_id
 							    << " instead of 0x" << HICANN_JTAG_ID << ") JTAG ID for "
-							    << HMF::Coordinate::short_format(hicann.toHICANNOnWafer(
+							    << halco::hicann::v2::short_format(hicann.toHICANNOnWafer(
 							           dnc.toDNCOnWafer(f.coordinate())))
 							    << " after JTAG reset";
 							throw std::runtime_error(error_msg.str().c_str());
@@ -143,7 +143,7 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 			auto const read_fpga_id = reticle.jtag->read_id(reticle.jtag->pos_fpga);
 			if (read_fpga_id != FPGA_JTAG_ID) {
 				std::stringstream error_msg;
-				error_msg << HMF::Coordinate::short_format(f.coordinate())
+				error_msg << halco::hicann::v2::short_format(f.coordinate())
 						  << "::reset: Read wrong (0x" << std::hex << read_fpga_id
 						  << " instead of 0x" << FPGA_JTAG_ID
 						  << ") JTAG ID after JTAG reset";
@@ -164,8 +164,8 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 		}
 
 		{ // Set PLLs of all chips... (design reset is held!)
-			for (auto d : Coordinate::iter_all<HMF::Coordinate::DNCOnFPGA>()) {
-				for (auto h : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>()) {
+			for (auto d : halco::common::iter_all<halco::hicann::v2::DNCOnFPGA>()) {
+				for (auto h : halco::common::iter_all<halco::hicann::v2::HICANNOnDNC>()) {
 					if (f.hicann_active(d, h)) {
 						HICANN::set_PLL_multiplier(*f.get(d, h), PLL_divisior, PLL_multiplier);
 					}
@@ -186,16 +186,16 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 
 		if (r.enable_tests)
 		{ // Verify JTAG-based communication link and some digital functionality
-			LOG4CXX_INFO(logger, HMF::Coordinate::short_format(f.coordinate())
+			LOG4CXX_INFO(logger, halco::hicann::v2::short_format(f.coordinate())
 			                         << " Verifying jtag based communication link");
 			Helper::switchramtest_jtag(f, reticle);
 		}
 
 		{ // Reset HICANN ARQ again... (switchram test spoilt it)
-			LOG4CXX_INFO(logger, HMF::Coordinate::short_format(f.coordinate())
+			LOG4CXX_INFO(logger, halco::hicann::v2::short_format(f.coordinate())
 			                         << " Resetting HICANN ARQ");
-			for (auto d : Coordinate::iter_all<HMF::Coordinate::DNCOnFPGA>()) {
-				for (auto h : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>()) {
+			for (auto d : halco::common::iter_all<halco::hicann::v2::DNCOnFPGA>()) {
+				for (auto h : halco::common::iter_all<halco::hicann::v2::HICANNOnDNC>()) {
 					if (f.hicann_active(d, h)) {
 						reticle.jtag->set_hicann_pos(f.get(d, h)->jtag_addr());
 						// reset HICANN's ARQ (both tags)
@@ -212,17 +212,17 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 		{ // Initialize High-Speed Connection
 			auto tmp = jtag_p2fa->trans_count;
 			jtag_p2fa->trans_count = r.cnt_hicann_init_tests;
-			for (auto dnc : Coordinate::iter_all<HMF::Coordinate::DNCOnFPGA>()) {
+			for (auto dnc : halco::common::iter_all<halco::hicann::v2::DNCOnFPGA>()) {
 				highspeed_init_successful = f.get_reticle(dnc)->hicannInit(
 				    hicann_in_hs_order, highspeed_hicanns_in_hs_order, /*silent*/ false, /*return_on_error*/ true);
 				LOG4CXX_INFO(
-				    logger, HMF::Coordinate::short_format(f.coordinate())
+				    logger, halco::hicann::v2::short_format(f.coordinate())
 				                << " completed hicannInit on: " << highspeed_hicanns_in_hs_order << " -> "
 				                << highspeed_init_successful);
 				if (max_init_trials-- <= 0) {
 					std::stringstream error_msg;
 					error_msg
-					    << HMF::Coordinate::short_format(f.coordinate())
+					    << halco::hicann::v2::short_format(f.coordinate())
 					    << "::reset: Initalization of high speed links failed. Stop.";
 					throw std::runtime_error(error_msg.str().c_str());
 				}
@@ -244,12 +244,12 @@ HALBE_SETTER_GUARDED(EventStartExperiment,
 {
 	ReticleControl& reticle = f.getPowerBackend().get_some_reticle(f);
 
-	for (auto d : Coordinate::iter_all<HMF::Coordinate::DNCOnFPGA>()) {
-		for (auto h : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>()) {
+	for (auto d : halco::common::iter_all<halco::hicann::v2::DNCOnFPGA>()) {
+		for (auto h : halco::common::iter_all<halco::hicann::v2::HICANNOnDNC>()) {
 			if (f.hicann_active(d, h)) {
 				HicannCtrl& hc = *reticle.hicann[f.get(d, h)->jtag_addr()];
 				LOG4CXX_INFO(logger,
-				             HMF::Coordinate::short_format(f.coordinate())
+				             halco::hicann::v2::short_format(f.coordinate())
 				                 << " init: "
 				                 << h.toHICANNOnWafer(d.toDNCOnWafer(f.coordinate())));
 				HMF::HICANN::hicann_init(hc, zero_synapses);
@@ -302,14 +302,14 @@ HALBE_SETTER(
 	// parameter is false, FPGA gets "primed". Don't get confused by non
 	// perfect naming of functions
 	LOG4CXX_DEBUG(logger, __func__ << " "
-	                               << HMF::Coordinate::short_format(f.coordinate()));
+	                               << halco::hicann::v2::short_format(f.coordinate()));
 	jtag_p2fa->trigger_systime(curr_ip, false, f.getListenGlobalMode());
 
 	// reset all time counters on HICANNs
-	for (auto dnc : Coordinate::iter_all<HMF::Coordinate::DNCOnFPGA>() ) {
+	for (auto dnc : halco::common::iter_all<halco::hicann::v2::DNCOnFPGA>() ) {
 		if (f.dnc_active(dnc)) {
 			LOG4CXX_DEBUG(logger,
-			              __func__ << " " << HMF::Coordinate::short_format(f.coordinate())
+			              __func__ << " " << halco::hicann::v2::short_format(f.coordinate())
 			                       << " reset all time counters");
 			f.get_reticle(dnc)->jtag->HICANNv2_reset_all_time_counters();
 		}
@@ -386,7 +386,7 @@ HALBE_SETTER(
 HALBE_SETTER_GUARDED(EventSetupL2,
 	set_fpga_background_generator,
 	Handle::FPGA &, f,
-	Coordinate::DNCOnFPGA const, d,
+	halco::hicann::v2::DNCOnFPGA const, d,
 	BackgroundGenerator const&, bg)
 {
 	ReticleControl& reticle = f.getPowerBackend().get_reticle(f, d);
@@ -410,8 +410,8 @@ HALBE_SETTER_GUARDED(EventSetupL2,
 	bool, drop_background_events)
 {
 	HostALController& host_al = f.getPowerBackend().get_host_al(f);
-	ReticleControl& reticle = f.getPowerBackend().get_reticle(f, Coordinate::DNCOnFPGA());
-	for (auto hicann : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>()) {
+	ReticleControl& reticle = f.getPowerBackend().get_reticle(f, halco::hicann::v2::DNCOnFPGA());
+	for (auto hicann : halco::common::iter_all<halco::hicann::v2::HICANNOnDNC>()) {
 		reticle.jtag->K7FPGA_set_hicannif(hicann.toEnum());
 		// filter all events where neuron address bits are 0
 		reticle.jtag->K7FPGA_set_neuron_addr_filter(
@@ -529,7 +529,7 @@ HALBE_GETTER(PulseEventContainer::container_type, read_trace_pulses,
 			if (BOOST_UNLIKELY(current_packet.pid !=
 			                   application_layer_packet_types::FPGATRACE)) {
 				LOG4CXX_ERROR(logger,
-				              HMF::Coordinate::short_format(f.coordinate())
+				              halco::hicann::v2::short_format(f.coordinate())
 				                  << " unexpected frame type in read_trace_pulses: "
 				                  << current_packet.pid);
 				throw std::runtime_error("unexpected frame type in read_trace_pulses");
@@ -549,7 +549,7 @@ HALBE_GETTER(PulseEventContainer::container_type, read_trace_pulses,
 					if (current_packet.pdu[ii/2] == 0x4000E11D40000000ull) {
 						if (((ii/2) + 1) < current_packet.len) {
 							std::stringstream debug_msg;
-							debug_msg << HMF::Coordinate::short_format(f.coordinate())
+							debug_msg << halco::hicann::v2::short_format(f.coordinate())
 							          << " unexpected end-of-trace marker"
 							             " within other data: " << ii / 2 << " out of "
 							          << (current_packet.len - 1) << ".\n"
@@ -573,7 +573,7 @@ HALBE_GETTER(PulseEventContainer::container_type, read_trace_pulses,
 #ifndef NDEBUG
 						// Overflow entries should only occur at odd indices.
 						LOG4CXX_WARN(logger,
-						             HMF::Coordinate::short_format(f.coordinate())
+						             halco::hicann::v2::short_format(f.coordinate())
 						                 << " garbage overflow entry at even index " << ii
 						                 << ": " << std::showbase << std::hex << entry.raw
 						                 << " (issue 2355)");
@@ -594,7 +594,7 @@ HALBE_GETTER(PulseEventContainer::container_type, read_trace_pulses,
 					if (trace_overflow_count != entry.overflow.count) {
 						LOG4CXX_WARN(
 						    logger,
-						    HMF::Coordinate::short_format(f.coordinate())
+						    halco::hicann::v2::short_format(f.coordinate())
 						        << " Local overflow count " << trace_overflow_count
 						        << " does not match contents of overflow indicator "
 						        << entry.overflow.count);
@@ -646,7 +646,7 @@ HALBE_GETTER(PulseEventContainer::container_type, read_trace_pulses,
 					    (last_event.getTime() == full_timestamp ||
 					     (last_event.getTime() + MAX_TIMESTAMP_CNT) == full_timestamp)) {
 						LOG4CXX_WARN(logger,
-						             HMF::Coordinate::short_format(f.coordinate())
+						             halco::hicann::v2::short_format(f.coordinate())
 						                 << " received pulse twice (issue 2022): "
 						                 << pulse_events.back().getTime()
 						                 << " == " << full_timestamp << "\n(32 bit entry "
@@ -706,7 +706,7 @@ HALBE_GETTER(PulseEventContainer::container_type, read_trace_pulses,
 		now = std::chrono::steady_clock::now();
 		if ((now - time_of_last_packet) > timeout) {
 			std::stringstream debug_msg;
-			debug_msg << HMF::Coordinate::short_format(f.coordinate())
+			debug_msg << halco::hicann::v2::short_format(f.coordinate())
 			          << ": No end-of-trace marker received in "
 			          << std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count() << "ms.";
 			LOG4CXX_ERROR(logger, debug_msg.str());
@@ -720,7 +720,7 @@ HALBE_GETTER(PulseEventContainer::container_type, read_trace_pulses,
 			timeout  = default_timeout;
 
 			LOG4CXX_TRACE(logger,
-			              HMF::Coordinate::short_format(f.coordinate())
+			              halco::hicann::v2::short_format(f.coordinate())
 			                  << " received " << num_pulses
 			                  << " pulse events after waiting for "
 			                  << std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -734,7 +734,7 @@ HALBE_GETTER(PulseEventContainer::container_type, read_trace_pulses,
 		}
 	}
 	LOG4CXX_INFO(
-	    logger, HMF::Coordinate::short_format(f.coordinate())
+	    logger, halco::hicann::v2::short_format(f.coordinate())
 	                << " received " << pulse_events.size() << " pulse events");
 
 	return pulse_events;

@@ -7,9 +7,9 @@ usage example: ./convert_coordinate.py --hicann 0 --hicann 5,5 --reticle 1
 
 import argparse
 import sys
-import Coordinate
+import pyhalco_hicann_v2 as Coordinate
 import pylogging
-from Coordinate import X, Y, Enum
+from pyhalco_common import X, Y, Enum
 
 WAFER = Coordinate.Wafer(10) # Show some new wafer as default
 
@@ -84,7 +84,7 @@ def f_fpga(coord):
     """print fpga related infomations"""
     gcoord = Coordinate.FPGAGlobal(coord, WAFER)
     out = "{}:\n".format(gcoord)
-    for dnc_f in Coordinate.iter_all(Coordinate.DNCOnFPGA):
+    for dnc_f in iter_all(Coordinate.DNCOnFPGA):
         dnc = dnc_f.toDNCOnWafer(gcoord)
         out += "\t{} ({}, {}):\n".format(dnc, dnc.toEnum(), dnc.toPowerCoordinate())
         out += print_hicanns_on_dnc(dnc, "\t\t")

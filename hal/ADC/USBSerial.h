@@ -1,7 +1,7 @@
 #pragma once
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/nvp.hpp>
-#include "hal/Coordinate/geometry.h"
+#include "halco/common/geometry.h"
 
 namespace HMF {
 namespace ADC {
@@ -40,5 +40,5 @@ private:
 } // end namespace HMF
 
 namespace std {
-	HALBE_GEOMETRY_HASH_CLASS(HMF::ADC::USBSerial)
+	HALCO_GEOMETRY_HASH_CLASS(HMF::ADC::USBSerial)
 }

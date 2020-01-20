@@ -18,7 +18,7 @@
 #include <iostream>
 
 
-using namespace geometry;
+using namespace halco::common;
 
 static log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger("halbe.backend.adc");
 
@@ -64,9 +64,9 @@ HALBE_SETTER_GUARDED_WITH_EXCEPTION_TRANSLATION(flyspi::DeviceError,
 	h.mux_board().enable_power();
 
 	//configure mux
-	assert(mux_lookup.size() == Coordinate::ChannelOnADC::size - 1);
-	assert(Coordinate::ChannelOnADC::GND.value() == -1);
-	if (cfg.input() == Coordinate::ChannelOnADC::GND)
+	assert(mux_lookup.size() == halco::hicann::v2::ChannelOnADC::size - 1);
+	assert(halco::hicann::v2::ChannelOnADC::GND.value() == -1);
+	if (cfg.input() == halco::hicann::v2::ChannelOnADC::GND)
 		h.mux_board().set_Mux(Vmux_board::MUX_GND);
 	else
 		h.mux_board().set_Mux( mux_lookup[cfg.input()] );

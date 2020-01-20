@@ -2,7 +2,7 @@
 
 #include "hal/Handle/HICANNHw.h"
 #include "hal/Handle/FPGA.h"
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/fwd.h"
 #include "hal/Coordinate/HMFGrid.h"
 
 #include <boost/shared_ptr.hpp>
@@ -20,18 +20,18 @@ namespace Handle {
 struct FPGAHw : public FPGAMixin<HICANNHw>
 {
 	struct HandleParameter {
-		Coordinate::FPGAGlobal c;
-		Coordinate::IPv4 fpga_ip;
-		Coordinate::DNCOnFPGA d;
+		halco::hicann::v2::FPGAGlobal c;
+		halco::hicann::v2::IPv4 fpga_ip;
+		halco::hicann::v2::DNCOnFPGA d;
 		// set of hicanns avaiable in JTag chain
-		std::set<Coordinate::HICANNOnDNC> physically_available_hicanns;
+		std::set<halco::hicann::v2::HICANNOnDNC> physically_available_hicanns;
 		// set of HICANNs where highspeed connection is required
-		std::set<Coordinate::HICANNOnDNC> highspeed_hicanns;
+		std::set<halco::hicann::v2::HICANNOnDNC> highspeed_hicanns;
 		// set of usable HICANNs
-		std::set<Coordinate::HICANNOnDNC> usable_hicanns;
-		Coordinate::SetupType setup;
-		Coordinate::IPv4 pmu_ip;
-		Coordinate::JTAGFrequency jtag_frequency;
+		std::set<halco::hicann::v2::HICANNOnDNC> usable_hicanns;
+		halco::hicann::v2::SetupType setup;
+		halco::hicann::v2::IPv4 pmu_ip;
+		halco::hicann::v2::JTAGFrequency jtag_frequency;
 
 		void check() {
 			// TODO
@@ -46,20 +46,20 @@ struct FPGAHw : public FPGAMixin<HICANNHw>
 	/// \param num_hicanns number of hicanns on the vertical setup.
 	///         ignored if on_wafer = true.
 	/// \note non-highspeed-required HICANNs are not (yet) supported (API change required)
-	FPGAHw(Coordinate::FPGAGlobal const c, Coordinate::IPv4 const ip,
-	       Coordinate::DNCOnFPGA const d, Coordinate::IPv4 const pmu_ip, bool on_wafer = false, size_t num_hicanns = 1,
-	       Coordinate::JTAGFrequency jtag_frequency = Coordinate::JTAGFrequency());
+	FPGAHw(halco::hicann::v2::FPGAGlobal const c, halco::hicann::v2::IPv4 const ip,
+	       halco::hicann::v2::DNCOnFPGA const d, halco::hicann::v2::IPv4 const pmu_ip, bool on_wafer = false, size_t num_hicanns = 1,
+	       halco::hicann::v2::JTAGFrequency jtag_frequency = halco::hicann::v2::JTAGFrequency());
 
 	/// Dummy destructor needed by unique_ptr member.
 	~FPGAHw();
 
 	/// Returns the ip.
-	Coordinate::IPv4 const & ip() const {
+	halco::hicann::v2::IPv4 const & ip() const {
 		return fpga_ip;
 	}
 
 	/// Cast operator to its IP.
-	operator Coordinate::IPv4 const & () const {
+	operator halco::hicann::v2::IPv4 const & () const {
 		return ip();
 	}
 
@@ -68,7 +68,7 @@ struct FPGAHw : public FPGAMixin<HICANNHw>
 	PowerBackend & getPowerBackend() const;
 
 	// Gets reticle
-	boost::shared_ptr<facets::ReticleControl> get_reticle(const Coordinate::DNCOnFPGA & d);
+	boost::shared_ptr<facets::ReticleControl> get_reticle(const halco::hicann::v2::DNCOnFPGA & d);
 
 	// CK/SJ @ECM: This looks fishy why a non const ref from const member function?!
 	SpinnController &get_spinn_controller() const;
@@ -83,19 +83,19 @@ private:
 	std::shared_ptr<SpinnController> spinn_controller;
 	std::shared_ptr<RealtimeComm> realtime_comm;
 
-	hicann_handle_t create_hicann(Coordinate::HICANNGlobal const& h, bool request_highspeed) override;
+	hicann_handle_t create_hicann(halco::hicann::v2::HICANNGlobal const& h, bool request_highspeed) override;
 #endif
 private:
 	// FPGA ip corresponding to FPGA coordinate
-	Coordinate::IPv4 const fpga_ip;
+	halco::hicann::v2::IPv4 const fpga_ip;
 	// jtag speed
-	Coordinate::JTAGFrequency jtag_frequency;
+	halco::hicann::v2::JTAGFrequency jtag_frequency;
 };
 
 // FIXME holy ugliness! looks like a failed attempt to workaround ownership/lifetime issues
-boost::shared_ptr<FPGAHw> createFPGAHw(Coordinate::FPGAGlobal const c,
-		Coordinate::IPv4 const ip, Coordinate::DNCOnFPGA const d, Coordinate::IPv4 const pmu_ip,
-		bool on_wafer=false, size_t num_hicanns=1, Coordinate::JTAGFrequency jtag_frequency = Coordinate::JTAGFrequency());
+boost::shared_ptr<FPGAHw> createFPGAHw(halco::hicann::v2::FPGAGlobal const c,
+		halco::hicann::v2::IPv4 const ip, halco::hicann::v2::DNCOnFPGA const d, halco::hicann::v2::IPv4 const pmu_ip,
+		bool on_wafer=false, size_t num_hicanns=1, halco::hicann::v2::JTAGFrequency jtag_frequency = halco::hicann::v2::JTAGFrequency());
 void freeFPGAHw(boost::shared_ptr<FPGAHw> & handle);
 
 } // namespace Handle

@@ -7,7 +7,7 @@
 namespace HMF {
 namespace Handle {
 
-HICANNHw::HICANNHw(Coordinate::HICANNGlobal const& h,
+HICANNHw::HICANNHw(halco::hicann::v2::HICANNGlobal const& h,
                    const boost::shared_ptr<facets::ReticleControl>& rc, uint8_t jtag_addr, bool request_highspeed)
     : HICANN(h, request_highspeed), mReticleControl(rc), m_jtag_addr(jtag_addr) {}
 

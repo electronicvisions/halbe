@@ -22,7 +22,7 @@ struct HICANNEss : public HICANN
 #endif
 
 	/// Construct a HICANN that is connected to FPGA f
-	explicit HICANNEss(Coordinate::HICANNGlobal const & h, boost::shared_ptr<Ess> ess) :
+	explicit HICANNEss(halco::hicann::v2::HICANNGlobal const & h, boost::shared_ptr<Ess> ess) :
 		HICANN(h),
 		mEss(ess)
 	{}

@@ -6,7 +6,7 @@
 #include "reticle_control.h"       //reticle control class
 
 using namespace std;
-using namespace geometry;
+using namespace halco::common;
 
 namespace HMF {
 
@@ -35,7 +35,7 @@ TEST_F(Layer2InitTest, HighspeedInitHWTest) {
 TEST_F(Layer2InitTest, FPGAResetInitHWTest) {
 	// get HICANN handles -> activate all HICANNs on a reticle
 	for (int nhicann=0;nhicann<8;++nhicann)
-		handle.get(d, HMF::Coordinate::HICANNOnDNC( geometry::Enum(nhicann) ) );
+		handle.get(d, halco::hicann::v2::HICANNOnDNC( halco::common::Enum(nhicann) ) );
 
 	// do repeated init (via FPGA::reset)
 	size_t const rep_count = 100;

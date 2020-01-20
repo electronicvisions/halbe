@@ -7,14 +7,14 @@
 #include "pywrap/compat/macros.hpp"
 #include "pywrap/compat/array.hpp"
 #include "pywrap/compat/rant.hpp"
-#include "hal/Coordinate/Relations.h"
+#include "halco/common/relations.h"
 #include "hal/HICANN/DriverDecoder.h"
 
 namespace HMF {
 namespace HICANN {
 
 class GmaxDiv :
-	public Coordinate::detail::RantWrapper<GmaxDiv, int, 30, 0>
+	public halco::common::detail::RantWrapper<GmaxDiv, int, 30, 0>
 {
 public:
 	explicit PYPP_CONSTEXPR GmaxDiv(uint8_t val = 0) : rant_t(val) {}
@@ -37,17 +37,17 @@ public:
 	/// of the neuron. The synaptic input is specified by
 	/// left = Esyni and right = Esynx
 	/// both can be connected
-	bool get_syn_in(geometry::Side const& s) const;
-	void set_syn_in(geometry::Side const& s, bool b);
+	bool get_syn_in(halco::common::Side const& s) const;
+	void set_syn_in(halco::common::Side const& s, bool b);
 
-	DriverDecoder const& get_decoder(geometry::SideVertical const& s) const;
-	void set_decoder(geometry::SideVertical const& s, DriverDecoder const& d);
+	DriverDecoder const& get_decoder(halco::common::SideVertical const& s) const;
+	void set_decoder(halco::common::SideVertical const& s, DriverDecoder const& d);
 
 	uint8_t get_gmax() const;
 	void set_gmax(uint8_t v);
 
-	uint8_t get_gmax_div(geometry::Side const& s) const;
-	void set_gmax_div(geometry::Side const& s, uint8_t v);
+	uint8_t get_gmax_div(halco::common::Side const& s) const;
+	void set_gmax_div(halco::common::Side const& s, uint8_t v);
 
 	/// There are two parallel circuits for the divisor in the synapse
 	/// driver (left, right), the sum of both divisor values gives the
@@ -97,6 +97,6 @@ void RowConfig::serialize(Archiver& ar, unsigned int const)
 
 namespace std {
 
-HALBE_GEOMETRY_HASH_CLASS(HMF::HICANN::GmaxDiv)
+HALCO_GEOMETRY_HASH_CLASS(HMF::HICANN::GmaxDiv)
 
 }

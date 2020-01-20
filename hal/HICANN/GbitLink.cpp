@@ -2,6 +2,8 @@
 
 #include <map>
 
+#include "halco/hicann/v2/external.h"
+
 namespace HMF {
 namespace HICANN {
 
@@ -11,12 +13,12 @@ GbitLink::GbitLink() :
 	, timestamp_enable(false)
 {}
 
-GbitLink::Direction & GbitLink::operator[](const Coordinate::GbitLinkOnHICANN & ii)
+GbitLink::Direction & GbitLink::operator[](const halco::hicann::v2::GbitLinkOnHICANN & ii)
 {
 	return dirs[ii];
 }
 
-const GbitLink::Direction & GbitLink::operator[](const Coordinate::GbitLinkOnHICANN & ii) const
+const GbitLink::Direction & GbitLink::operator[](const halco::hicann::v2::GbitLinkOnHICANN & ii) const
 {
 	return dirs[ii];
 }

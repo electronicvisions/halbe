@@ -3,9 +3,11 @@
 #include <boost/serialization/nvp.hpp>
 #include <boost/serialization/serialization.hpp>
 
-#include "hal/Coordinate/iter_all.h"
+#include "halco/hicann/v2/fg.h"
+#include "halco/common/iter_all.h"
 #include "FGErrorResult.h"
 
+using namespace halco::hicann::v2;
 
 namespace HMF
 {
@@ -37,12 +39,12 @@ bool FGErrorResult::check() const
 	return tmp < FGBlock::fg_columns;
 }
 
-HMF::Coordinate::X FGErrorResult::get_cell() const
+halco::common::X FGErrorResult::get_cell() const
 {
 	// See Table 4.12: The lowest 8 bit contain the column number
 	// of an incorrectly programmed cell
-	return HMF::Coordinate::X(
-		HMF::Coordinate::Enum(
+	return halco::common::X(
+		halco::common::Enum(
 			bit::crop<8>(bit::convert(m_slave_answer_data)).to_ulong()));
 }
 
@@ -80,13 +82,13 @@ FGErrorResultRow::FGErrorResultRow()
 	// default constructs the data member variable
 }
 
-FGErrorResult const& FGErrorResultRow::operator[] (HMF::Coordinate::X const& fg_col_index) const {
+FGErrorResult const& FGErrorResultRow::operator[] (halco::common::X const& fg_col_index) const {
 	if (fg_col_index.value() >= FGBlock::fg_columns)
 		throw std::length_error("FGErrorResultRow[]: invalid column");
 	return m_row_results[fg_col_index.value()];
 }
 
-FGErrorResult& FGErrorResultRow::operator[] (HMF::Coordinate::X const& fg_col_index) {
+FGErrorResult& FGErrorResultRow::operator[] (halco::common::X const& fg_col_index) {
 	if (fg_col_index.value() >= FGBlock::fg_columns)
 		throw std::length_error("FGErrorResultRow[]: invalid column");
 	return m_row_results[fg_col_index.value()];
@@ -95,7 +97,7 @@ FGErrorResult& FGErrorResultRow::operator[] (HMF::Coordinate::X const& fg_col_in
 std::ostream& operator<< (std::ostream& os, FGErrorResultRow const& fgerr) {
 
 	for(size_t column = 0; column != FGBlock::fg_columns; ++column) {
-		const FGErrorResult& fger = fgerr[HMF::Coordinate::X(column)];
+		const FGErrorResult& fger = fgerr[halco::common::X(column)];
 		os << (fger.get_error_flag() ? "X" : "-");
 	}
 
@@ -115,19 +117,19 @@ FGErrorResultQuadRow::FGErrorResultQuadRow()
 	// default constructs the data member variable
 }
 
-FGErrorResultRow const& FGErrorResultQuadRow::operator[] (Coordinate::FGBlockOnHICANN const& blk) const
+FGErrorResultRow const& FGErrorResultQuadRow::operator[] (halco::hicann::v2::FGBlockOnHICANN const& blk) const
 {
 	return m_quad_row_results[blk];
 }
 
-FGErrorResultRow& FGErrorResultQuadRow::operator[] (Coordinate::FGBlockOnHICANN const& blk)
+FGErrorResultRow& FGErrorResultQuadRow::operator[] (halco::hicann::v2::FGBlockOnHICANN const& blk)
 {
 	return m_quad_row_results[blk];
 }
 
 std::ostream& operator<< (std::ostream& os, FGErrorResultQuadRow const& fgeqr) {
 
-	for (auto block : Coordinate::iter_all<Coordinate::FGBlockOnHICANN>()) {
+	for (auto block : halco::common::iter_all<halco::hicann::v2::FGBlockOnHICANN>()) {
 		os << block << ":\t";
 		os << fgeqr[block] << '\n';
 	}

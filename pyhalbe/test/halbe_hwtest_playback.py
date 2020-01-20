@@ -9,10 +9,13 @@ import pylogging
 pylogging.reset()
 pylogging.default_config(level=pylogging.LogLevel.INFO)
 
+import pyhalco_common
+import pyhalco_hicann_v2 as Coordinate
+
 DNCOnFPGA = Coordinate.DNCOnFPGA
 HICANNOnDNC = Coordinate.HICANNOnDNC
 GbitLinkOnHICANN = Coordinate.GbitLinkOnHICANN
-Enum = Coordinate.Enum
+Enum = pyhalco_common.Enum
 
 
 def filter_events_from_hicann(pc,hicann):

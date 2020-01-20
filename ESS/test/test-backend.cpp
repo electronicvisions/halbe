@@ -14,11 +14,11 @@
 #include "hal/HICANN/DNCMergerLine.h"
 
 //include halbe coordinates
-#include "hal/Coordinate/Merger0OnHICANN.h"
-#include "hal/Coordinate/Merger1OnHICANN.h"
-#include "hal/Coordinate/Merger2OnHICANN.h"
-#include "hal/Coordinate/Merger3OnHICANN.h"
-#include "hal/Coordinate/iter_all.h"
+#include "halco/hicann/v2/merger0onhicann.h"
+#include "halco/hicann/v2/merger1onhicann.h"
+#include "halco/hicann/v2/merger2onhicann.h"
+#include "halco/hicann/v2/merger3onhicann.h"
+#include "halco/common/iter_all.h"
 
 #include "ess-test-util.h"
 
@@ -51,30 +51,30 @@ TEST_F(ESSTest, Test_MergerTree_Config)
 	srand(time(0));
     for(size_t i=0; i < pattern1.size(); i++)
 	{
-		for(uint8_t j = 0; j < Coordinate::Merger0OnHICANN::size; j++)
+		for(uint8_t j = 0; j < halco::hicann::v2::Merger0OnHICANN::size; j++)
 		{
-            Coordinate::Merger0OnHICANN m{j};
+            halco::hicann::v2::Merger0OnHICANN m{j};
             mer.config = rand() % 4;
 			mer.slow = rand() %2;
 			tree[m] = mer;
 		}
-		for(uint8_t j = 0; j < Coordinate::Merger1OnHICANN::size; j++)
+		for(uint8_t j = 0; j < halco::hicann::v2::Merger1OnHICANN::size; j++)
 		{
-            Coordinate::Merger1OnHICANN m{j};
+            halco::hicann::v2::Merger1OnHICANN m{j};
             mer.config = rand() % 4;
 			mer.slow = rand() %2;
 			tree[m] = mer;
 		}
-		for(uint8_t j = 0; j < Coordinate::Merger2OnHICANN::size; j++)
+		for(uint8_t j = 0; j < halco::hicann::v2::Merger2OnHICANN::size; j++)
 		{
-            Coordinate::Merger2OnHICANN m{j};
+            halco::hicann::v2::Merger2OnHICANN m{j};
             mer.config = rand() % 4;
 			mer.slow = rand() %2;
 			tree[m] = mer;
 		}
-		for(uint8_t j = 0; j < Coordinate::Merger3OnHICANN::size; j++)
+		for(uint8_t j = 0; j < halco::hicann::v2::Merger3OnHICANN::size; j++)
 		{
-            Coordinate::Merger3OnHICANN m{j};
+            halco::hicann::v2::Merger3OnHICANN m{j};
             mer.config = rand() % 4;
 			mer.slow = rand() %2;
 			tree[m] = mer;
@@ -133,7 +133,7 @@ TEST_F(ESSTest, Test_DNCMerger_Config)
 	{
 		for(uint8_t j = 0; j < HICANN::DNCMergerLine::num_merger; ++j)
 		{
-            Coordinate::DNCMergerOnHICANN m{j};
+            halco::hicann::v2::DNCMergerOnHICANN m{j};
             mer.config = rand() % 4;
 			mer.slow = rand() % 2;
 			tree[m] = mer;
@@ -141,8 +141,8 @@ TEST_F(ESSTest, Test_DNCMerger_Config)
 		for(uint8_t j = 0; j < 4; ++j)
 		{
 			std::bitset<2> temp = rand() % 3;	// 2 neighbor loopbacks cannot be 1 for some reason (cf. test-HICANNBackend -> DNCMergerHWTest)
-			Coordinate::DNCMergerOnHICANN m0(2u * j);
-			Coordinate::DNCMergerOnHICANN m1(2u * j + 1u);
+			halco::hicann::v2::DNCMergerOnHICANN m0(2u * j);
+			halco::hicann::v2::DNCMergerOnHICANN m1(2u * j + 1u);
 			tree[m0].loopback = temp[0];
 			tree[m1].loopback = temp[1];
 		}
@@ -201,9 +201,9 @@ TEST_F(ESSTest, Test_Repeater_Config_vert)
 		{
 			bool dir = rand() % 2;
 			if(dir)
-				rep.setForwarding(geometry::top);
+				rep.setForwarding(halco::common::top);
 			else
-				rep.setForwarding(geometry::bottom);
+				rep.setForwarding(halco::common::bottom);
 		}
 		pattern1[i]=rep;
 	}
@@ -212,14 +212,14 @@ TEST_F(ESSTest, Test_Repeater_Config_vert)
     {
 		HICANN::set_repeater(
 				h,
-				Coordinate::VLineOnHICANN(i).toVRepeaterOnHICANN(),
+				halco::hicann::v2::VLineOnHICANN(i).toVRepeaterOnHICANN(),
 				pattern1[i]);
 	}
 	fpga.initializeESS();
 	for(size_t i = 0; i < pattern1.size(); i++)
     {
 		pattern2[i] = HICANN::get_repeater(
-				h, Coordinate::VLineOnHICANN(i).toVRepeaterOnHICANN());
+				h, halco::hicann::v2::VLineOnHICANN(i).toVRepeaterOnHICANN());
 	}
 	EXPECT_EQ(pattern1, pattern2);
 }
@@ -246,9 +246,9 @@ TEST_F(ESSTest, Test_Repeater_Config_hor)
 			{
 				bool dir = rand() % 2;
 				if(dir)
-					rep.setForwarding(geometry::right);
+					rep.setForwarding(halco::common::right);
 				else
-					rep.setForwarding(geometry::left);
+					rep.setForwarding(halco::common::left);
 			}
 		}
 		else	//Sending-Repeater
@@ -260,15 +260,15 @@ TEST_F(ESSTest, Test_Repeater_Config_hor)
 			{
 				bool dir = rand() % 2;
 				if(dir)
-					rep.setOutput(geometry::right);
+					rep.setOutput(halco::common::right);
 				else
-					rep.setOutput(geometry::left);
+					rep.setOutput(halco::common::left);
 			}
 		}
 		pattern1[i]=rep;
 		HICANN::set_repeater(
 				h,
-				Coordinate::HLineOnHICANN(i).toHRepeaterOnHICANN(), pattern1[i]);
+				halco::hicann::v2::HLineOnHICANN(i).toHRepeaterOnHICANN(), pattern1[i]);
 	}
 	//write data to ess
 	fpga.initializeESS();
@@ -277,7 +277,7 @@ TEST_F(ESSTest, Test_Repeater_Config_hor)
     {
 		pattern2[i] = HICANN::get_repeater(
 				h,
-				Coordinate::HLineOnHICANN(i).toHRepeaterOnHICANN());
+				halco::hicann::v2::HLineOnHICANN(i).toHRepeaterOnHICANN());
 	}
 	EXPECT_EQ(pattern1, pattern2);
 }
@@ -301,16 +301,16 @@ TEST_F(ESSTest, Test_Crossbar_Config)
 	//write different pattern for left and right side
 	for (size_t i=0; i < pattern1r.size(); i++)
 	{
-		HICANN::set_crossbar_switch_row(h, Coordinate::HLineOnHICANN(i), geometry::left, pattern1l[i]);
-		HICANN::set_crossbar_switch_row(h, Coordinate::HLineOnHICANN(i), geometry::right, pattern1r[i]);
+		HICANN::set_crossbar_switch_row(h, halco::hicann::v2::HLineOnHICANN(i), halco::common::left, pattern1l[i]);
+		HICANN::set_crossbar_switch_row(h, halco::hicann::v2::HLineOnHICANN(i), halco::common::right, pattern1r[i]);
     }
 	//write data to Ess
 	fpga.initializeESS();
 	//read data
 	for (size_t i=0; i < pattern2r.size(); i++)
 	{
-		pattern2l[i] = HICANN::get_crossbar_switch_row(h, Coordinate::HLineOnHICANN(i), geometry::left);
-		pattern2r[i] = HICANN::get_crossbar_switch_row(h, Coordinate::HLineOnHICANN(i), geometry::right);
+		pattern2l[i] = HICANN::get_crossbar_switch_row(h, halco::hicann::v2::HLineOnHICANN(i), halco::common::left);
+		pattern2r[i] = HICANN::get_crossbar_switch_row(h, halco::hicann::v2::HLineOnHICANN(i), halco::common::right);
 	    ASSERT_EQ(pattern1l[i],pattern2l[i]);
 	    ASSERT_EQ(pattern1r[i],pattern2r[i]);
 	}
@@ -339,16 +339,16 @@ TEST_F(ESSTest, Test_Synswitches_Config)
 
 	for (size_t i=0; i<224; i++)
 	{
-		HICANN::set_syndriver_switch_row(h, Coordinate::SynapseSwitchRowOnHICANN(geometry::Y(i), geometry::left), pattern1l[i]);
-		HICANN::set_syndriver_switch_row(h, Coordinate::SynapseSwitchRowOnHICANN(geometry::Y(i), geometry::right), pattern1r[i]);
+		HICANN::set_syndriver_switch_row(h, halco::hicann::v2::SynapseSwitchRowOnHICANN(halco::common::Y(i), halco::common::left), pattern1l[i]);
+		HICANN::set_syndriver_switch_row(h, halco::hicann::v2::SynapseSwitchRowOnHICANN(halco::common::Y(i), halco::common::right), pattern1r[i]);
 	}
 	//write data to Ess
 	fpga.initializeESS();
 	//get data and check for equality
 	for (size_t i=0; i<224; i++)
 	{
-		pattern2l[i] = HICANN::get_syndriver_switch_row(h, Coordinate::SynapseSwitchRowOnHICANN(geometry::Y(i), geometry::left));
-		pattern2r[i] = HICANN::get_syndriver_switch_row(h, Coordinate::SynapseSwitchRowOnHICANN(geometry::Y(i), geometry::right));
+		pattern2l[i] = HICANN::get_syndriver_switch_row(h, halco::hicann::v2::SynapseSwitchRowOnHICANN(halco::common::Y(i), halco::common::left));
+		pattern2r[i] = HICANN::get_syndriver_switch_row(h, halco::hicann::v2::SynapseSwitchRowOnHICANN(halco::common::Y(i), halco::common::right));
 	}
 	EXPECT_EQ(pattern1l, pattern2l);
 	EXPECT_EQ(pattern1r, pattern2r);
@@ -365,8 +365,8 @@ TEST_F(ESSTest, Test_NeuronConfig)
 	HICANN::NeuronConfig nrn_cfg{};
 	for(size_t i = 0; i < 10; ++i)	//test 10 times just to make sure
 	{
-		nrn_cfg.bigcap[geometry::top] = rand()%2;
-		nrn_cfg.bigcap[geometry::bottom] = rand()%2;
+		nrn_cfg.bigcap[halco::common::top] = rand()%2;
+		nrn_cfg.bigcap[halco::common::bottom] = rand()%2;
 		HICANN::set_neuron_config(h, nrn_cfg);
 		auto test = HICANN::get_neuron_config(h);
 		EXPECT_EQ(test, nrn_cfg);
@@ -388,8 +388,8 @@ TEST_F(ESSTest, Test_CurrentStimulus)
 			s[j] = rand() % 1024;
 		HICANN::FGConfig cfg;
 
-		HICANN::set_current_stimulus(h, Coordinate::FGBlockOnHICANN(Coordinate::Enum(i)), s);
-		HICANN::FGStimulus r = HICANN::get_current_stimulus(h, Coordinate::FGBlockOnHICANN(Coordinate::Enum(i)));
+		HICANN::set_current_stimulus(h, halco::hicann::v2::FGBlockOnHICANN(halco::common::Enum(i)), s);
+		HICANN::FGStimulus r = HICANN::get_current_stimulus(h, halco::hicann::v2::FGBlockOnHICANN(halco::common::Enum(i)));
 		EXPECT_EQ(s, r);
 	}
 }

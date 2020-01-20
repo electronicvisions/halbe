@@ -5,7 +5,7 @@ namespace HMF {
 
 namespace Handle {
 
-Ess::Ess(Coordinate::Wafer wafer, std::string filepath)
+Ess::Ess(halco::hicann::v2::Wafer wafer, std::string filepath)
     : mWafer(wafer), mEss(new HAL2ESS(wafer, filepath))
 {}
 
@@ -64,7 +64,7 @@ void Ess::initialize()
 	mEss->initialize_sim();
 }
     
-void Ess::add_hicann(Coordinate::HICANNOnWafer hicann)
+void Ess::add_hicann(halco::hicann::v2::HICANNOnWafer hicann)
 {
     mEss->instantiate_hicann(hicann);
 }

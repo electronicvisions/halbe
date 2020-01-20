@@ -14,11 +14,11 @@ struct PMUDump :
 		PMU(), DumpMixin(dumper)
 	{}
 
-	explicit PMUDump(DumpMixin::ref_t dumper, Coordinate::IPv4 const &) :
+	explicit PMUDump(DumpMixin::ref_t dumper, halco::hicann::v2::IPv4 const &) :
 		PMU(), DumpMixin(dumper)
 	{}
 
-	PMUDump(DumpMixin::ref_t dumper, Coordinate::PMU const &, Coordinate::IPv4 const &) :
+	PMUDump(DumpMixin::ref_t dumper, halco::hicann::v2::PMU const &, halco::hicann::v2::IPv4 const &) :
 		PMU(), DumpMixin(dumper)
 	{}
 };

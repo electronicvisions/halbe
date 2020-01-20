@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/fwd.h"
 #include "hal/FPGAContainer.h"
 //#include "hal/FPGA.h"
 
@@ -109,7 +109,7 @@ void start_experiment(Handle::FPGA& f);
  */
 void set_fpga_background_generator(
 	Handle::FPGA & f,
-	Coordinate::DNCOnFPGA const d,
+	halco::hicann::v2::DNCOnFPGA const d,
 	BackgroundGenerator const& bg);
 
 /**

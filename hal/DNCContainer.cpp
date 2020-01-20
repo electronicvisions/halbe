@@ -1,15 +1,16 @@
 #include "DNCContainer.h"
-#include "hal/Coordinate/iter_all.h"
+#include "halco/common/iter_all.h"
 #include "hal/macro_HALbe.h"
 
+#include "halco/hicann/v2/hicann.h"
 
 namespace HMF {
 namespace DNC {
 
-GbitLink& GbitReticle::operator[] (Coordinate::HICANNOnDNC const & hicann_on_reticle) {
+GbitLink& GbitReticle::operator[] (halco::hicann::v2::HICANNOnDNC const & hicann_on_reticle) {
 	return links[hicann_on_reticle.toEnum()];
 }
-GbitLink const & GbitReticle::operator[] (Coordinate::HICANNOnDNC const & hicann_on_reticle) const {
+GbitLink const & GbitReticle::operator[] (halco::hicann::v2::HICANNOnDNC const & hicann_on_reticle) const {
 	return links[hicann_on_reticle.toEnum()];
 }
 bool GbitReticle::operator==(const GbitReticle & other) const {
@@ -18,17 +19,17 @@ bool GbitReticle::operator==(const GbitReticle & other) const {
 
 std::ostream& operator<< (std::ostream& o, GbitReticle const& gr) {
 	o << "GbitReticle:\n";
-	for (auto hicann : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>() ) {
+	for (auto hicann : halco::common::iter_all<halco::hicann::v2::HICANNOnDNC>() ) {
 		o << hicann << ":\n";
 		o << gr[hicann];
 	}
 	return o;
 }
 
-bool& Loopback::operator[] (Coordinate::HICANNOnDNC const & hicann_on_reticle) {
+bool& Loopback::operator[] (halco::hicann::v2::HICANNOnDNC const & hicann_on_reticle) {
 	return data[hicann_on_reticle.toEnum()];
 }
-bool const& Loopback::operator[] (Coordinate::HICANNOnDNC const & hicann_on_reticle) const {
+bool const& Loopback::operator[] (halco::hicann::v2::HICANNOnDNC const & hicann_on_reticle) const {
 	return data[hicann_on_reticle.toEnum()];
 }
 bool Loopback::operator==(const Loopback & other) const {
@@ -37,7 +38,7 @@ bool Loopback::operator==(const Loopback & other) const {
 
 std::ostream& operator<< (std::ostream& o, Loopback const& l) {
 	o << "Loopback:\n";
-	for (auto hicann : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>() ) {
+	for (auto hicann : halco::common::iter_all<halco::hicann::v2::HICANNOnDNC>() ) {
 		o << hicann << " : " << l[hicann] << "\n";
 	}
 	return o;

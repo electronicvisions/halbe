@@ -1,7 +1,7 @@
 #include "hal/backend/DNCBackend.h"
 
 #include "hal/backend/dispatch.h"
-#include "hal/Coordinate/iter_all.h"
+#include "halco/common/iter_all.h"
 
 // TODO: ugly!
 #include "hal/Handle/HMFRun.h"
@@ -15,7 +15,7 @@ namespace DNC {
 
 HALBE_SETTER(reset,
 	Handle::FPGA &, f,
-	Coordinate::DNCOnFPGA const &, d)
+	halco::hicann::v2::DNCOnFPGA const &, d)
 {
 	ReticleControl& reticle = *f.get_reticle(d);
 
@@ -25,7 +25,7 @@ HALBE_SETTER(reset,
 
 HALBE_SETTER(set_hicann_directions,
 	Handle::FPGA &, f,
-	const Coordinate::DNCOnFPGA &, d,
+	const halco::hicann::v2::DNCOnFPGA &, d,
 	GbitReticle const&, links)
 {
 	ReticleControl& reticle = *f.get_reticle(d);
@@ -34,7 +34,7 @@ HALBE_SETTER(set_hicann_directions,
 	std::bitset<8> dnc_timestamp_enable=0; // timestamp_enable for DNC-side
 
 	//configuration of the DNC-side has to be made for all HICANNs in reticle every time
-	for (auto hicann : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>() ) {
+	for (auto hicann : halco::common::iter_all<halco::hicann::v2::HICANNOnDNC>() ) {
 		auto link = links[hicann];
 		size_t j = hicann.x()*2 + hicann.y(); // convert to numbering on DNC
 		std::bitset<8> temp;
@@ -53,12 +53,12 @@ HALBE_SETTER(set_hicann_directions,
 
 HALBE_SETTER(set_loopback,
 	Handle::FPGA &, f,
-	const Coordinate::DNCOnFPGA &, d,
+	const halco::hicann::v2::DNCOnFPGA &, d,
 	Loopback const &, loopback)
 {
 	ReticleControl& reticle = *f.get_reticle(d);
 	std::bitset<8> converted;
-	for (auto hicann : Coordinate::iter_all<HMF::Coordinate::HICANNOnDNC>() ) {
+	for (auto hicann : halco::common::iter_all<halco::hicann::v2::HICANNOnDNC>() ) {
 		size_t j = hicann.x()*2 + hicann.y(); // convert to numbering on DNC
 		converted[j] = loopback[hicann];
 	}

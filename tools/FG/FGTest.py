@@ -1,7 +1,8 @@
 import pyhalbe as ph
 import pycalibtic
 import pylab
-import Coordinate
+from pyhalco_common import Enum, X, Y
+import pyhalco_hicann_v2
 
 class FGTest:
     adcs = {
@@ -36,7 +37,7 @@ class FGTest:
                 fgb.setNeuronRaw(cell, row, pattern[row][cell])
 
     def read_fg_cell(self,cell_x,cell_y):
-        ph.HICANN.set_fg_cell(self.h, self.fg_coord, ph.Coordinate.FGCellOnFGBlock(ph.Coordinate.X(cell_x),ph.Coordinate.Y(cell_y)))
+        ph.HICANN.set_fg_cell(self.h, self.fg_coord, pyhalco_hicann_v2.FGCellOnFGBlock(X(cell_x),Y(cell_y)))
         ph.HICANN.flush(self.h)
         ph.ADC.trigger_now(self.adc)
         raw_trace = ph.ADC.get_trace(self.adc)
@@ -47,13 +48,13 @@ class FGTest:
     def get_adc_coords(self, analog=Coordinate.AnalogOnHICANN(0)):
         adc, adc_channel0, adc_channel1 = self.adcs[self.IP][self.DNC]
         adc_channel = (adc_channel0, adc_channel1)[analog.value()]
-        return Coordinate.ADC(adc), Coordinate.ChannelOnADC(adc_channel)
+        return ph.ADC.USBSerial(adc), Coordinate.ChannelOnADC(adc_channel)
 
     def init_adc(self):
 
         adc,adc_channel = self.get_adc_coords()	
-        self.adc_channel = ph.Coordinate.ChannelOnADC(adc_channel)
-        self.adc_board = ph.Coordinate.ADC(adc)
+        self.adc_channel = pyhalco_hicann_v2.ChannelOnADC(adc_channel)
+        self.adc_board = pyhalco_hicann_v2.ADC(adc)
 
         print "Trying to get ADC Handle."
         self.adc = ph.Handle.ADCHw(self.adc_board)
@@ -61,17 +62,17 @@ class FGTest:
         #configure ADC
         adc_id = ph.ADC.get_board_id(self.adc)
         self.init_adc_calibration_backend(adc_id)
-        trig  = ph.Coordinate.TriggerOnADC(0)
+        trig  = pyhalco_hicann_v2.TriggerOnADC(0)
         adc_conf  = ph.ADC.Config(5000, self.adc_channel, trig)
         ph.ADC.config(self.adc, adc_conf)
 
         print "ADC set up."
 
     def init_fg_measurement(self,block):
-        if isinstance(block, ph.Coordinate.FGBlockOnHICANN):
+        if isinstance(block, pyhalco_hicann_v2.FGBlockOnHICANN):
             self.fg_coord = block
         else:
-            self.fg_coord = ph.Coordinate.FGBlockOnHICANN(ph.Coordinate.Enum(block))
+            self.fg_coord = pyhalco_hicann_v2.FGBlockOnHICANN(Enum(block))
 
         print "Trying FPGA reset."
         ph.FPGA.reset(self.fpga)
@@ -82,8 +83,8 @@ class FGTest:
 
         # set ANALOG
         ac = ph.HICANN.Analog()
-        ac.set_fg_left(ph.Coordinate.AnalogOnHICANN(0))
-        ac.set_fg_left(ph.Coordinate.AnalogOnHICANN(1))
+        ac.set_fg_left(pyhalco_hicann_v2.AnalogOnHICANN(0))
+        ac.set_fg_left(pyhalco_hicann_v2.AnalogOnHICANN(1))
         ph.HICANN.set_analog(self.h, ac)
 
         print "Analog output configured."

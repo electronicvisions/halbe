@@ -1,10 +1,11 @@
 #include "ESS/halbe_to_ess_formatter.h"
-
+#include "halco/hicann/v2/l1.h"
+#include "halco/hicann/v2/synapse.h"
 
 namespace HMF
 {
 
-size_t revert_vbus(Coordinate::VLineOnHICANN const& vline)
+size_t revert_vbus(halco::hicann::v2::VLineOnHICANN const& vline)
 {
     if(vline < 128)
         return vline.value();
@@ -23,7 +24,7 @@ size_t revert_vbus(size_t const& vline)
 }
 
 
-size_t revert_hbus(Coordinate::HLineOnHICANN const& hline)
+size_t revert_hbus(halco::hicann::v2::HLineOnHICANN const& hline)
 {
     return 63 - hline.value();
 }
@@ -37,7 +38,7 @@ size_t revert_hbus(size_t const& hline)
 }
 
 
-void format_synswitch(Coordinate::SynapseSwitchRowOnHICANN const& s, size_t &synbl, size_t &addr)
+void format_synswitch(halco::hicann::v2::SynapseSwitchRowOnHICANN const& s, size_t &synbl, size_t &addr)
 {
 	if(s.line() < 112)		//top half
 	{
@@ -58,7 +59,7 @@ void format_synswitch(Coordinate::SynapseSwitchRowOnHICANN const& s, size_t &syn
 }
 
 
-size_t format_synapse_row(Coordinate::SynapseRowOnHICANN const& s)
+size_t format_synapse_row(halco::hicann::v2::SynapseRowOnHICANN const& s)
 {
    if(s.value() < 224)
        return 223 - s.value();
@@ -67,18 +68,18 @@ size_t format_synapse_row(Coordinate::SynapseRowOnHICANN const& s)
 }
 
 
-size_t to_synblock(Coordinate::SynapseDriverOnHICANN const& coord)
+size_t to_synblock(halco::hicann::v2::SynapseDriverOnHICANN const& coord)
 {
     size_t synbl = 0;
-    if (coord.toSideHorizontal() == Coordinate::left) {
+    if (coord.toSideHorizontal() == halco::common::left) {
         synbl = 0;
-    } else if (coord.toSideHorizontal() == Coordinate::right) {
+    } else if (coord.toSideHorizontal() == halco::common::right) {
         synbl = 1;
     }
     return synbl;
 }
 
-size_t to_drvaddr(Coordinate::SynapseDriverOnHICANN const& coord)
+size_t to_drvaddr(halco::hicann::v2::SynapseDriverOnHICANN const& coord)
 {
     if(coord.line() < 112)  //top -> invert coordinates
     {
@@ -91,7 +92,7 @@ size_t to_drvaddr(Coordinate::SynapseDriverOnHICANN const& coord)
 }
 
 //returns the block of the repeater in ESS Coordinates
-ESS::RepeaterLocation to_repblock(Coordinate::RepeaterBlockOnHICANN const& block)
+ESS::RepeaterLocation to_repblock(halco::hicann::v2::RepeaterBlockOnHICANN const& block)
 {
     ESS::RepeaterLocation rep_block = ESS::RepeaterLocation::REP_UL;
 
@@ -109,7 +110,7 @@ ESS::RepeaterLocation to_repblock(Coordinate::RepeaterBlockOnHICANN const& block
 }
 
 //returns the addres of the repeater inside the block
-size_t to_repaddr(Coordinate::RepeaterBlockOnHICANN const& block, size_t val)
+size_t to_repaddr(halco::hicann::v2::RepeaterBlockOnHICANN const& block, size_t val)
 {
     size_t addr = 0;
     size_t rblock = static_cast<size_t>(block.toEnum());

@@ -215,7 +215,7 @@ int main(int argc, char * argv[]) {
 	}
 
 	// create FPGAHandle
-	HMF::Handle::FPGAHw f(HMF::Coordinate::FPGAGlobal(geometry::Enum(0)), HMF::Coordinate::IPv4::from_string(ip_remote), HMF::Coordinate::DNCOnFPGA(geometry::Enum(1)), HMF::Coordinate::IPv4::from_string(ip_pmu));
+	HMF::Handle::FPGAHw f(halco::hicann::v2::FPGAGlobal(halco::common::Enum(0)), halco::hicann::v2::IPv4::from_string(ip_remote), halco::hicann::v2::DNCOnFPGA(halco::common::Enum(1)), halco::hicann::v2::IPv4::from_string(ip_pmu));
 
 	// create tool object and measure latency
 	SWRealtimeLatencyMeasurementTool t(f, master);

@@ -3,7 +3,8 @@
 #include <boost/noncopyable.hpp>
 
 #include "hal/Handle/Base.h"
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/hicann.h"
+#include "halco/hicann/v2/external.h"
 
 namespace HMF {
 namespace Handle {
@@ -24,17 +25,17 @@ struct HICANN
 	virtual ~HICANN() {}
 
 	/// Returns the coordinate.
-	Coordinate::HICANNGlobal const & coordinate() const {
+	halco::hicann::v2::HICANNGlobal const & coordinate() const {
 		return coord;
 	}
 
 	/// conversion function (same as explicit cast above) to DNCGlobal
-	Coordinate::DNCGlobal to_DNCGlobal() const {
+	halco::hicann::v2::DNCGlobal to_DNCGlobal() const {
 		return coord.toDNCGlobal();
 	}
 
 	/// Cast operator to its DNC-local coordinate.
-	Coordinate::HICANNOnDNC to_HICANNOnDNC () const {
+	halco::hicann::v2::HICANNOnDNC to_HICANNOnDNC () const {
 		return coordinate().toHICANNOnDNC();
 	}
 
@@ -47,11 +48,11 @@ struct HICANN
 
 protected:
 	/// Construct a HICANN that is connected to FPGA f
-	explicit HICANN(const Coordinate::HICANNGlobal & h, bool request_highspeed = true);
+	explicit HICANN(const halco::hicann::v2::HICANNGlobal & h, bool request_highspeed = true);
 
 private:
 	// HICANN coordinate
-	Coordinate::HICANNGlobal const coord;
+	halco::hicann::v2::HICANNGlobal const coord;
 	bool const m_highspeed;
 }; // class HICANN
 

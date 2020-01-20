@@ -13,7 +13,7 @@
 //HALbe datatypes
 #include "hal/DNCContainer.h"
 #include "hal/FPGAContainer.h"
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/fwd.h"
 #include "hal/HICANNContainer.h"
 #include "hal/HICANN/FGConfig.h"
 #include "hal/HICANN/FGBlock.h"
@@ -78,7 +78,7 @@ namespace HMF
 class HAL2ESS
 {
 public:
-	HAL2ESS(Coordinate::Wafer wafer, std::string filepath = "");
+	HAL2ESS(halco::hicann::v2::Wafer wafer, std::string filepath = "");
 	~HAL2ESS();
 
 //functions controlling the simulation
@@ -113,80 +113,80 @@ public:
 
 //Functions of HICANNBackend
 	//Crossbars and Switches
-	void set_crossbar_switch_row(Handle::HICANN const& h, Coordinate::HLineOnHICANN y_, geometry::Side s, HICANN::CrossbarRow const & switches);
-	HICANN::CrossbarRow get_crossbar_switch_row(Handle::HICANN const& h, Coordinate::HLineOnHICANN y_, geometry::Side s);
+	void set_crossbar_switch_row(Handle::HICANN const& h, halco::hicann::v2::HLineOnHICANN y_, halco::common::Side s, HICANN::CrossbarRow const & switches);
+	HICANN::CrossbarRow get_crossbar_switch_row(Handle::HICANN const& h, halco::hicann::v2::HLineOnHICANN y_, halco::common::Side s);
 
-	void set_syndriver_switch_row(Handle::HICANN const& h, Coordinate::SynapseSwitchRowOnHICANN const& s, HICANN::SynapseSwitchRow const& switches);
-	HICANN::SynapseSwitchRow get_syndriver_switch_row(Handle::HICANN const& h, Coordinate::SynapseSwitchRowOnHICANN const& s);
+	void set_syndriver_switch_row(Handle::HICANN const& h, halco::hicann::v2::SynapseSwitchRowOnHICANN const& s, HICANN::SynapseSwitchRow const& switches);
+	HICANN::SynapseSwitchRow get_syndriver_switch_row(Handle::HICANN const& h, halco::hicann::v2::SynapseSwitchRowOnHICANN const& s);
 
 	//Synapses and Synapse drivers
-	void set_weights_row(Handle::HICANN const& h, Coordinate::SynapseRowOnHICANN const& s, HICANN::WeightRow const& weights);
-	void set_weights_row(std::vector<boost::shared_ptr<Handle::HICANN> > handles, Coordinate::SynapseRowOnHICANN const& s, std::vector<HICANN::WeightRow> const& data);
-	HICANN::WeightRow get_weights_row(Handle::HICANN const& h, Coordinate::SynapseRowOnHICANN const& s);
+	void set_weights_row(Handle::HICANN const& h, halco::hicann::v2::SynapseRowOnHICANN const& s, HICANN::WeightRow const& weights);
+	void set_weights_row(std::vector<boost::shared_ptr<Handle::HICANN> > handles, halco::hicann::v2::SynapseRowOnHICANN const& s, std::vector<HICANN::WeightRow> const& data);
+	HICANN::WeightRow get_weights_row(Handle::HICANN const& h, halco::hicann::v2::SynapseRowOnHICANN const& s);
 
-	void set_decoder_double_row(Handle::HICANN const& h, Coordinate::SynapseDriverOnHICANN const& s, HICANN::DecoderDoubleRow const& data);
-	void set_decoder_double_row(std::vector<boost::shared_ptr<Handle::HICANN> > handles, Coordinate::SynapseDriverOnHICANN const& syndrv, std::vector<HICANN::DecoderDoubleRow> const& data);
-	HICANN::DecoderDoubleRow get_decoder_double_row(Handle::HICANN const& h, Coordinate::SynapseDriverOnHICANN const& s);
+	void set_decoder_double_row(Handle::HICANN const& h, halco::hicann::v2::SynapseDriverOnHICANN const& s, HICANN::DecoderDoubleRow const& data);
+	void set_decoder_double_row(std::vector<boost::shared_ptr<Handle::HICANN> > handles, halco::hicann::v2::SynapseDriverOnHICANN const& syndrv, std::vector<HICANN::DecoderDoubleRow> const& data);
+	HICANN::DecoderDoubleRow get_decoder_double_row(Handle::HICANN const& h, halco::hicann::v2::SynapseDriverOnHICANN const& s);
 
-	void set_synapse_driver(Handle::HICANN const& h, Coordinate::SynapseDriverOnHICANN const& s, HICANN::SynapseDriver const& drv_row);
-	HICANN::SynapseDriver get_synapse_driver(Handle::HICANN const& h, Coordinate::SynapseDriverOnHICANN const& s);
+	void set_synapse_driver(Handle::HICANN const& h, halco::hicann::v2::SynapseDriverOnHICANN const& s, HICANN::SynapseDriver const& drv_row);
+	HICANN::SynapseDriver get_synapse_driver(Handle::HICANN const& h, halco::hicann::v2::SynapseDriverOnHICANN const& s);
 
 	//Setting the Neurons
-	void set_denmem_quad(Handle::HICANN const& h, Coordinate::QuadOnHICANN qb, HICANN::NeuronQuad const& nquad);
-	HICANN::NeuronQuad get_denmem_quad(Handle::HICANN const& h, Coordinate::QuadOnHICANN qb);
+	void set_denmem_quad(Handle::HICANN const& h, halco::hicann::v2::QuadOnHICANN qb, HICANN::NeuronQuad const& nquad);
+	HICANN::NeuronQuad get_denmem_quad(Handle::HICANN const& h, halco::hicann::v2::QuadOnHICANN qb);
 
 	//sets the configuration of a neuron block. only the capacity is needed for the ess
 	void set_neuron_config(Handle::HICANN const& h, HICANN::NeuronConfig const& nblock);
 	HICANN::NeuronConfig get_neuron_config(Handle::HICANN const& h);
 
 	//Floating Gates
-	HICANN::FGErrorResultRow wait_fg(Handle::HICANN &, Coordinate::FGBlockOnHICANN const &);
+	HICANN::FGErrorResultRow wait_fg(Handle::HICANN &, halco::hicann::v2::FGBlockOnHICANN const &);
 	HICANN::FGErrorResultQuadRow wait_fg(Handle::HICANN &);
-	void set_fg_values(Handle::HICANN const& h, Coordinate::FGBlockOnHICANN const& b, HICANN::FGBlock const& fg);
+	void set_fg_values(Handle::HICANN const& h, halco::hicann::v2::FGBlockOnHICANN const& b, HICANN::FGBlock const& fg);
 	void set_fg_values(Handle::HICANN const& h, HICANN::FGControl const& fg);
-	HICANN::FGErrorResultQuadRow set_fg_row_values(Handle::HICANN & h, Coordinate::FGRowOnFGBlock row, HICANN::FGControl const& fg, bool const, bool const);
+	HICANN::FGErrorResultQuadRow set_fg_row_values(Handle::HICANN & h, halco::hicann::v2::FGRowOnFGBlock row, HICANN::FGControl const& fg, bool const, bool const);
 	HICANN::FGErrorResultQuadRow set_fg_row_values(
 		Handle::HICANN & h,
 		HICANN::FGRowOnFGBlock4 rows,
 		HICANN::FGRow4 data,
 		bool const writeDown,
 		bool const blocking = true);
-	HICANN::FGErrorResultQuadRow set_fg_row_values(Handle::HICANN & h, Coordinate::FGBlockOnHICANN block, Coordinate::FGRowOnFGBlock row,
+	HICANN::FGErrorResultQuadRow set_fg_row_values(Handle::HICANN & h, halco::hicann::v2::FGBlockOnHICANN block, halco::hicann::v2::FGRowOnFGBlock row,
 	HICANN::FGRow const& fg, bool const writeDown, bool const blocking = true);
 
-	void set_fg_config(Handle::HICANN & h, Coordinate::FGBlockOnHICANN const& block, const HICANN::FGConfig & config);
-    HICANN::FGConfig get_fg_config(Handle::HICANN const&, Coordinate::FGBlockOnHICANN const&);
+	void set_fg_config(Handle::HICANN & h, halco::hicann::v2::FGBlockOnHICANN const& block, const HICANN::FGConfig & config);
+    HICANN::FGConfig get_fg_config(Handle::HICANN const&, halco::hicann::v2::FGBlockOnHICANN const&);
 
     //not a function of HICANNBackend anymore, but still here for tests
-	HICANN::FGBlock get_fg_values(Handle::HICANN const& h, Coordinate::FGBlockOnHICANN const& addr);
+	HICANN::FGBlock get_fg_values(Handle::HICANN const& h, halco::hicann::v2::FGBlockOnHICANN const& addr);
     //these functions read out a fg-cell via the analog output -> not possible in the ESS (use get_fg_values instead!)
-	void set_fg_cell(Handle::HICANN const&, Coordinate::NeuronOnHICANN const&,  HICANN::neuron_parameter const&)    {ESS_DUMMY();}
-	void set_fg_cell(Handle::HICANN const&, Coordinate::FGBlockOnHICANN const&, HICANN::shared_parameter const&)    {ESS_DUMMY();}
-	void set_fg_cell(Handle::HICANN const&, Coordinate::FGBlockOnHICANN const&, Coordinate::FGCellOnFGBlock const&) {ESS_DUMMY();}
+	void set_fg_cell(Handle::HICANN const&, halco::hicann::v2::NeuronOnHICANN const&,  HICANN::neuron_parameter const&)    {ESS_DUMMY();}
+	void set_fg_cell(Handle::HICANN const&, halco::hicann::v2::FGBlockOnHICANN const&, HICANN::shared_parameter const&)    {ESS_DUMMY();}
+	void set_fg_cell(Handle::HICANN const&, halco::hicann::v2::FGBlockOnHICANN const&, halco::hicann::v2::FGCellOnFGBlock const&) {ESS_DUMMY();}
 
 	//these functions set and get a current stimulus from a fg-cell
-	void set_current_stimulus(Handle::HICANN const& h, Coordinate::FGBlockOnHICANN const& b, HICANN::FGStimulus const& stim);
-	HICANN::FGStimulus get_current_stimulus(Handle::HICANN const& h, Coordinate::FGBlockOnHICANN const& b);
+	void set_current_stimulus(Handle::HICANN const& h, halco::hicann::v2::FGBlockOnHICANN const& b, HICANN::FGStimulus const& stim);
+	HICANN::FGStimulus get_current_stimulus(Handle::HICANN const& h, halco::hicann::v2::FGBlockOnHICANN const& b);
 
 	//Repeater
-	void set_repeater(Handle::HICANN const& h, Coordinate::VRepeaterOnHICANN r, HICANN::VerticalRepeater const& rc);
-	HICANN::VerticalRepeater get_repeater(Handle::HICANN const& h, Coordinate::VRepeaterOnHICANN r);
+	void set_repeater(Handle::HICANN const& h, halco::hicann::v2::VRepeaterOnHICANN r, HICANN::VerticalRepeater const& rc);
+	HICANN::VerticalRepeater get_repeater(Handle::HICANN const& h, halco::hicann::v2::VRepeaterOnHICANN r);
 
-	void set_repeater(Handle::HICANN const& h, Coordinate::HRepeaterOnHICANN r, HICANN::HorizontalRepeater const& rc);
-	HICANN::HorizontalRepeater get_repeater(Handle::HICANN const& h, Coordinate::HRepeaterOnHICANN r);
+	void set_repeater(Handle::HICANN const& h, halco::hicann::v2::HRepeaterOnHICANN r, HICANN::HorizontalRepeater const& rc);
+	HICANN::HorizontalRepeater get_repeater(Handle::HICANN const& h, halco::hicann::v2::HRepeaterOnHICANN r);
 
 	//ESS_DUMMY implemented, these functions are necessary for controlling test_events, as far as i know this functionality is not represented in the ESS
-	void set_repeater_block(Handle::HICANN const&, Coordinate::RepeaterBlockOnHICANN, HICANN::RepeaterBlock const&){ESS_DUMMY();}
-	HICANN::RepeaterBlock get_repeater_block(Handle::HICANN const&, Coordinate::RepeaterBlockOnHICANN){ESS_DUMMY();return HICANN::RepeaterBlock{};}
+	void set_repeater_block(Handle::HICANN const&, halco::hicann::v2::RepeaterBlockOnHICANN, HICANN::RepeaterBlock const&){ESS_DUMMY();}
+	HICANN::RepeaterBlock get_repeater_block(Handle::HICANN const&, halco::hicann::v2::RepeaterBlockOnHICANN){ESS_DUMMY();return HICANN::RepeaterBlock{};}
 
 	// SynapseController
 
 	void set_stdp_lut(
-	    Handle::HICANN&, Coordinate::SynapseArrayOnHICANN const&, HICANN::STDPLUT const&)
+	    Handle::HICANN&, halco::hicann::v2::SynapseArrayOnHICANN const&, HICANN::STDPLUT const&)
 	{
 		ESS_DUMMY();
 	}
-	HICANN::STDPLUT get_stdp_lut(Handle::HICANN&, Coordinate::SynapseArrayOnHICANN const&)
+	HICANN::STDPLUT get_stdp_lut(Handle::HICANN&, halco::hicann::v2::SynapseArrayOnHICANN const&)
 	{
 		ESS_DUMMY();
 		return HICANN::STDPLUT{};
@@ -194,13 +194,13 @@ public:
 
 	void set_syn_rst(
 	    Handle::HICANN&,
-	    Coordinate::SynapseArrayOnHICANN const&,
+	    halco::hicann::v2::SynapseArrayOnHICANN const&,
 	    HICANN::SynapseController::syn_rst_t const&)
 	{
 		ESS_DUMMY();
 	}
 	HICANN::SynapseController::syn_rst_t get_syn_rst(
-	    Handle::HICANN&, Coordinate::SynapseArrayOnHICANN const&)
+	    Handle::HICANN&, halco::hicann::v2::SynapseArrayOnHICANN const&)
 	{
 		ESS_DUMMY();
 		return HICANN::SynapseController::syn_rst_t{};
@@ -208,13 +208,13 @@ public:
 
 	void set_syn_ctrl(
 	    Handle::HICANN&,
-	    Coordinate::SynapseArrayOnHICANN const&,
+	    halco::hicann::v2::SynapseArrayOnHICANN const&,
 	    HICANN::SynapseControlRegister const&)
 	{
 		ESS_DUMMY();
 	}
 	HICANN::SynapseControlRegister get_syn_ctrl(
-	    Handle::HICANN&, Coordinate::SynapseArrayOnHICANN const&)
+	    Handle::HICANN&, halco::hicann::v2::SynapseArrayOnHICANN const&)
 	{
 		ESS_DUMMY();
 		return HICANN::SynapseControlRegister{};
@@ -222,32 +222,32 @@ public:
 
 	void set_syn_cnfg(
 	    Handle::HICANN&,
-	    Coordinate::SynapseArrayOnHICANN const&,
+	    halco::hicann::v2::SynapseArrayOnHICANN const&,
 	    HICANN::SynapseConfigurationRegister const&)
 	{
 		ESS_DUMMY();
 	}
 	HICANN::SynapseConfigurationRegister get_syn_cnfg(
-	    Handle::HICANN&, Coordinate::SynapseArrayOnHICANN const&)
+	    Handle::HICANN&, halco::hicann::v2::SynapseArrayOnHICANN const&)
 	{
 		ESS_DUMMY();
 		return HICANN::SynapseConfigurationRegister();
 	}
 
 	HICANN::SynapseStatusRegister get_syn_status(
-	    Handle::HICANN&, Coordinate::SynapseArrayOnHICANN const&)
+	    Handle::HICANN&, halco::hicann::v2::SynapseArrayOnHICANN const&)
 	{
 		ESS_DUMMY();
 		return HICANN::SynapseStatusRegister{};
 	}
 
 	void set_synapse_controller(
-	    Handle::HICANN&, Coordinate::SynapseArrayOnHICANN const&, HICANN::SynapseController const&)
+	    Handle::HICANN&, halco::hicann::v2::SynapseArrayOnHICANN const&, HICANN::SynapseController const&)
 	{
 		ESS_DUMMY();
 	}
 	HICANN::SynapseController get_synapse_controller(
-	    Handle::HICANN&, Coordinate::SynapseArrayOnHICANN const&)
+	    Handle::HICANN&, halco::hicann::v2::SynapseArrayOnHICANN const&)
 	{
 		ESS_DUMMY();
 		return HICANN::SynapseController{};
@@ -280,7 +280,7 @@ public:
 
     void flush(Handle::HICANN const&) { ESS_DUMMY(); }
 
-    void instantiate_hicann(Coordinate::HICANNOnWafer const& h);
+    void instantiate_hicann(halco::hicann::v2::HICANNOnWafer const& h);
 
 	void reset(Handle::HICANN const& h, uint8_t PLL_frequency = 100);
 
@@ -289,13 +289,13 @@ public:
 //end namespace HICANN
 
 //functions of DNCBackend, ESS_DUMMY implemented
-    void reset(Handle::FPGA &, Coordinate::DNCOnFPGA const&){ESS_DUMMY()};
-	void set_hicann_directions(Handle::FPGA &, Coordinate::DNCOnFPGA const&, DNC::GbitReticle const&);
-	void set_loopback(Handle::FPGA &, Coordinate::DNCOnFPGA const&, DNC::Loopback const&){ESS_NOT_IMPLEMENTED();}
+    void reset(Handle::FPGA &, halco::hicann::v2::DNCOnFPGA const&){ESS_DUMMY()};
+	void set_hicann_directions(Handle::FPGA &, halco::hicann::v2::DNCOnFPGA const&, DNC::GbitReticle const&);
+	void set_loopback(Handle::FPGA &, halco::hicann::v2::DNCOnFPGA const&, DNC::Loopback const&){ESS_NOT_IMPLEMENTED();}
 
 //functions of FPGABackend
     void reset(Handle::FPGA const&);
-    void set_fpga_background_generator(Handle::FPGA const& f, Coordinate::DNCOnFPGA const d, FPGA::BackgroundGenerator const& bg);
+    void set_fpga_background_generator(Handle::FPGA const& f, halco::hicann::v2::DNCOnFPGA const d, FPGA::BackgroundGenerator const& bg);
 	void write_playback_program(
 	    Handle::FPGA const& f,
 	    FPGA::PulseEventContainer const& st,
@@ -310,29 +310,29 @@ public:
     void reset(Handle::FPGA const&, FPGA::Reset const&){ESS_DUMMY();}
     void reset_pbmem(Handle::FPGA const&){ESS_DUMMY();}
 	void init(Handle::FPGA&, bool const = true){ ESS_DUMMY();}
-	FPGA::Status get_fpga_status(Coordinate::FPGAGlobal const&){ESS_DUMMY();return FPGA::Status{};}
-	void fill_pulse_fifo(Handle::FPGA &, Coordinate::DNCOnFPGA const&, FPGA::PulseEventContainer const&){ESS_NOT_IMPLEMENTED();}
-	FPGA::PulseEventContainer read_trace_fifo(Handle::FPGA &, Coordinate::DNCOnFPGA const&){ESS_NOT_IMPLEMENTED();return FPGA::PulseEventContainer{};}
+	FPGA::Status get_fpga_status(halco::hicann::v2::FPGAGlobal const&){ESS_DUMMY();return FPGA::Status{};}
+	void fill_pulse_fifo(Handle::FPGA &, halco::hicann::v2::DNCOnFPGA const&, FPGA::PulseEventContainer const&){ESS_NOT_IMPLEMENTED();}
+	FPGA::PulseEventContainer read_trace_fifo(Handle::FPGA &, halco::hicann::v2::DNCOnFPGA const&){ESS_NOT_IMPLEMENTED();return FPGA::PulseEventContainer{};}
 	void prime_systime_counter(Handle::FPGA const&){ESS_DUMMY();}
 	void disable_global(Handle::FPGA const&){ESS_DUMMY();}
 	void start_systime_counter(Handle::FPGA const&){ESS_DUMMY();}
 	void prime_experiment(Handle::FPGA const&){ESS_DUMMY();}
 	void start_experiment(Handle::FPGA const& f);
-    void start_playback_and_trace_fifo(Handle::FPGA &, Coordinate::DNCOnFPGA const&, bool){ESS_NOT_IMPLEMENTED();}
-    void start_trace_fifo(Handle::FPGA &, Coordinate::DNCOnFPGA const&){ESS_NOT_IMPLEMENTED();}
-    void stop_playback_and_trace_fifo(Handle::FPGA &, Coordinate::DNCOnFPGA const& ){ESS_NOT_IMPLEMENTED();}
+    void start_playback_and_trace_fifo(Handle::FPGA &, halco::hicann::v2::DNCOnFPGA const&, bool){ESS_NOT_IMPLEMENTED();}
+    void start_trace_fifo(Handle::FPGA &, halco::hicann::v2::DNCOnFPGA const&){ESS_NOT_IMPLEMENTED();}
+    void stop_playback_and_trace_fifo(Handle::FPGA &, halco::hicann::v2::DNCOnFPGA const& ){ESS_NOT_IMPLEMENTED();}
     void set_spinnaker_receive_port(Handle::FPGA const&, uint16_t){ESS_NOT_IMPLEMENTED();}
     void set_spinnaker_routing_table(Handle::FPGA const&, FPGA::SpinnRoutingTable const&){ESS_NOT_IMPLEMENTED();}
     void set_spinnaker_pulse_upsampler(Handle::FPGA const&, size_t){ESS_NOT_IMPLEMENTED();}
     void set_spinnaker_pulse_downsampler(Handle::FPGA const&, size_t){ESS_NOT_IMPLEMENTED();}
     void add_spinnaker_pulse(Handle::FPGA const&, FPGA::SpinnInputAddress_t const&){ESS_NOT_IMPLEMENTED();}
     void send_spinnaker_pulses(Handle::FPGA const &){ESS_NOT_IMPLEMENTED();}
-	void send(Handle::FPGA &, Coordinate::DNCOnFPGA const&, FPGA::PulseEventContainer const&, bool, uint64_t){ESS_NOT_IMPLEMENTED();}
+	void send(Handle::FPGA &, halco::hicann::v2::DNCOnFPGA const&, FPGA::PulseEventContainer const&, bool, uint64_t){ESS_NOT_IMPLEMENTED();}
 	void send(Handle::FPGA const&, FPGA::SpinnakerEventContainer const&){ESS_NOT_IMPLEMENTED();}
-	FPGA::PulseEventContainer receive(Handle::FPGA &, Coordinate::DNCOnFPGA const&, uint64_t){ESS_NOT_IMPLEMENTED();return FPGA::PulseEventContainer{};}
-	FPGA::PulseEventContainer send_and_receive(Handle::FPGA &, Coordinate::DNCOnFPGA const&, FPGA::PulseEventContainer const&, bool, uint64_t)
+	FPGA::PulseEventContainer receive(Handle::FPGA &, halco::hicann::v2::DNCOnFPGA const&, uint64_t){ESS_NOT_IMPLEMENTED();return FPGA::PulseEventContainer{};}
+	FPGA::PulseEventContainer send_and_receive(Handle::FPGA &, halco::hicann::v2::DNCOnFPGA const&, FPGA::PulseEventContainer const&, bool, uint64_t)
 	{ESS_NOT_IMPLEMENTED();return FPGA::PulseEventContainer{};}
-	void set_fpga_background_generator(Coordinate::FPGAGlobal const&, FPGA::BackgroundGenerator const&){ESS_NOT_IMPLEMENTED();}
+	void set_fpga_background_generator(halco::hicann::v2::FPGAGlobal const&, FPGA::BackgroundGenerator const&){ESS_NOT_IMPLEMENTED();}
     FPGA::SpinnOutputAddress_t get_received_spinnaker_pulse(Handle::FPGA const &){ESS_NOT_IMPLEMENTED();return FPGA::SpinnOutputAddress_t{};}
     void set_spinnaker_sender_config(Handle::FPGA const&, FPGA::SpinnSenderConfig const&){ESS_NOT_IMPLEMENTED();}
     void set_spinnaker_address_config(Handle::FPGA const&, FPGA::SpinnAddressConfig const&){ESS_NOT_IMPLEMENTED();}
@@ -360,8 +360,8 @@ public:
     float get_temperature(Handle::ADC &);
 
 //Functions of SupportBackend
-    void set_hicann_reset(Coordinate::IPv4 const&, Coordinate::HICANNGlobal const&, bool){ESS_DUMMY();}
-	void set_reticle_power(Coordinate::IPv4 const&, Coordinate::DNCGlobal const&, bool){ESS_DUMMY();}
+    void set_hicann_reset(halco::hicann::v2::IPv4 const&, halco::hicann::v2::HICANNGlobal const&, bool){ESS_DUMMY();}
+	void set_reticle_power(halco::hicann::v2::IPv4 const&, halco::hicann::v2::DNCGlobal const&, bool){ESS_DUMMY();}
     void voh_up(Handle::PMU &){ESS_DUMMY();}
 	void voh_down(Handle::PMU &){ESS_DUMMY();}
 	void vol_up(Handle::PMU &){ESS_DUMMY();}
@@ -371,8 +371,8 @@ public:
 
 // Public non-halbe funcions
     // retunrs the adex-model-parameter of nrn
-    PyNNParameters::EIF_cond_exp_isfa_ista get_bio_parameter(Handle::HICANN const& h, Coordinate::NeuronOnHICANN const& nrn ) const;
-    PyNNParameters::EIF_cond_exp_isfa_ista get_technical_parameter(Handle::HICANN const& h, Coordinate::NeuronOnHICANN const& nrn ) const;
+    PyNNParameters::EIF_cond_exp_isfa_ista get_bio_parameter(Handle::HICANN const& h, halco::hicann::v2::NeuronOnHICANN const& nrn ) const;
+    PyNNParameters::EIF_cond_exp_isfa_ista get_technical_parameter(Handle::HICANN const& h, halco::hicann::v2::NeuronOnHICANN const& nrn ) const;
 
 private:
 //functions that get data from the ESS
@@ -382,31 +382,31 @@ private:
 
 	unsigned int get_hic_y_ESS(Handle::HICANN const& h) const;
 
-    HICANN::L1Address get_L1Address_ESS(Handle::HICANN const& h, Coordinate::NeuronOnHICANN const& neuron) const;
+    HICANN::L1Address get_L1Address_ESS(Handle::HICANN const& h, halco::hicann::v2::NeuronOnHICANN const& neuron) const;
 
-	HICANN::CrossbarRow get_crossbar_switch_row_ESS(Handle::HICANN const& h, Coordinate::HLineOnHICANN y_, geometry::Side s) const;
+	HICANN::CrossbarRow get_crossbar_switch_row_ESS(Handle::HICANN const& h, halco::hicann::v2::HLineOnHICANN y_, halco::common::Side s) const;
 
     HICANN::BackgroundGeneratorArray get_background_generator_ESS(Handle::HICANN const& h) const;
 
-    HICANN::HorizontalRepeater get_repeater_ESS(Handle::HICANN const& h, Coordinate::HRepeaterOnHICANN r) const;
+    HICANN::HorizontalRepeater get_repeater_ESS(Handle::HICANN const& h, halco::hicann::v2::HRepeaterOnHICANN r) const;
 
-    HICANN::VerticalRepeater get_repeater_ESS(Handle::HICANN const& h, Coordinate::VRepeaterOnHICANN r) const;
+    HICANN::VerticalRepeater get_repeater_ESS(Handle::HICANN const& h, halco::hicann::v2::VRepeaterOnHICANN r) const;
     
-    HICANN::SynapseSwitchRow get_syndriver_switch_row_ESS(Handle::HICANN const& h, Coordinate::SynapseSwitchRowOnHICANN const& s) const;
+    HICANN::SynapseSwitchRow get_syndriver_switch_row_ESS(Handle::HICANN const& h, halco::hicann::v2::SynapseSwitchRowOnHICANN const& s) const;
 
-    HICANN::SynapseDriver get_synapse_driver_ESS(Handle::HICANN const& h, Coordinate::SynapseDriverOnHICANN const& s) const;
+    HICANN::SynapseDriver get_synapse_driver_ESS(Handle::HICANN const& h, halco::hicann::v2::SynapseDriverOnHICANN const& s) const;
 
-    HICANN::DecoderDoubleRow get_decoder_double_row_ESS(Handle::HICANN const& h, Coordinate::SynapseDriverOnHICANN const& s) const;
+    HICANN::DecoderDoubleRow get_decoder_double_row_ESS(Handle::HICANN const& h, halco::hicann::v2::SynapseDriverOnHICANN const& s) const;
 
-    HICANN::WeightRow get_weights_row_ESS(Handle::HICANN const& h, Coordinate::SynapseRowOnHICANN const& s) const;
+    HICANN::WeightRow get_weights_row_ESS(Handle::HICANN const& h, halco::hicann::v2::SynapseRowOnHICANN const& s) const;
 
-    HICANN::FGBlock get_fg_values_ESS(Handle::HICANN const& h, Coordinate::FGBlockOnHICANN const& addr) const;
+    HICANN::FGBlock get_fg_values_ESS(Handle::HICANN const& h, halco::hicann::v2::FGBlockOnHICANN const& addr) const;
 
 //constants
 	static const int num_wafer = 1;		//this must be 1 because the ess does not support more than 1 wafer yet
 //Member
 
-	Coordinate::Wafer mWafer;     ///< wafer id
+	halco::hicann::v2::Wafer mWafer;     ///< wafer id
 	const unsigned int mNumFPGAs; ///< number of FPGAs: 12 for Virtex, 48 for Kintex
 	bool                                    mrun;           //flag to indicate whether ESS was executed yet
 	std::string                             mfilepath;  ///< directory where all temporary files during simulation and debug goes to.

@@ -1,6 +1,10 @@
 #pragma once
 
-#include "hal/Coordinate/Merger3OnHICANN.h"
+#include "halco/hicann/v2/merger0onhicann.h"
+#include "halco/hicann/v2/merger1onhicann.h"
+#include "halco/hicann/v2/merger2onhicann.h"
+#include "halco/hicann/v2/merger3onhicann.h"
+
 #include "hal/HICANN/Merger.h"
 
 namespace HMF {
@@ -12,10 +16,10 @@ namespace HICANN {
 struct MergerTree
 {
 public:
-	static const size_t num_merger = Coordinate::Merger0OnHICANN::end \
-									 + Coordinate::Merger1OnHICANN::end \
-									 + Coordinate::Merger2OnHICANN::end \
-									 + Coordinate::Merger3OnHICANN::end;
+	static const size_t num_merger = halco::hicann::v2::Merger0OnHICANN::end \
+									 + halco::hicann::v2::Merger1OnHICANN::end \
+									 + halco::hicann::v2::Merger2OnHICANN::end \
+									 + halco::hicann::v2::Merger3OnHICANN::end;
 
 	static PYPP_CONSTEXPR size_t size() { return num_merger; }
 
@@ -38,17 +42,17 @@ public:
 	void set_eight_on_one();
 
 
-	Merger&       operator[] (Coordinate::Merger0OnHICANN const& ii);
-	Merger const& operator[] (Coordinate::Merger0OnHICANN const& ii) const;
+	Merger&       operator[] (halco::hicann::v2::Merger0OnHICANN const& ii);
+	Merger const& operator[] (halco::hicann::v2::Merger0OnHICANN const& ii) const;
 
-	Merger&       operator[] (Coordinate::Merger1OnHICANN const& ii);
-	Merger const& operator[] (Coordinate::Merger1OnHICANN const& ii) const;
+	Merger&       operator[] (halco::hicann::v2::Merger1OnHICANN const& ii);
+	Merger const& operator[] (halco::hicann::v2::Merger1OnHICANN const& ii) const;
 
-	Merger&       operator[] (Coordinate::Merger2OnHICANN const& ii);
-	Merger const& operator[] (Coordinate::Merger2OnHICANN const& ii) const;
+	Merger&       operator[] (halco::hicann::v2::Merger2OnHICANN const& ii);
+	Merger const& operator[] (halco::hicann::v2::Merger2OnHICANN const& ii) const;
 
-	Merger&       operator[] (Coordinate::Merger3OnHICANN const& ii);
-	Merger const& operator[] (Coordinate::Merger3OnHICANN const& ii) const;
+	Merger&       operator[] (halco::hicann::v2::Merger3OnHICANN const& ii);
+	Merger const& operator[] (halco::hicann::v2::Merger3OnHICANN const& ii) const;
 
 	bool operator ==(MergerTree const& b) const;
 	bool operator !=(MergerTree const& b) const;

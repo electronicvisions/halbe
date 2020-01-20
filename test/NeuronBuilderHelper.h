@@ -36,7 +36,7 @@ static std::array<int, 16> const iomap {{
 
 std::array<std::bitset<25>, 4> format(HICANN::NeuronQuad const& quad);
 
-std::bitset<4> getIObits(HMF::Coordinate::Y const& y, HICANN::NeuronQuad const& quad);
+std::bitset<4> getIObits(halco::common::Y const& y, HICANN::NeuronQuad const& quad);
 
 HICANN::NeuronQuad randomize_quad();
 

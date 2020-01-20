@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from pyhalbe import Coordinate
+import pyhalco_hicann_v2 as Coordinate
 from pyhalbe import ADC, Handle
 import argparse
 import pylogging

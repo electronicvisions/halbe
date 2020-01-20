@@ -1,4 +1,6 @@
 #include "hal/HICANN/FGRow.h"
+#include "halco/hicann/v2/fg.h"
+#include "halco/hicann/v2/neuron.h"
 
 namespace HMF {
 namespace HICANN {
@@ -23,12 +25,12 @@ FGRow::value_type FGRow::getShared() const
 	return mShared;
 }
 
-void FGRow::setNeuron(Coordinate::NeuronOnFGBlock neuron, value_type value)
+void FGRow::setNeuron(halco::hicann::v2::NeuronOnFGBlock neuron, value_type value)
 {
 	mNeuron.at(neuron) = value;
 }
 
-FGRow::value_type FGRow::getNeuron(Coordinate::NeuronOnFGBlock neuron) const
+FGRow::value_type FGRow::getNeuron(halco::hicann::v2::NeuronOnFGBlock neuron) const
 {
 	return mNeuron.at(neuron);
 }

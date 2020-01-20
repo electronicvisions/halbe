@@ -15,7 +15,7 @@ struct Merger
 {
 public:
 	// In the corresponding figure of the HICANN-doc all the register/merger
-	// numbers are swapped 0<->7. !BUT! geometry::left/geometry::right are still correct-around
+	// numbers are swapped 0<->7. !BUT! halco::common::left/halco::common::right are still correct-around
 	static const size_t enable_bit = 1, select_bit = 0;
 	static const uint8_t
 		       LEFT_ONLY  = 0x0 << enable_bit | 0x1 << select_bit,

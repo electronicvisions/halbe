@@ -12,17 +12,18 @@ import numpy as np
 
 import pyhalbe
 import pysthal
+from pyhalco_common import Enum, iter_all
+import pyhalco_hicann_v2 as Coordinate
 
 # Set up shortcuts
-Coordinate = pyhalbe.Coordinate
 HICANN = pyhalbe.HICANN
 
 # Choose coordinates
 NRN = 0
 
 wafer_c = Coordinate.Wafer(0)
-hicann_c = Coordinate.HICANNOnWafer(Coordinate.Enum(84))
-neuron_c = Coordinate.NeuronOnHICANN(Coordinate.Enum(NRN))
+hicann_c = Coordinate.HICANNOnWafer(Enum(84))
+neuron_c = Coordinate.NeuronOnHICANN(Enum(NRN))
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -42,7 +43,7 @@ neuron = hicann.neurons[neuron_c]
 neuron.activate_firing(True)
 
 # Configure background generators to fire on L1 address 0
-for bg in Coordinate.iter_all(Coordinate.BackgroundGeneratorOnHICANN):
+for bg in iter_all(Coordinate.BackgroundGeneratorOnHICANN):
     generator = hicann.layer1[bg]
     generator.enable(True)
     generator.random(False)
@@ -53,7 +54,7 @@ for bg in Coordinate.iter_all(Coordinate.BackgroundGeneratorOnHICANN):
 #hicann.layer1[Coordinate.Merger0OnHICANN(0)].config = HICANN.Merger.LEFT_ONLY
 
 # Configure DNC mergers.:
-for merger in Coordinate.iter_all(Coordinate.DNCMergerOnHICANN):
+for merger in iter_all(Coordinate.DNCMergerOnHICANN):
     hicann.layer1[merger].slow = True # Needed for sending repeaters
 
 # Configure sending repeater to forward spikes to the right
@@ -135,7 +136,7 @@ if False:
     fg.setNeuron(neuron_c, HICANN.I_gl, 10) # Time constant
 
 else:
-    for fg_block in Coordinate.iter_all(Coordinate.FGBlockOnHICANN):
+    for fg_block in iter_all(Coordinate.FGBlockOnHICANN):
         hicann.floating_gates.setShared(fg_block, pyhalbe.HICANN.V_dllres, 300)
         hicann.floating_gates.setShared(fg_block, pyhalbe.HICANN.I_breset,      1023)
         hicann.floating_gates.setShared(fg_block, pyhalbe.HICANN.I_bstim,       1023)
@@ -208,7 +209,7 @@ hicann.layer1[sending_link] = pyhalbe.HICANN.GbitLink.Direction.TO_HICANN
 receiving_link = Coordinate.GbitLinkOnHICANN(1)
 hicann.layer1[receiving_link] = pyhalbe.HICANN.GbitLink.Direction.TO_DNC
 
-for m in Coordinate.iter_all(Coordinate.DNCMergerOnHICANN):
+for m in iter_all(Coordinate.DNCMergerOnHICANN):
      m = hicann.layer1[merger]
      m.config = m.MERGE
      m.slow = False

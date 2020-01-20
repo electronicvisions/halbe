@@ -1,6 +1,7 @@
 #include "hal/HICANN/SynapseDriver.h"
+#include "halco/hicann/v2/synapse.h"
 
-using namespace HMF::Coordinate;
+using namespace halco::hicann::v2;
 
 namespace HMF {
 namespace HICANN {

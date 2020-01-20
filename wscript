@@ -91,22 +91,11 @@ def build(bld):
         export_includes = [bld.path.get_bld()],
        )
 
-    # TODO temporary compat
-    bld(
-        target          = 'halbe_coordinate_inc',
-        export_includes = ['.'],
-    )
-
-    # TODO temporary compat
-    bld(
-        features        = 'use',
-        target          = 'halbe_coordinate',
-        use             = ['halco_hicann_v2', 'halbe_coordinate_inc'],
-    )
-
     bld(
         target          = 'halbe_container_inc',
-        export_includes = ['.']
+        export_includes = ['.'],
+        use             = ['s2hal_inc', 'realtime_inc', 'hostfpga_inc',
+                           'hate_inc'],
     )
 
     # ECM (2018-10-19) FIXME: marocco depends on coordinate checks (existance of switches)
@@ -115,8 +104,8 @@ def build(bld):
         target          = 'halbe_container_emscripten',
         source          = bld.path.ant_glob('hal/HICANN/Crossbar.cpp') + bld.path.ant_glob('hal/HICANN/SynapseSwitch.cpp'),
         install_path    = '${PREFIX}/lib',
-        use             = ['halbe_container_inc', 'halbe_coordinate', 'rcf-boost-only',
-                           'bitter', 'pythonic'],
+        use             = ['halbe_container_inc',  'halco_hicann_v2', 'rcf-boost-only',
+                           'bitter', 'pythonic', 'pywrap'],
         cxxflags=cxxflags
     )
 
@@ -127,8 +116,8 @@ def build(bld):
             bld.path.ant_glob('hal/HICANN/*.cpp') +
             bld.path.ant_glob('hal/ADC/*.cpp')),
         install_path    = '${PREFIX}/lib',
-        use             = ['halbe_container_inc', 'halbe_coordinate', 'rcf-boost-only',
-                           'bitter', 'pythonic', 'realtime_inc', 'hostfpga_inc', 'hate_inc'],
+        use             = ['halbe_container_inc',  'halco_hicann_v2', 'rcf-boost-only',
+                           'bitter', 'pythonic', 'pywrap'],
         cxxflags=cxxflags
     )
 

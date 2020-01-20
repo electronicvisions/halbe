@@ -6,13 +6,14 @@
 #include "hal/Handle/FPGAHw.h"
 
 #include "hal/Coordinate/HMFGrid.h"
-#include "hal/Coordinate/iter_all.h"
+#include "halco/common/iter_all.h"
 
 #include "reticle_control.h"
 
 using std::runtime_error;
 using facets::ReticleControl;
-using namespace HMF::Coordinate;
+using namespace halco::common;
+using namespace halco::hicann::v2;
 using namespace facets;
 using namespace std;
 
@@ -47,7 +48,7 @@ private:
 	typename T::first_type val;
 };
 
-boost::shared_ptr<facets::ReticleControl> PowerBackend::get_reticle_ptr(Coordinate::DNCGlobal const d) {
+boost::shared_ptr<facets::ReticleControl> PowerBackend::get_reticle_ptr(halco::hicann::v2::DNCGlobal const d) {
 	auto it = std::find_if(all_reticles.begin(), all_reticles.end(), CompareFirstOfPair<decltype(all_reticles)::value_type>(d));
 	if (it == all_reticles.end()) {
 		std::stringstream ss;
@@ -57,17 +58,17 @@ boost::shared_ptr<facets::ReticleControl> PowerBackend::get_reticle_ptr(Coordina
 	return it->second;
 }
 
-ReticleControl& PowerBackend::get_reticle(Coordinate::DNCGlobal const d) {
+ReticleControl& PowerBackend::get_reticle(halco::hicann::v2::DNCGlobal const d) {
 	return *get_reticle_ptr(d);
 }
 
-ReticleControl& PowerBackend::get_reticle(Handle::FPGAHw const & f, Coordinate::DNCOnFPGA const d) {
+ReticleControl& PowerBackend::get_reticle(Handle::FPGAHw const & f, halco::hicann::v2::DNCOnFPGA const d) {
 	return get_reticle(f.dnc(d));
 }
 
 ReticleControl& PowerBackend::get_some_reticle(Handle::FPGAHw const & f) {
-	for (size_t i = Coordinate::DNCOnFPGA::min; i <= Coordinate::DNCOnFPGA::max; i++) {
-		Coordinate::DNCOnFPGA const d{Enum(i)};
+	for (size_t i = halco::hicann::v2::DNCOnFPGA::min; i <= halco::hicann::v2::DNCOnFPGA::max; i++) {
+		halco::hicann::v2::DNCOnFPGA const d{Enum(i)};
 		auto it = std::find_if(all_reticles.begin(), all_reticles.end(), CompareFirstOfPair<decltype(all_reticles)::value_type>(f.dnc(d)));
 		if (it != all_reticles.end())
 			return *(it->second);
@@ -77,7 +78,7 @@ ReticleControl& PowerBackend::get_some_reticle(Handle::FPGAHw const & f) {
 	throw std::runtime_error(ss.str());
 }
 
-void PowerBackend::destroy_reticle(Coordinate::DNCGlobal const d) {
+void PowerBackend::destroy_reticle(halco::hicann::v2::DNCGlobal const d) {
 	auto it = std::find_if(all_reticles.begin(), all_reticles.end(), CompareFirstOfPair<decltype(all_reticles)::value_type>(d));
 	if (it == all_reticles.end()) {
 		std::stringstream ss;
@@ -101,7 +102,7 @@ void PowerBackend::destroy_reticle(Coordinate::DNCGlobal const d) {
 	}
 }
 
-uint8_t PowerBackend::hicann_jtag_addr(Coordinate::HICANNGlobal const& h) {
+uint8_t PowerBackend::hicann_jtag_addr(halco::hicann::v2::HICANNGlobal const& h) {
 	//look up in ReticleControl how many HICANNs it has
 	uint8_t hs_channel = h.toHICANNOnDNC().toHighspeedLinkOnDNC().toEnum();
 	assert (hs2jtag_lut.count(hs_channel) > 0);
@@ -110,15 +111,15 @@ uint8_t PowerBackend::hicann_jtag_addr(Coordinate::HICANNGlobal const& h) {
 
 // single reticle usage
 void PowerBackend::SetupReticle(
-    Coordinate::DNCGlobal const d,
-    Coordinate::IPv4 fpga_ip,
+    halco::hicann::v2::DNCGlobal const d,
+    halco::hicann::v2::IPv4 fpga_ip,
     uint16_t jtag_port,
-    Coordinate::IPv4 pmu_ip,
-    std::set<Coordinate::HICANNOnDNC> physically_available_hicanns,
-    std::set<Coordinate::HICANNOnDNC> highspeed_hicanns,
+    halco::hicann::v2::IPv4 pmu_ip,
+    std::set<halco::hicann::v2::HICANNOnDNC> physically_available_hicanns,
+    std::set<halco::hicann::v2::HICANNOnDNC> highspeed_hicanns,
     bool on_wafer,
     bool arq_mode,
-    Coordinate::JTAGFrequency jtag_freq)
+    halco::hicann::v2::JTAGFrequency jtag_freq)
 {
 	if (all_reticles.size() > 1) {
 		throw runtime_error("PowerBackend::SetupReticle: Too many reticles instantiated!");
@@ -138,9 +139,9 @@ void PowerBackend::SetupReticle(
 	// creation of array and bitset for reticlecontrol, also gets used to keep which hicanns are
 	// availabe in hs channel ordering
 	size_t jtag_num = physically_available_hicanns.size();
-	std::bitset<Coordinate::HighspeedLinkOnDNC::end> avail_hicann_bitset_in_hs_order;
-	std::bitset<Coordinate::HICANNOnDNC::enum_type::end> highspeed_bitset;
-	for (auto const hs_link : Coordinate::iter_all<Coordinate::HighspeedLinkOnDNC>()) {
+	std::bitset<halco::hicann::v2::HighspeedLinkOnDNC::end> avail_hicann_bitset_in_hs_order;
+	std::bitset<halco::hicann::v2::HICANNOnDNC::enum_type::end> highspeed_bitset;
+	for (auto const hs_link : halco::common::iter_all<halco::hicann::v2::HighspeedLinkOnDNC>()) {
 		if (physically_available_hicanns.count(hs_link.toHICANNOnDNC())) {
 			avail_hicann_bitset_in_hs_order.set(hs_link.toEnum());
 			hs2jtag_lut[hs_link.toEnum()] = --jtag_num;

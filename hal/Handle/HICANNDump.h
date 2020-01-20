@@ -8,7 +8,7 @@ namespace Handle {
 
 struct HICANNDump : public HICANN, DumpMixin
 {
-	HICANNDump(DumpMixin::ref_t dump, const Coordinate::HICANNGlobal & h) :
+	HICANNDump(DumpMixin::ref_t dump, const halco::hicann::v2::HICANNGlobal & h) :
 		HICANN(h),
 		DumpMixin(dump)
 	{}

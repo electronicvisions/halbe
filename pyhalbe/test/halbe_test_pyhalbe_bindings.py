@@ -6,38 +6,39 @@ from Test import PyhalbeTest, parametrize
 class Test_PyhalbeBindings(PyhalbeTest):
     def test_import(self):
         import pyhalbe
-        pyhalbe.Coordinate
         pyhalbe.DNC
         pyhalbe.FPGA
         pyhalbe.HICANN
         pyhalbe.Debug
 
     def test_array_operators(self):
-        from pyhalbe import HICANN, Coordinate
+        from pyhalbe import HICANN
+        from pyhalco_common import Enum
+        import pyhalco_hicann_v2 as Coordinate
         quad = HICANN.NeuronQuad()
 
         neuron = HICANN.Neuron()
         neuron.enable_aout(True)
 
-        quad[Coordinate.NeuronOnQuad(Coordinate.Enum(0))] = neuron
-        self.assertTrue( quad[Coordinate.NeuronOnQuad(Coordinate.Enum(0))].enable_aout())
-        self.assertFalse(quad[Coordinate.NeuronOnQuad(Coordinate.Enum(1))].enable_aout())
-        self.assertFalse(quad[Coordinate.NeuronOnQuad(Coordinate.Enum(2))].enable_aout())
-        self.assertFalse(quad[Coordinate.NeuronOnQuad(Coordinate.Enum(3))].enable_aout())
+        quad[Coordinate.NeuronOnQuad(Enum(0))] = neuron
+        self.assertTrue( quad[Coordinate.NeuronOnQuad(Enum(0))].enable_aout())
+        self.assertFalse(quad[Coordinate.NeuronOnQuad(Enum(1))].enable_aout())
+        self.assertFalse(quad[Coordinate.NeuronOnQuad(Enum(2))].enable_aout())
+        self.assertFalse(quad[Coordinate.NeuronOnQuad(Enum(3))].enable_aout())
 
 
-        quad[Coordinate.NeuronOnQuad(Coordinate.Enum(1))].enable_aout(True)
-        self.assertTrue( quad[Coordinate.NeuronOnQuad(Coordinate.Enum(0))].enable_aout())
-        self.assertTrue( quad[Coordinate.NeuronOnQuad(Coordinate.Enum(1))].enable_aout())
-        self.assertFalse(quad[Coordinate.NeuronOnQuad(Coordinate.Enum(2))].enable_aout())
-        self.assertFalse(quad[Coordinate.NeuronOnQuad(Coordinate.Enum(3))].enable_aout())
+        quad[Coordinate.NeuronOnQuad(Enum(1))].enable_aout(True)
+        self.assertTrue( quad[Coordinate.NeuronOnQuad(Enum(0))].enable_aout())
+        self.assertTrue( quad[Coordinate.NeuronOnQuad(Enum(1))].enable_aout())
+        self.assertFalse(quad[Coordinate.NeuronOnQuad(Enum(2))].enable_aout())
+        self.assertFalse(quad[Coordinate.NeuronOnQuad(Enum(3))].enable_aout())
 
-        x = quad[Coordinate.NeuronOnQuad(Coordinate.Enum(2))]
+        x = quad[Coordinate.NeuronOnQuad(Enum(2))]
         x.enable_aout(True)
-        self.assertTrue( quad[Coordinate.NeuronOnQuad(Coordinate.Enum(0))].enable_aout())
-        self.assertTrue( quad[Coordinate.NeuronOnQuad(Coordinate.Enum(1))].enable_aout())
-        self.assertTrue( quad[Coordinate.NeuronOnQuad(Coordinate.Enum(2))].enable_aout())
-        self.assertFalse(quad[Coordinate.NeuronOnQuad(Coordinate.Enum(3))].enable_aout())
+        self.assertTrue( quad[Coordinate.NeuronOnQuad(Enum(0))].enable_aout())
+        self.assertTrue( quad[Coordinate.NeuronOnQuad(Enum(1))].enable_aout())
+        self.assertTrue( quad[Coordinate.NeuronOnQuad(Enum(2))].enable_aout())
+        self.assertFalse(quad[Coordinate.NeuronOnQuad(Enum(3))].enable_aout())
 
     def test_bitset4(self):
         from pyhalbe import std
@@ -154,7 +155,7 @@ class Test_PyhalbeBindings(PyhalbeTest):
             self.assertEqual(a[ii], d)
 
     def test_some_conversion_operators(self):
-        import Coordinate as C
+        import pyhalco_common as C
         x0 = C.X(0)
         x1 = C.X(1)
         x2 = C.X(2)
@@ -186,12 +187,13 @@ class Test_PyhalbeBindings(PyhalbeTest):
                     self.assertNotEqual(a, b)
 
     def test_short_format(self):
-        import Coordinate as C
+        from pyhalco_common import Enum
+        import pyhalco_hicann_v2 as C
 
-        self.assertEqual(C.short_format(C.HICANNGlobal(C.HICANNOnWafer(C.Enum(42)),C.Wafer(12))), "W012H042")
-        self.assertEqual(C.short_format(C.FPGAGlobal(C.FPGAOnWafer(C.Enum(11)),C.Wafer(5))), "W005F011")
-        self.assertEqual(C.short_format(C.HICANNOnWafer(C.Enum(12))), "H012")
-        self.assertEqual(C.short_format(C.FPGAOnWafer(C.Enum(12))), "F012")
+        self.assertEqual(C.short_format(C.HICANNGlobal(C.HICANNOnWafer(Enum(42)),C.Wafer(12))), "W012H042")
+        self.assertEqual(C.short_format(C.FPGAGlobal(C.FPGAOnWafer(Enum(11)),C.Wafer(5))), "W005F011")
+        self.assertEqual(C.short_format(C.HICANNOnWafer(Enum(12))), "H012")
+        self.assertEqual(C.short_format(C.FPGAOnWafer(Enum(12))), "F012")
         self.assertEqual(C.short_format(C.Wafer(32)), "W032")
 
     @parametrize(['shared_parameter', 'neuron_parameter'])

@@ -5,7 +5,7 @@
  * Data needs to be stored and managed on a higher level in the hierarchy.
  */
 
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/fwd.h"
 #include "hal/DNCContainer.h"
 #include "hal/Handle/FPGA.h"
 
@@ -15,7 +15,7 @@ namespace DNC {
 /**
  * DNC Design Reset. This triggers HICANN design reset on the vertical setup!
  */
-void reset(Handle::FPGA & f, Coordinate::DNCOnFPGA const & d);
+void reset(Handle::FPGA & f, halco::hicann::v2::DNCOnFPGA const & d);
 
 /**
  * Sets correct directions for DNC<->HICANN communication in the DNC.
@@ -24,7 +24,7 @@ void reset(Handle::FPGA & f, Coordinate::DNCOnFPGA const & d);
  * @param d Configuration: directions for all 8 channels of a HICANN
  * @note: For the HICANN side use HICANN::set_gbit_link(..)
  */
-void set_hicann_directions(Handle::FPGA & f, const Coordinate::DNCOnFPGA& d, GbitReticle const& links);
+void set_hicann_directions(Handle::FPGA & f, const halco::hicann::v2::DNCOnFPGA& d, GbitReticle const& links);
 
 
 /**
@@ -40,7 +40,7 @@ void set_hicann_directions(Handle::FPGA & f, const Coordinate::DNCOnFPGA& d, Gbi
  * @note: This is not an official feature of the DNC, but rather a debug facility.
  * @note: uses JTAG
  */
-void set_loopback(Handle::FPGA & f, const Coordinate::DNCOnFPGA& d, Loopback const & loopback);
+void set_loopback(Handle::FPGA & f, const halco::hicann::v2::DNCOnFPGA& d, Loopback const & loopback);
 
 } // namespace DNC
 } // namespace HMF

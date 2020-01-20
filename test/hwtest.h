@@ -58,7 +58,7 @@ protected:
 	HMF::Handle::HICANNHw & hhandle;
 
 private:
-	HMF::Coordinate::IPv4 ip;
+	halco::hicann::v2::IPv4 ip;
 };
 
 template<>
@@ -107,7 +107,7 @@ protected:
 		ess(new ::HMF::Handle::Ess()),
 		handle(g_conn.f,
 			   ess,
-			   std::vector<HMF::Coordinate::HICANNOnWafer>{getHICANNOnWafer()}),
+			   std::vector<halco::hicann::v2::HICANNOnWafer>{getHICANNOnWafer()}),
 		hhandle(*handle.get(g_conn.d, g_conn.h))
 	{
 	}
@@ -120,9 +120,9 @@ protected:
 
 	bool has_getter() { return true; }
 
-	static HMF::Coordinate::HICANNOnWafer getHICANNOnWafer()
+	static halco::hicann::v2::HICANNOnWafer getHICANNOnWafer()
 	{
-		HMF::Coordinate::DNCOnWafer dnc = g_conn.d.toDNCOnWafer(g_conn.f);
+		halco::hicann::v2::DNCOnWafer dnc = g_conn.d.toDNCOnWafer(g_conn.f);
 		return g_conn.h.toHICANNOnWafer(dnc);
 	}
 
@@ -160,8 +160,8 @@ protected:
 
 	HMF::Handle::FPGA &                f;
 	HMF::Handle::HICANN &              h;
-	const HMF::Coordinate::DNCOnFPGA   d;
-	const HMF::Coordinate::HICANNOnDNC hc;
+	const halco::hicann::v2::DNCOnFPGA   d;
+	const halco::hicann::v2::HICANNOnDNC hc;
 };
 
 typedef ::testing::Types<

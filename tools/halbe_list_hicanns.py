@@ -4,7 +4,8 @@ import sys
 import argparse
 import pylogging
 from halbe_convert_coordinate import add_coordinate
-import Coordinate as C
+from pyhalco_common import Enum
+import pyhalco_hicann_v2 as C
 
 WAFER = C.Wafer()
 
@@ -34,8 +35,8 @@ def hicanns_on_dnc(dnc):
     per_dnc = C.HICANNOnDNC.enum_type.size
     offset = (per_dnc / 2 - 1)
 
-    h0 = C.HICANNOnDNC(C.Enum(0)).toHICANNOnWafer(dnc)
-    h1 = C.HICANNOnDNC(C.Enum(per_dnc / 2)).toHICANNOnWafer(dnc)
+    h0 = C.HICANNOnDNC(Enum(0)).toHICANNOnWafer(dnc)
+    h1 = C.HICANNOnDNC(Enum(per_dnc / 2)).toHICANNOnWafer(dnc)
 
     top = range(h0.toEnum().value(), h0.toEnum().value() + offset + 1)
     bot = range(h1.toEnum().value(), h1.toEnum().value() + offset + 1)

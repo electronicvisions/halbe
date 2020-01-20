@@ -1,6 +1,6 @@
 #pragma once
 
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/l1.h"
 #include "hal/HICANN/DNCMerger.h"
 
 namespace HMF {
@@ -8,14 +8,14 @@ namespace HICANN {
 
 struct DNCMergerLine
 {
-	static const size_t num_merger = Coordinate::DNCMergerOnHICANN::size;
+	static const size_t num_merger = halco::hicann::v2::DNCMergerOnHICANN::size;
 
-	DNCMerger&       operator[] (const Coordinate::DNCMergerOnHICANN & ii)
+	DNCMerger&       operator[] (const halco::hicann::v2::DNCMergerOnHICANN & ii)
 	{ return mMerger[ii]; }
-	DNCMerger const& operator[] (const Coordinate::DNCMergerOnHICANN & ii) const
+	DNCMerger const& operator[] (const halco::hicann::v2::DNCMergerOnHICANN & ii) const
 	{ return mMerger[ii]; }
 
-	static Coordinate::DNCMergerOnHICANN loopback_target(const Coordinate::DNCMergerOnHICANN & source);
+	static halco::hicann::v2::DNCMergerOnHICANN loopback_target(const halco::hicann::v2::DNCMergerOnHICANN & source);
 
 	bool operator ==(DNCMergerLine const& b) const
 		{ return mMerger==b.mMerger; }

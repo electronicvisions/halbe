@@ -11,10 +11,10 @@ namespace Handle {
 
 struct FPGADump : public FPGAMixin<HICANNDump>, DumpMixin
 {
-	FPGADump(DumpMixin::ref_t dump, Coordinate::FPGAGlobal const c);
+	FPGADump(DumpMixin::ref_t dump, halco::hicann::v2::FPGAGlobal const c);
 
 #ifndef PYPLUSPLUS
-	hicann_handle_t create_hicann(Coordinate::HICANNGlobal const& h, bool /*request_highspeed*/) override
+	hicann_handle_t create_hicann(halco::hicann::v2::HICANNGlobal const& h, bool /*request_highspeed*/) override
 	{
 		return boost::make_shared<HICANNDump>(dumper(), h);
 	}

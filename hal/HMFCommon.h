@@ -8,7 +8,7 @@
 #include <boost/serialization/array.h>
 
 #include "pywrap/compat/array.hpp"
-#include "hal/Coordinate/geometry.h"
+#include "halco/common/geometry.h"
 #include "hal/test.h"
 
 namespace HMF {

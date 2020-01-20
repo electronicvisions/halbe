@@ -12,8 +12,8 @@ extern "C" {
 #include "s2c_jtagphys_2fpga.h"
 #include "reticle_control.h"
 
-#include "hal/Coordinate/HMFGeometry.h"
-#include "hal/Coordinate/iter_all.h"
+#include "halco/hicann/v2/fwd.h"
+#include "halco/common/iter_all.h"
 
 using namespace std;
 using namespace facets;

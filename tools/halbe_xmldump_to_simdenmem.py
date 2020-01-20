@@ -4,9 +4,9 @@ import os, sys, json, copy
 from itertools import chain, groupby
 from numpy import array
 from lxml import etree
-from pyhalbe.Coordinate import Enum, FPGAGlobal, HICANNGlobal, NeuronOnHICANN, NeuronGlobal, FGBlockOnHICANN, QuadOnHICANN, NeuronOnQuad
+from pyhalco_hicann_v2 import FPGAGlobal, HICANNGlobal, NeuronOnHICANN, NeuronGlobal, FGBlockOnHICANN, QuadOnHICANN, NeuronOnQuad
 from pyhalbe.HICANN import neuron_parameter, shared_parameter, FGBlock
-from pyhalbe.Coordinate import top, bottom, left, right
+from pyhalco_common import Enum, top, bottom, left, right
 
 emptyjson = {
     'voltages': {'neuron':{},

@@ -3,7 +3,8 @@
 #include <boost/operators.hpp>
 
 #include "hal/test.h"
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/fwd.h"
+#include "halco/hicann/v2/external.h"
 #include "hal/HICANN/L1Address.h"
 
 namespace HMF {
@@ -20,15 +21,15 @@ struct PulseAddress
 {
 	// each FPGA handles mupltiple DNCs (but atm: multiple instances handle a
 	// single DNC each)
-	typedef Coordinate::DNCOnFPGA dnc_address_t;
+	typedef halco::hicann::v2::DNCOnFPGA dnc_address_t;
 
 	// each DNC handles 8 HICANNs, a spike therefore needs a 3 bit address for
 	// it's destination chip
-	typedef Coordinate::HICANNOnDNC chip_address_t;
+	typedef halco::hicann::v2::HICANNOnDNC chip_address_t;
 
 	// address of the corresponding dnc merger on the HICANN where the spike is
 	// supposed to be inserted
-	typedef Coordinate::GbitLinkOnHICANN  channel_t;
+	typedef halco::hicann::v2::GbitLinkOnHICANN  channel_t;
 
 	// the hardware label (the raw address) which is returned by the FPGA
 	// should not be used by the user.

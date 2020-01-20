@@ -4,15 +4,15 @@
 namespace HMF
 {
 
-using namespace geometry;
+using namespace halco::common;
 
 namespace {
-static const Coordinate::HICANNGlobal hicann_c(Coordinate::Enum(0));
+static const halco::hicann::v2::HICANNGlobal hicann_c(halco::common::Enum(0));
 }
 
 ESSTest::ESSTest() :
 	ess(new Handle::Ess(hicann_c.toWafer())),
-	fpga(hicann_c.toFPGAGlobal(), ess, std::vector<Coordinate::HICANNOnWafer>{{hicann_c}}),
+	fpga(hicann_c.toFPGAGlobal(), ess, std::vector<halco::hicann::v2::HICANNOnWafer>{{hicann_c}}),
 	h(*fpga.get(hicann_c))
 {
 	ess->enableSpikeDebugging(true);
@@ -36,8 +36,8 @@ void load_pattern_naud(HICANN::FGControl &fgc, size_t neuron, std::string const&
     if(it != lut.end() )
         x = it->second;
 
-    Coordinate::NeuronOnHICANN nrn{Enum(neuron)};
-    Coordinate::FGBlockOnHICANN shrd = nrn.toSharedFGBlockOnHICANN();
+    halco::hicann::v2::NeuronOnHICANN nrn{Enum(neuron)};
+    halco::hicann::v2::FGBlockOnHICANN shrd = nrn.toSharedFGBlockOnHICANN();
     switch(x)
     {
         case(0):    //custom
@@ -164,8 +164,8 @@ void load_pattern(HICANN::FGControl &fgc, size_t neuron, std::string const& patt
     if(it != lut.end() )
         x = it->second;
 
-    Coordinate::NeuronOnHICANN nrn{Enum(neuron)};
-    Coordinate::FGBlockOnHICANN shrd = nrn.toSharedFGBlockOnHICANN();
+    halco::hicann::v2::NeuronOnHICANN nrn{Enum(neuron)};
+    halco::hicann::v2::FGBlockOnHICANN shrd = nrn.toSharedFGBlockOnHICANN();
     //setting the non bifurcation params for all pattern
     fgc.setNeuron(nrn, HICANN::neuron_parameter::E_l, 285);
     fgc.setNeuron(nrn, HICANN::neuron_parameter::E_syni, 511);

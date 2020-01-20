@@ -16,7 +16,8 @@
 #include <iostream>
 
 using namespace std;
-using namespace HMF::Coordinate;
+using namespace halco::hicann::v2;
+using namespace halco::common;
 
 namespace HMF {
 

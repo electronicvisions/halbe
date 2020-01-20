@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "hal/Coordinate/HMFGeometry.h"
+#include "halco/hicann/v2/fwd.h"
 #include "hal/ADC/Config.h"
 #include "hal/ADC/Status.h"
 #include "hal/ADC/USBSerial.h"

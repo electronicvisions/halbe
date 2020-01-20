@@ -8,16 +8,16 @@ PMU::PMU() :
 	pwr_ip()
 {}
 
-PMU::PMU(Coordinate::IPv4 const & ip) :
+PMU::PMU(halco::hicann::v2::IPv4 const & ip) :
 	pwr_ip(ip)
 {}
 
-PMU::PMU(Coordinate::PMU const & coord, Coordinate::IPv4 const & ip) :
+PMU::PMU(halco::hicann::v2::PMU const & coord, halco::hicann::v2::IPv4 const & ip) :
 	coord(coord),
 	pwr_ip(ip)
 {}
 
-Coordinate::IPv4 const & PMU::ip() const {
+halco::hicann::v2::IPv4 const & PMU::ip() const {
 	return pwr_ip;
 }
 
@@ -29,11 +29,11 @@ bool PMU::operator==(PMU const& b) const {
 	return coordinate() == b.coordinate();
 }
 
-PMU::operator Coordinate::IPv4 const & () const {
+PMU::operator halco::hicann::v2::IPv4 const & () const {
 	return ip();
 }
 
-Coordinate::PMU PMU::coordinate() const
+halco::hicann::v2::PMU PMU::coordinate() const
 {
 	return coord;
 }

@@ -5,7 +5,7 @@
 #include <boost/filesystem.hpp>
 #include "hal/HICANNContainer.h"
 
-using namespace HMF::Coordinate;
+using namespace halco::hicann::v2;
 using namespace HMF::HICANN;
 
 namespace HMF {
@@ -138,7 +138,7 @@ TEST(RepeaterBlock, RepeaterBlockSerialization)
 
 TEST(SynapseControlRegister, SetGetRow)
 {
-	typedef Coordinate::SynapseRowOnArray syn_row_t;
+	typedef halco::hicann::v2::SynapseRowOnArray syn_row_t;
 	HMF::HICANN::SynapseControlRegister ctrl_reg;
 
 	syn_row_t row(4);
@@ -156,7 +156,7 @@ TEST(SynapseControlRegister, SetGetRow)
 
 TEST(SynapseControlRegister, SetGetLastRow)
 {
-	typedef Coordinate::SynapseRowOnArray syn_row_t;
+	typedef halco::hicann::v2::SynapseRowOnArray syn_row_t;
 	HMF::HICANN::SynapseControlRegister ctrl_reg;
 
 	syn_row_t row(4);

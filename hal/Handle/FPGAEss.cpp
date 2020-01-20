@@ -3,27 +3,27 @@
 #include <cassert>
 #include <boost/make_shared.hpp>
 
-#include "hal/Coordinate/iter_all.h"
+#include "halco/common/iter_all.h"
 #include "ESS/halbe_to_ess.h"
 #include "euter/cellparameters.h"
 
 namespace HMF {
 namespace Handle {
 
-FPGAEss::FPGAEss(Coordinate::FPGAGlobal const c, boost::shared_ptr<Ess> ess, const std::vector<Coordinate::HICANNOnWafer> & hicanns) :
+FPGAEss::FPGAEss(halco::hicann::v2::FPGAGlobal const c, boost::shared_ptr<Ess> ess, const std::vector<halco::hicann::v2::HICANNOnWafer> & hicanns) :
 	FPGA(c),
 	Base(c),
 	mEss(ess)
 {
 	assert(wafer() == mEss->wafer());
 
-	for (auto dnc : Coordinate::iter_all<Coordinate::DNCOnFPGA>())
+	for (auto dnc : halco::common::iter_all<halco::hicann::v2::DNCOnFPGA>())
 	{
 		activate_dnc(dnc);
 	}
 	for( auto hicann_local : hicanns )
 	{
-		Coordinate::HICANNGlobal hicann(hicann_local, wafer());
+		halco::hicann::v2::HICANNGlobal hicann(hicann_local, wafer());
 		if (hicann.toFPGAOnWafer() != coordinate())
 		{
 			std::stringstream ss;
@@ -36,7 +36,7 @@ FPGAEss::FPGAEss(Coordinate::FPGAGlobal const c, boost::shared_ptr<Ess> ess, con
     }
 }
 
-auto FPGAEss::create_hicann(Coordinate::HICANNGlobal const& h, bool /*request_highspeed*/) -> hicann_handle_t
+auto FPGAEss::create_hicann(halco::hicann::v2::HICANNGlobal const& h, bool /*request_highspeed*/) -> hicann_handle_t
 {
 	return boost::make_shared<HICANNEss>(h, mEss);
 }
@@ -71,12 +71,12 @@ Ess const & FPGAEss::ess_handle() const
 	return *mEss;
 }
 
-PyNNParameters::EIF_cond_exp_isfa_ista FPGAEss::getBioParameter(Handle::HICANN const& h, Coordinate::NeuronOnHICANN const& nrn ) const
+PyNNParameters::EIF_cond_exp_isfa_ista FPGAEss::getBioParameter(Handle::HICANN const& h, halco::hicann::v2::NeuronOnHICANN const& nrn ) const
 {
     return ess().get_bio_parameter(h,nrn);
 }
 
-PyNNParameters::EIF_cond_exp_isfa_ista FPGAEss::getTechnicalParameter(Handle::HICANN const& h, Coordinate::NeuronOnHICANN const& nrn ) const
+PyNNParameters::EIF_cond_exp_isfa_ista FPGAEss::getTechnicalParameter(Handle::HICANN const& h, halco::hicann::v2::NeuronOnHICANN const& nrn ) const
 {
     return ess().get_technical_parameter(h,nrn);
 }

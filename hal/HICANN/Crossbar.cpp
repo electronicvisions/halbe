@@ -1,4 +1,5 @@
 #include "hal/HICANN/Crossbar.h"
+#include "halco/hicann/v2/l1.h"
 
 #include <sstream>
 
@@ -48,13 +49,13 @@ std::string Crossbar::check_exclusiveness(size_t max_switches_per_row,
 }
 
 HICANN::CrossbarRow const&
-Crossbar::get_row(Coordinate::HLineOnHICANN y, geometry::Side s) const
+Crossbar::get_row(halco::hicann::v2::HLineOnHICANN y, halco::common::Side s) const
 {
 	return reinterpret_cast<HICANN::CrossbarRow const&>(switches()[y][s*4]);
 }
 
 void Crossbar::set_row(
-		Coordinate::HLineOnHICANN y, geometry::Side s, CrossbarRow const & row)
+		halco::hicann::v2::HLineOnHICANN y, halco::common::Side s, CrossbarRow const & row)
 {
 	reinterpret_cast<HICANN::CrossbarRow&>(switches()[y][s*4]) = row;
 }
