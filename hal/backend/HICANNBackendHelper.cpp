@@ -970,7 +970,7 @@ void set_PLL_multiplier(
 	// http://freelibrary.faraday-tech.com/AIP/FXPLL031HA0A_APGD_Datasheet.pdf
 	uint32_t const frange = (freq < 100.0 ? 0x0 : 0x1);
 
-	if (freq < 50.0 || freq > 250.0)
+	if (freq < 100.0 || freq > 250.0)
 	{
 		std::stringstream err;
 		err << "Invalid PLL frequency of " << freq << "MHz on " + short_format(h.coordinate());
