@@ -1,5 +1,7 @@
 #include <iostream>
 #include <chrono>
+#include <cmath>
+
 #include "hal/Coordinate/FormatHelper.h"
 #include "hal/backend/HICANNBackendHelper.h"
 #include "hal/HICANN/FGInstruction.h"
@@ -135,6 +137,26 @@ void set_weights_row_impl(
 
 		callback({index, sc_write_data::WRITEANDWAIT, SynapseControl::sc_ctrlreg,
 		          flush_command});
+	}
+}
+
+void wait_by_dummy(
+	Handle::HICANN& h,
+	Coordinate::SynapseArrayOnHICANN const& synarray,
+	HICANN::SynapseConfigurationRegister const& cnfg_reg,
+	size_t num_cycles)
+{
+	/*
+	 * At a PLL HICANN frequency of 100 Mhz, the minimum number of HICANN clock cycles
+	 * that pass between packets sent back to back from the FPGA to the HICANN is 2.
+	 * This is a worst case estimation as the minimum PLL frequency allowed to be
+	 * configured by software is 100 Mhz.
+	 */
+	size_t const min_cycles_per_packet = 2;
+	size_t const num_dummys = std::ceil(num_cycles / (float)min_cycles_per_packet);
+
+	for (size_t i = 0; i < num_dummys; ++i) {
+		set_syn_cnfg(h, synarray, cnfg_reg);
 	}
 }
 

@@ -44,6 +44,25 @@ void set_weights_row_impl(
 	HMF::Coordinate::SynapseRowOnHICANN const& s, HMF::HICANN::WeightRow const& weights,
 	std::function<void(sc_write_data const&)> callback);
 
+/**
+ * Waits at least the number of cycles specified by num_cycles.
+ * The waiting is realized by writing to the configuration register
+ * of the synapse controller. The number of cycles this writing takes
+ * is calculated for a HICANN clock frequency of 100Mhz such that
+ * num_cycles is a lower limit for the number of actually waited cycles.
+ *
+ * @param h HICANN Handle.
+ * @param synarray Synapse array on HICANN on which synapse controller is located.
+ * @param cnfg_reg Content of the synapse configuration register.
+ * @param num_cycles Waiting time in number of cycles.
+ *
+ */
+void wait_by_dummy(
+	Handle::HICANN& h,
+	Coordinate::SynapseArrayOnHICANN const& synarray,
+	HICANN::SynapseConfigurationRegister const& cnfg_reg,
+	size_t num_cycles);
+
 bool popexec_sc_write_data_queue(
     HMF::Handle::HICANNHw& h, size_t& idx, sc_write_data_queue_t const& data);
 
