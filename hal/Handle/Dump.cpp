@@ -33,14 +33,14 @@ namespace
 			std::unique_ptr<fstream> stream(new fstream());
 			stream->push(boost::iostreams::gzip_compressor());
 			stream->push(boost::iostreams::file_sink(filename, mode));
-			return std::move(stream);
+			return stream;
 		}
 		else if (boost::algorithm::ends_with(filename, gzending))
 		{
 			std::unique_ptr<fstream> stream(new fstream());
 			stream->push(boost::iostreams::bzip2_compressor());
 			stream->push(boost::iostreams::file_sink(filename, mode));
-			return std::move(stream);
+			return stream;
 		}
 		else
 		{

@@ -535,7 +535,12 @@ HALBE_GETTER(PulseEventContainer::container_type, read_trace_pulses,
 				throw std::runtime_error("unexpected frame type in read_trace_pulses");
 			}
 
+#pragma GCC diagnostic push
+#if defined(__GNUC__) && (__GNUC__ >= 9)
+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
+#endif
 			entry_type* const entries = reinterpret_cast<entry_type*>(current_packet.pdu);
+#pragma GCC diagnostic pop
 
 			for (std::uint16_t ii = 0; ii < 2 * current_packet.len; ++ii) {
 
