@@ -911,11 +911,25 @@ TYPED_TEST(HICANNBackendTest, WriteSynapsesHWTest) {
 	HICANN::WeightRow row, row0;
 	std::vector <uint32_t> data(32,0);
 	std::generate(row.begin(), row.end(), IncrementingSequence<HICANN::SynapseWeight>(0xf));
+	HICANN::SynapseController synapse_controller_top;
+	HICANN::SynapseController synapse_controller_bottom;
 
-	HICANN::set_weights_row(this->h, SynapseRowOnHICANN(SynapseDriverOnHICANN(Y(3), left), top), row);    //top line
-	HICANN::set_weights_row(this->h, SynapseRowOnHICANN(SynapseDriverOnHICANN(Y(3), left), bottom), row0);    //bottom line
-	HICANN::set_weights_row(this->h, SynapseRowOnHICANN(SynapseDriverOnHICANN(Y(116), left), top), row0); //top line
-	HICANN::set_weights_row(this->h, SynapseRowOnHICANN(SynapseDriverOnHICANN(Y(116), left), bottom), row);   //bottom line
+	HICANN::set_weights_row(this->h,
+	                        synapse_controller_top,
+	                        SynapseRowOnHICANN(SynapseDriverOnHICANN(Y(3), left), top),
+	                        row);    //top line
+	HICANN::set_weights_row(this->h,
+	                        synapse_controller_top,
+	                        SynapseRowOnHICANN(SynapseDriverOnHICANN(Y(3), left), bottom),
+	                        row0);    //bottom line
+	HICANN::set_weights_row(this->h,
+	                        synapse_controller_bottom,
+	                        SynapseRowOnHICANN(SynapseDriverOnHICANN(Y(116), left), top),
+	                        row0); //top line
+	HICANN::set_weights_row(this->h,
+	                        synapse_controller_bottom,
+	                        SynapseRowOnHICANN(SynapseDriverOnHICANN(Y(116), left), bottom),
+	                        row);   //bottom line
 
 	if (auto * reticle = this->get_reticle()) { // Test only for a real hardware test
 		RET->getSC(HCSYN::SYNAPSE_TOP).read_row(217, data, false);
@@ -929,10 +943,22 @@ TYPED_TEST(HICANNBackendTest, WriteSynapsesHWTest) {
 	}
 
 	std::rotate(row.begin(), row.begin()+1, row.end());
-	HICANN::set_weights_row(this->h, SynapseRowOnHICANN(SynapseDriverOnHICANN(Y(4), right), top), row0);  //top line
-	HICANN::set_weights_row(this->h, SynapseRowOnHICANN(SynapseDriverOnHICANN(Y(4), right), bottom), row);    //bottom line
-	HICANN::set_weights_row(this->h, SynapseRowOnHICANN(SynapseDriverOnHICANN(Y(115), right), top), row); //top line
-	HICANN::set_weights_row(this->h, SynapseRowOnHICANN(SynapseDriverOnHICANN(Y(115), right), bottom), row0); //bottom line
+	HICANN::set_weights_row(this->h,
+	                        synapse_controller_top,
+	                        SynapseRowOnHICANN(SynapseDriverOnHICANN(Y(4), right), top),
+	                        row0);  //top line
+	HICANN::set_weights_row(this->h,
+	                        synapse_controller_top,
+	                        SynapseRowOnHICANN(SynapseDriverOnHICANN(Y(4), right), bottom),
+	                        row);    //bottom line
+	HICANN::set_weights_row(this->h,
+	                        synapse_controller_bottom,
+	                        SynapseRowOnHICANN(SynapseDriverOnHICANN(Y(115), right), top),
+	                        row); //top line
+	HICANN::set_weights_row(this->h,
+	                        synapse_controller_bottom,
+	                        SynapseRowOnHICANN(SynapseDriverOnHICANN(Y(115), right), bottom),\
+	                        row0); //bottom line
 
 	if (auto * reticle = this->get_reticle()) { // Test only for a real hardware test
 		RET->getSC(HCSYN::SYNAPSE_TOP).read_row(215, data, false);
@@ -952,8 +978,14 @@ TYPED_TEST(HICANNBackendTest, WriteSynapsesHWTest) {
 	std::generate(drow[0].begin(), drow[0].end(), IncrementingSequence<HICANN::SynapseDecoder>(0xf));
 	std::fill(drow[1].begin(), drow[1].end(), HICANN::SynapseDecoder(0));
 
-	HICANN::set_decoder_double_row(this->h, SynapseDriverOnHICANN(Y(5), left), drow);
-	HICANN::set_decoder_double_row(this->h, SynapseDriverOnHICANN(Y(118), left), drow);
+	HICANN::set_decoder_double_row(this->h,
+	                               synapse_controller_top,
+	                               SynapseDriverOnHICANN(Y(5), left),
+	                               drow);
+	HICANN::set_decoder_double_row(this->h,
+	                               synapse_controller_bottom,
+	                               SynapseDriverOnHICANN(Y(118), left),
+	                               drow);
 
 	if (auto * reticle = this->get_reticle()) { // Test only for a real hardware test
 		RET->getSC(HCSYN::SYNAPSE_TOP).read_decoder(212, data_bot, data_top);
@@ -965,8 +997,14 @@ TYPED_TEST(HICANNBackendTest, WriteSynapsesHWTest) {
 	}
 
 	std::rotate(drow[0].begin(), drow[0].begin()+2, drow[0].end());
-	HICANN::set_decoder_double_row(this->h, SynapseDriverOnHICANN(Y(6), right), drow);
-	HICANN::set_decoder_double_row(this->h, SynapseDriverOnHICANN(Y(117), right), drow);
+	HICANN::set_decoder_double_row(this->h,
+	                               synapse_controller_top,
+	                               SynapseDriverOnHICANN(Y(6), right),
+	                               drow);
+	HICANN::set_decoder_double_row(this->h,
+	                               synapse_controller_bottom,
+	                               SynapseDriverOnHICANN(Y(117), right),
+	                               drow);
 
 	if (auto * reticle = this->get_reticle()) { // Test only for a real hardware test
 		RET->getSC(HCSYN::SYNAPSE_TOP).read_decoder(210, data_bot, data_top);

@@ -211,8 +211,8 @@ class ADCHardwareTest(HWTest):
         decoders[0][int(neuron.x())] = event.getSynapseDecoderMask()
         weights[int(neuron.x())] = weight
 
-        HICANN.set_decoder_double_row(self.h, driver, decoders)
-        HICANN.set_weights_row(self.h, synapse_row, weights)
+        HICANN.set_decoder_double_row(self.h, HICANN.SynapseController() ,driver, decoders)
+        HICANN.set_weights_row(self.h, HICANN.SynapseController(), synapse_row, weights)
 
         ###################
         #  get ADC trace  #

@@ -120,13 +120,13 @@ public:
 	HICANN::SynapseSwitchRow get_syndriver_switch_row(Handle::HICANN const& h, halco::hicann::v2::SynapseSwitchRowOnHICANN const& s);
 
 	//Synapses and Synapse drivers
-	void set_weights_row(Handle::HICANN const& h, halco::hicann::v2::SynapseRowOnHICANN const& s, HICANN::WeightRow const& weights);
-	void set_weights_row(std::vector<boost::shared_ptr<Handle::HICANN> > handles, halco::hicann::v2::SynapseRowOnHICANN const& s, std::vector<HICANN::WeightRow> const& data);
-	HICANN::WeightRow get_weights_row(Handle::HICANN const& h, halco::hicann::v2::SynapseRowOnHICANN const& s);
+	void set_weights_row(Handle::HICANN const& h, HICANN::SynapseController const&, halco::hicann::v2::SynapseRowOnHICANN const& s, HICANN::WeightRow const& weights);
+	void set_weights_row(std::vector<boost::shared_ptr<Handle::HICANN> > handles, std::vector<HICANN::SynapseController> const&, halco::hicann::v2::SynapseRowOnHICANN const& s, std::vector<HICANN::WeightRow> const& data);
+	HICANN::WeightRow get_weights_row(Handle::HICANN const& h, HICANN::SynapseController const&, halco::hicann::v2::SynapseRowOnHICANN const& s);
 
-	void set_decoder_double_row(Handle::HICANN const& h, halco::hicann::v2::SynapseDriverOnHICANN const& s, HICANN::DecoderDoubleRow const& data);
-	void set_decoder_double_row(std::vector<boost::shared_ptr<Handle::HICANN> > handles, halco::hicann::v2::SynapseDriverOnHICANN const& syndrv, std::vector<HICANN::DecoderDoubleRow> const& data);
-	HICANN::DecoderDoubleRow get_decoder_double_row(Handle::HICANN const& h, halco::hicann::v2::SynapseDriverOnHICANN const& s);
+	void set_decoder_double_row(Handle::HICANN const& h, HICANN::SynapseController const&, halco::hicann::v2::SynapseDriverOnHICANN const& s, HICANN::DecoderDoubleRow const& data);
+	void set_decoder_double_row(std::vector<boost::shared_ptr<Handle::HICANN> > handles, std::vector<HICANN::SynapseController> const&, halco::hicann::v2::SynapseDriverOnHICANN const& syndrv, std::vector<HICANN::DecoderDoubleRow> const& data);
+	HICANN::DecoderDoubleRow get_decoder_double_row(Handle::HICANN const& h, HICANN::SynapseController const&, halco::hicann::v2::SynapseDriverOnHICANN const& s);
 
 	void set_synapse_driver(Handle::HICANN const& h, halco::hicann::v2::SynapseDriverOnHICANN const& s, HICANN::SynapseDriver const& drv_row);
 	HICANN::SynapseDriver get_synapse_driver(Handle::HICANN const& h, halco::hicann::v2::SynapseDriverOnHICANN const& s);

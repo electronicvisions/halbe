@@ -132,14 +132,23 @@ def main(args):
                 decoders[ii][jj] = 0xf # blocks L1Addres(0)
             decoders[ii][nrn] = 0
 
-        set_decoder_double_row(hicann, row.toSynapseDriverOnHICANN(), decoders)
+        set_decoder_double_row(hicann,
+                               SynapseController(),
+                               row.toSynapseDriverOnHICANN(),
+                               decoders)
 
         # synapse weights
         weights = WeightRow()
         weights[nrn] = 15
 
-        set_weights_row(hicann, SynapseRowOnHICANN(row.toSynapseDriverOnHICANN(), TOP), weights);
-        set_weights_row(hicann, SynapseRowOnHICANN(row.toSynapseDriverOnHICANN(), BOTTOM), weights);
+        set_weights_row(hicann,
+                        SynapseController(),
+                        SynapseRowOnHICANN(row.toSynapseDriverOnHICANN(), TOP),
+                        weights);
+        set_weights_row(hicann,
+                        SynapseController(),
+                        SynapseRowOnHICANN(row.toSynapseDriverOnHICANN(), BOTTOM),
+                        weights);
 
 
 if __name__ == '__main__':

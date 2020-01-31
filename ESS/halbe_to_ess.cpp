@@ -413,7 +413,7 @@ HICANN::SynapseSwitchRow HAL2ESS::get_syndriver_switch_row(Handle::HICANN const&
 }
 
 //sets the weights for a row of synapses 
-void HAL2ESS::set_weights_row(Handle::HICANN const& h, halco::hicann::v2::SynapseRowOnHICANN const& s, HICANN::WeightRow const& weights)
+void HAL2ESS::set_weights_row(Handle::HICANN const& h, HICANN::SynapseController const&, halco::hicann::v2::SynapseRowOnHICANN const& s, HICANN::WeightRow const& weights)
 {
 	//Calculate the hicann coordinate
 	auto e = h.coordinate().toHICANNOnWafer().toEnum();
@@ -434,15 +434,18 @@ void HAL2ESS::set_weights_row(Handle::HICANN const& h, halco::hicann::v2::Synaps
     }
 }
 
-void HAL2ESS::set_weights_row(std::vector<boost::shared_ptr<Handle::HICANN> > handles, halco::hicann::v2::SynapseRowOnHICANN const& s, std::vector<HICANN::WeightRow> const& data)
+void HAL2ESS::set_weights_row(std::vector<boost::shared_ptr<Handle::HICANN> > handles, std::vector<HICANN::SynapseController> const&, halco::hicann::v2::SynapseRowOnHICANN const& s, std::vector<HICANN::WeightRow> const& data)
 {
 	for (auto v: pythonic::zip(handles, data)) {
-		set_weights_row(*(v.first), s, v.second);
+		// Pass generic SynapseController since not used by function in ESS
+		HICANN::SynapseController synapse_controller;
+		set_weights_row(*(v.first), synapse_controller, s, v.second);
 	}
 }
 
 //gets the weights for a row of synapses from the ESS and the HAL2ESS datastructure
-HICANN::WeightRow HAL2ESS::get_weights_row(Handle::HICANN const& h, halco::hicann::v2::SynapseRowOnHICANN const& s)
+
+HICANN::WeightRow HAL2ESS::get_weights_row(Handle::HICANN const& h, HICANN::SynapseController const&, halco::hicann::v2::SynapseRowOnHICANN const& s)
 {
 	//Calculate the hicann coordinate
 	auto e = h.coordinate().toHICANNOnWafer().toEnum();
@@ -466,7 +469,7 @@ HICANN::WeightRow HAL2ESS::get_weights_row(Handle::HICANN const& h, halco::hican
 }
 
 //sets the decoder-value 
-void HAL2ESS::set_decoder_double_row(Handle::HICANN const& h, halco::hicann::v2::SynapseDriverOnHICANN const& s, HICANN::DecoderDoubleRow const& data)
+void HAL2ESS::set_decoder_double_row(Handle::HICANN const& h, HICANN::SynapseController const&, halco::hicann::v2::SynapseDriverOnHICANN const& s, HICANN::DecoderDoubleRow const& data)
 {
 	//Calculate the hicann coordinate
 	auto e = h.coordinate().toHICANNOnWafer().toEnum();
@@ -494,15 +497,17 @@ void HAL2ESS::set_decoder_double_row(Handle::HICANN const& h, halco::hicann::v2:
 	}
 }
 
-void HAL2ESS::set_decoder_double_row(std::vector<boost::shared_ptr<Handle::HICANN> > handles, halco::hicann::v2::SynapseDriverOnHICANN const& syndrv, std::vector<HICANN::DecoderDoubleRow> const& data)
+void HAL2ESS::set_decoder_double_row(std::vector<boost::shared_ptr<Handle::HICANN> > handles, std::vector<HICANN::SynapseController> const&, halco::hicann::v2::SynapseDriverOnHICANN const& syndrv, std::vector<HICANN::DecoderDoubleRow> const& data)
 {
 	for (auto v: pythonic::zip(handles, data)) {
-		set_decoder_double_row(*(v.first), syndrv, v.second);
+		// Pass generic SynapseController since not used by function in ESS
+		HICANN::SynapseController synapse_controller;
+		set_decoder_double_row(*(v.first), synapse_controller, syndrv, v.second);
 	}
 }
 
 //gets the decoder value
-HICANN::DecoderDoubleRow HAL2ESS::get_decoder_double_row(Handle::HICANN const& h, halco::hicann::v2::SynapseDriverOnHICANN const& s)
+HICANN::DecoderDoubleRow HAL2ESS::get_decoder_double_row(Handle::HICANN const& h, HICANN::SynapseController const&, halco::hicann::v2::SynapseDriverOnHICANN const& s)
 {
 	HICANN::DecoderDoubleRow returnval;
 

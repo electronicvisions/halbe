@@ -332,9 +332,24 @@ def SetRightCrossbarLine(h, vwire, hwire):
 
 # sets a double line of synapses (weights and decoders)
 def SetLeftSynapseDoubleLine(h, syndrvnumber, weightdrow, decoderdrow):
-    HICANN.set_decoder_double_row(h, Coordinate.SynapseDriverOnHICANN(Coordinate.Y(syndrvnumber), Coordinate.left), decoderdrow)
-    HICANN.set_weights_row(h, Coordinate.SynapseRowOnHICANN(Coordinate.SynapseDriverOnHICANN(Coordinate.Y(syndrvnumber), Coordinate.left), Coordinate.top), weightdrow[0]) #top line of a driver
-    HICANN.set_weights_row(h, Coordinate.SynapseRowOnHICANN(Coordinate.SynapseDriverOnHICANN(Coordinate.Y(syndrvnumber), Coordinate.left), Coordinate.bottom), weightdrow[1]) #bottom line of a driver
+
+    # Save according coordinates in variables
+    syndrv_coord = Coordinate.SynapseDriverOnHICANN(Coordinate.Y(syndrvnumber), Coordinate.left)
+    synrow_top = Coordinate.SynapseRowOnHICANN(syndrv_coord, Coordinate.top)
+    synrow_bottom = Coordinate.SynapseRowOnHICANN(syndrv_coord, Coordinate.bottom)
+
+    HICANN.set_decoder_double_row(h,
+                                  HICANN.SynapseController(),
+                                  syndrv_coord,
+                                  decoderdrow)
+    HICANN.set_weights_row(h,
+                           HICANN.SynapseController(),
+                           synrow_top,
+                           weightdrow[0])
+    HICANN.set_weights_row(h,
+                           HICANN.SynapseController(),
+                           synrow_bottom,
+                           weightdrow[1])
     HICANN.flush(h) #flush to hardware
 
 

@@ -26,6 +26,9 @@ namespace HICANN {
 struct sc_write_data
 {
 	unsigned int index;
+	// TODO: Add WDECANDWAIT to be able to distinguish between writing of weights and decoder
+	//       addresses. This is relevant for the number of dummy waits performed.
+	//       For now it is ok to just use write since WRITE and WDEC have the same waiting times.
 	enum access_type
 	{
 		WRITE,
@@ -63,8 +66,10 @@ void wait_by_dummy(
 	HICANN::SynapseConfigurationRegister const& cnfg_reg,
 	size_t num_cycles);
 
-bool popexec_sc_write_data_queue(
-    HMF::Handle::HICANNHw& h, size_t& idx, sc_write_data_queue_t const& data);
+bool popexec_sc_write_data_queue(HMF::Handle::HICANNHw& h,
+                                 SynapseController const& synapse_controller,
+                                 size_t& idx,
+                                 sc_write_data_queue_t const& data);
 
 /** builds neuron builder configuration byte */
 std::bitset<25> nbdata(

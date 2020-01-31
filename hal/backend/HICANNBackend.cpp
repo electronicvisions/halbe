@@ -166,18 +166,21 @@ HALBE_GETTER(SynapseSwitchRow, get_syndriver_switch_row,
 HALBE_SETTER_GUARDED(EventSetupSynapses,
 	set_weights_row,
 	Handle::HICANN &, h,
+	SynapseController const&, synapse_controller,
 	SynapseRowOnHICANN const&, s,
 	WeightRow const&, weights)
 {
 	ReticleControl& reticle = *h.get_reticle();
 	auto& hicann = reticle.hicann[h.jtag_addr()];
 
-	set_weights_row_impl(s, weights, [&hicann](sc_write_data const& instr) {
+	set_weights_row_impl(s, weights, [&hicann, &h, &s, &synapse_controller](sc_write_data const& instr) {
 			SynapseControl& sc = hicann->getSC(instr.index);
 			sc.write_data(instr.addr, instr.data);
 			if (instr.type == sc_write_data::WRITEANDWAIT) {
-				// wait until controller not busy
-				while(sc.arraybusy()) {}
+				wait_by_dummy(h,
+				              s.toSynapseArrayOnHICANN(),
+				              synapse_controller.cnfg_reg,
+				              synapse_controller.cycles_synarray(SynapseControllerCmd::WRITE));
 			}
 		});
 }
@@ -185,13 +188,14 @@ HALBE_SETTER_GUARDED(EventSetupSynapses,
 HALBE_SETTER_GUARDED(EventSetupSynapses,
 	set_weights_row,
 	std::vector<boost::shared_ptr<Handle::HICANN> >, handles,
+	std::vector<SynapseController> const&, synapse_controllers,
 	halco::hicann::v2::SynapseRowOnHICANN const&, s,
 	std::vector<WeightRow> const&, data)
 {
 	const size_t n_hicanns = handles.size();
-	if (data.size() != n_hicanns)
-		throw std::invalid_argument(
-			"set_weights_row: number of handles and data does not match");
+	if (data.size() != n_hicanns || synapse_controllers.size() != n_hicanns)
+		throw std::invalid_argument("set_weights_row: number of handles, "
+		                            "synapse controllers and data does not match");
 
 	// to buffer sc writes...
 	std::vector<sc_write_data_queue_t> per_hicann_queues(n_hicanns);
@@ -212,7 +216,9 @@ HALBE_SETTER_GUARDED(EventSetupSynapses,
 		all_done = true;
 		for (size_t i = 0; i < n_hicanns; ++i)
 			if (popexec_sc_write_data_queue(
-				    dynamic_cast<HMF::Handle::HICANNHw&>(*handles[i]), idxs[i],
+				    dynamic_cast<HMF::Handle::HICANNHw&>(*handles[i]),
+				    synapse_controllers[i],
+				    idxs[i],
 				    per_hicann_queues[i]))
 				all_done = false;
 	}
@@ -220,6 +226,7 @@ HALBE_SETTER_GUARDED(EventSetupSynapses,
 
 HALBE_GETTER(WeightRow, get_weights_row,
 	Handle::HICANN &, h,
+	SynapseController const&, synapse_controller,
 	SynapseRowOnHICANN const&, s)
 {
 	ReticleControl& reticle = *h.get_reticle();
@@ -251,7 +258,10 @@ HALBE_GETTER(WeightRow, get_weights_row,
 	WeightRow returnvalue;
 
 	sc.write_data(facets::SynapseControl::sc_ctrlreg, open_row); //open row for reading
-	while(sc.arraybusy()) {} //wait until controller not busy
+	wait_by_dummy(h,
+	              s.toSynapseArrayOnHICANN(),
+	              synapse_controller.cnfg_reg,
+	              synapse_controller.cycles_synarray(SynapseControllerCmd::START_READ));
 
 	for (size_t colset = 0; colset < 8; colset++){
 		uint32_t read_command = facets::SynapseControl::sc_cmd_read | //put together a read command
@@ -260,7 +270,10 @@ HALBE_GETTER(WeightRow, get_weights_row,
 							(addr << facets::SynapseControl::sc_adr_p);
 
 		sc.write_data(facets::SynapseControl::sc_ctrlreg, read_command); //issue read command
-		while(sc.arraybusy()) {} //wait until not busy
+		wait_by_dummy(h,
+		              s.toSynapseArrayOnHICANN(),
+		              synapse_controller.cnfg_reg,
+		              synapse_controller.cycles_synarray(SynapseControllerCmd::READ));
 
 		for (size_t i = 0; i < 4; i++){ //single chunks in the columnset
 			std::bitset<32> sd = sc.read_data(facets::SynapseControl::sc_synout+i);
@@ -273,7 +286,10 @@ HALBE_GETTER(WeightRow, get_weights_row,
 	}
 
 	sc.write_data(facets::SynapseControl::sc_ctrlreg, close_row); //close row
-	while(sc.arraybusy()) {} //wait until not busy
+	wait_by_dummy(h,
+	              s.toSynapseArrayOnHICANN(),
+	              synapse_controller.cnfg_reg,
+	              synapse_controller.cycles_synarray(SynapseControllerCmd::CLOSE_ROW));
 	return returnvalue;
 }
 
@@ -281,18 +297,21 @@ HALBE_GETTER(WeightRow, get_weights_row,
 HALBE_SETTER_GUARDED(EventSetupSynapses,
 	set_decoder_double_row,
 	Handle::HICANN &, h,
+	SynapseController const&, synapse_controller,
 	SynapseDriverOnHICANN const&, s,
 	DecoderDoubleRow const&, data)
 {
 	ReticleControl& reticle = *h.get_reticle();
 	auto& hicann = reticle.hicann[h.jtag_addr()];
 
-	set_decoder_double_row_impl(s, data, [&hicann](sc_write_data const& instr) {
+	set_decoder_double_row_impl(s, data, [&hicann, &h, &s, &synapse_controller](sc_write_data const& instr) {
 			SynapseControl& sc = hicann->getSC(instr.index);
 			sc.write_data(instr.addr, instr.data);
 			if (instr.type == sc_write_data::WRITEANDWAIT) {
-				// wait until controller not busy
-				while(sc.arraybusy()) {}
+				wait_by_dummy(h,
+				              s.toSynapseArrayOnHICANN(),
+				              synapse_controller.cnfg_reg,
+				              synapse_controller.cycles_synarray(SynapseControllerCmd::WDEC));
 			}
 		});
 }
@@ -300,13 +319,14 @@ HALBE_SETTER_GUARDED(EventSetupSynapses,
 HALBE_SETTER_GUARDED(EventSetupSynapses,
 	set_decoder_double_row,
 	std::vector<boost::shared_ptr<Handle::HICANN> >, handles,
+	std::vector<SynapseController> const&, synapse_controllers,
 	halco::hicann::v2::SynapseDriverOnHICANN const&, syndrv,
 	std::vector<DecoderDoubleRow> const&, data)
 {
 	const size_t n_hicanns = handles.size();
-	if (data.size() != n_hicanns)
-		throw std::invalid_argument(
-			"set_decoder_double_row: number of handles and data does not match");
+	if (data.size() != n_hicanns || synapse_controllers.size() != n_hicanns)
+		throw std::invalid_argument("set_decoder_double_row: number of handles, "
+		                            "synapse controllers and data does not match");
 
 	// to buffer sc writes...
 	std::vector<sc_write_data_queue_t> per_hicann_queues(n_hicanns);
@@ -327,7 +347,9 @@ HALBE_SETTER_GUARDED(EventSetupSynapses,
 		all_done = true;
 		for (size_t i = 0; i < n_hicanns; ++i)
 			if (popexec_sc_write_data_queue(
-				    dynamic_cast<HMF::Handle::HICANNHw&>(*handles[i]), idxs[i],
+				    dynamic_cast<HMF::Handle::HICANNHw&>(*handles[i]),
+				    synapse_controllers[i],
+				    idxs[i],
 				    per_hicann_queues[i]))
 				all_done = false;
 	}
@@ -335,6 +357,7 @@ HALBE_SETTER_GUARDED(EventSetupSynapses,
 
 HALBE_GETTER(DecoderDoubleRow, get_decoder_double_row,
 	Handle::HICANN &, h,
+	SynapseController const&, synapse_controller,
 	SynapseDriverOnHICANN const&, s)
 {
 	ReticleControl& reticle = *h.get_reticle();
@@ -373,7 +396,10 @@ HALBE_GETTER(DecoderDoubleRow, get_decoder_double_row,
 	std::array<std::array<std::bitset<32>, 32>, 2> hwdata; //temporary data read from hardware
 	for (size_t ROW = TOP; ROW <= BOT; ROW++){ //loop over top/bottom rows
 		sc.write_data(facets::SynapseControl::sc_ctrlreg, open_row[ROW]); //open row for reading
-		while(sc.arraybusy()) {} //wait until controller not busy
+		wait_by_dummy(h,
+		              s.toSynapseArrayOnHICANN(),
+		              synapse_controller.cnfg_reg,
+		              synapse_controller.cycles_synarray(SynapseControllerCmd::START_RDEC));
 
 		for (size_t colset = 0; colset < 8; colset++){
 			uint32_t read_command = facets::SynapseControl::sc_cmd_rdec | //put together a read command
@@ -382,14 +408,20 @@ HALBE_GETTER(DecoderDoubleRow, get_decoder_double_row,
 								(addr[ROW] << facets::SynapseControl::sc_adr_p);
 
 			sc.write_data(facets::SynapseControl::sc_ctrlreg, read_command); //issue read command
-			while(sc.arraybusy()) {} //wait until not busy
+			wait_by_dummy(h,
+			              s.toSynapseArrayOnHICANN(),
+			              synapse_controller.cnfg_reg,
+			              synapse_controller.cycles_synarray(SynapseControllerCmd::RDEC));
 
 			for (size_t i = 0; i < 4; i++) //save single chunks in the columnset to the temporary container
 				hwdata[ROW][8*i + colset] = sc.read_data(facets::SynapseControl::sc_synout+i);
 		}
 
 		sc.write_data(facets::SynapseControl::sc_ctrlreg, close_row[ROW]); //close row
-		while(sc.arraybusy()) {} //wait until not busy
+		wait_by_dummy(h,
+		              s.toSynapseArrayOnHICANN(),
+		              synapse_controller.cnfg_reg,
+		              synapse_controller.cycles_synarray(SynapseControllerCmd::CLOSE_ROW));
 	}
 
 	//"unwrap" the hardware data by swapping bits in the correct order

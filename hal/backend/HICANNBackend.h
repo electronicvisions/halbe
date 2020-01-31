@@ -61,6 +61,7 @@ SynapseSwitchRow get_syndriver_switch_row(
  */
 void set_weights_row(
 	Handle::HICANN & h,
+	SynapseController const& synapse_controller,
 	halco::hicann::v2::SynapseRowOnHICANN const& s,
 	WeightRow const& weights);
 
@@ -74,12 +75,14 @@ void set_weights_row(
  */
 void set_weights_row(
 	std::vector<boost::shared_ptr<Handle::HICANN> > handles,
+	std::vector<SynapseController> const& synapse_controllers,
 	halco::hicann::v2::SynapseRowOnHICANN const& s,
 	std::vector<WeightRow> const& data);
 #endif // !PYPLUSPLUS
 
 WeightRow get_weights_row(
 	Handle::HICANN & h,
+	SynapseController const& synapse_controller,
 	halco::hicann::v2::SynapseRowOnHICANN const& s);
 
 
@@ -91,6 +94,7 @@ WeightRow get_weights_row(
  */
 void set_decoder_double_row(
 	Handle::HICANN & h,
+	SynapseController const& synapse_controller,
 	halco::hicann::v2::SynapseDriverOnHICANN const& s,
 	DecoderDoubleRow const& data);
 
@@ -104,12 +108,14 @@ void set_decoder_double_row(
  */
 void set_decoder_double_row(
 	std::vector<boost::shared_ptr<Handle::HICANN> > handles,
+	std::vector<SynapseController> const& synapse_controllers,
 	halco::hicann::v2::SynapseDriverOnHICANN const& syndrv,
 	std::vector<DecoderDoubleRow> const& data);
 #endif // !PYPLUSPLUS
 
 DecoderDoubleRow get_decoder_double_row(
 	Handle::HICANN & h,
+	SynapseController const& synapse_controller,
 	halco::hicann::v2::SynapseDriverOnHICANN const& s);
 
 

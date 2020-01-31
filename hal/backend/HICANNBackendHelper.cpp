@@ -155,13 +155,18 @@ void wait_by_dummy(
 	size_t const min_cycles_per_packet = 2;
 	size_t const num_dummys = std::ceil(num_cycles / (float)min_cycles_per_packet);
 
+	LOG4CXX_DEBUG(logger, short_format(h.coordinate()) << " " << synarray
+	                      <<": Perform " << num_dummys << " dummy waits");
+
 	for (size_t i = 0; i < num_dummys; ++i) {
 		set_syn_cnfg(h, synarray, cnfg_reg);
 	}
 }
 
-bool popexec_sc_write_data_queue(
-    HMF::Handle::HICANNHw& h, size_t& idx, sc_write_data_queue_t const& data)
+bool popexec_sc_write_data_queue(HMF::Handle::HICANNHw& h,
+                                 SynapseController const& synapse_controller,
+                                 size_t& idx,
+                                 sc_write_data_queue_t const& data)
 {
 	using namespace facets;
 
@@ -183,9 +188,15 @@ bool popexec_sc_write_data_queue(
 				// busy wait (and not write, see below).
 				break;
 		}
-	} else if (data[idx].type == sc_write_data::WRITEANDWAIT) { // it's a ARRAYBUSY check, do it...
-		SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(data[idx].index);
-		while(sc.arraybusy());
+	} else if (data[idx].type == sc_write_data::WRITEANDWAIT) {
+		// Just wait at this point. Data was already written in if-statement
+		wait_by_dummy(h,
+		              SynapseArrayOnHICANN(data[idx].index),
+		              synapse_controller.cnfg_reg,
+		              synapse_controller.cycles_synarray(SynapseControllerCmd::WRITE));
+		// TODO: Differentiate between WRITE (writing of weights) and WDEC (writing of decoder
+		//       addresses). For now it is ok to just use write since WRITE and WDEC have the
+		//       same waiting times.
 		idx++;
 	} else {
 		throw std::runtime_error("Cannot happen on " + short_format(h.coordinate()));
