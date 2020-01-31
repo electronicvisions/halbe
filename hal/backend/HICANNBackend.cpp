@@ -198,50 +198,42 @@ HALBE_GETTER(WeightRow, get_weights_row,
 {
 	ReticleControl& reticle = *h.get_reticle();
 
-	//calculate the correct hardware address of the line and choose the synapse block instance
-	uint32_t addr = 0;
-	HicannCtrl::Synapse index;
-	const SynapseDriverOnHICANN drv = s.toSynapseDriverOnHICANN();
-
-	if (drv.line() < 112) { //upper half of ANNCORE
-		addr = 223-(drv.line()*2) - (s.toRowOnSynapseDriver() == top ? 0 : 1);
-		index = HicannCtrl::SYNAPSE_TOP;
-	}
-	else {  //lower half of ANNCORE
-		addr = (drv.line()-112)*2 + (s.toRowOnSynapseDriver() == top ? 0 : 1); /// top/bottom here is geometrical, not hardware!
-		index = HicannCtrl::SYNAPSE_BOTTOM;
-	}
+	HicannCtrl::Synapse const index =
+	    s.toSynapseArrayOnHICANN().isTop() ? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM;
 
 	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
 
-	//read the data from hardware: columnset-wise
-	uint32_t open_row = facets::SynapseControl::sc_cmd_st_rd | //put together an "open row" command
-				(1 << facets::SynapseControl::sc_newcmd_p) |
-				(addr << facets::SynapseControl::sc_adr_p);
-	uint32_t close_row = facets::SynapseControl::sc_cmd_close | //put together a "close row" command
-				(1 << facets::SynapseControl::sc_newcmd_p) |
-				(addr << facets::SynapseControl::sc_adr_p);
+	// open row
+	SynapseControlRegister open_row = synapse_controller.ctrl_reg;
+	open_row.newcmd = true;
+	open_row.row = s.toSynapseRowOnArray();
+	open_row.cmd = SynapseControllerCmd::START_READ;
 
-	WeightRow returnvalue;
-
-	sc.write_data(facets::SynapseControl::sc_ctrlreg, open_row); //open row for reading
+	set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), open_row);
 	wait_by_dummy(h,
 	              s.toSynapseArrayOnHICANN(),
 	              synapse_controller.cnfg_reg,
-	              synapse_controller.cycles_synarray(SynapseControllerCmd::START_READ));
+	              synapse_controller.cycles_synarray(open_row.cmd));
 
-	for (size_t colset = 0; colset < 8; colset++){
-		uint32_t read_command = facets::SynapseControl::sc_cmd_read | //put together a read command
-							(colset << facets::SynapseControl::sc_colset_p) |
-							(1 << facets::SynapseControl::sc_newcmd_p) |
-							(addr << facets::SynapseControl::sc_adr_p);
+	// put together a read command
+	SynapseControlRegister read_row = synapse_controller.ctrl_reg;
+	read_row.newcmd = true;
+	read_row.row = s.toSynapseRowOnArray();
+	read_row.cmd = SynapseControllerCmd::READ;
 
-		sc.write_data(facets::SynapseControl::sc_ctrlreg, read_command); //issue read command
+	WeightRow returnvalue;
+
+	for (size_t colset = SynapseSel::min; colset != SynapseSel::end; ++colset) {
+		read_row.sel = SynapseSel(colset);
+
+		// issue read command
+		set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), read_row);
 		wait_by_dummy(h,
 		              s.toSynapseArrayOnHICANN(),
 		              synapse_controller.cnfg_reg,
-		              synapse_controller.cycles_synarray(SynapseControllerCmd::READ));
+		              synapse_controller.cycles_synarray(read_row.cmd));
 
+		// read data back from SYNOUT
 		for (size_t i = 0; i < 4; i++){ //single chunks in the columnset
 			std::bitset<32> sd = sc.read_data(facets::SynapseControl::sc_synout+i);
 			sd = bit::reverse(sd); // first "copy"
@@ -252,11 +244,19 @@ HALBE_GETTER(WeightRow, get_weights_row,
 		}
 	}
 
-	sc.write_data(facets::SynapseControl::sc_ctrlreg, close_row); //close row
+	// close row
+	SynapseControlRegister close_row = open_row;
+	close_row.cmd = SynapseControllerCmd::CLOSE_ROW;
+
+	set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), close_row);
 	wait_by_dummy(h,
 	              s.toSynapseArrayOnHICANN(),
 	              synapse_controller.cnfg_reg,
-	              synapse_controller.cycles_synarray(SynapseControllerCmd::CLOSE_ROW));
+	              synapse_controller.cycles_synarray(close_row.cmd));
+
+	//restore initial state
+	set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), synapse_controller.ctrl_reg);
+
 	return returnvalue;
 }
 
