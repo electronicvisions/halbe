@@ -170,7 +170,9 @@ def build(bld):
         's2hal_obj',
         'tud_jtag',
         'rcf-boost-only',
-        'visions-slurm_inc'
+        'visions-slurm_inc',
+        'halco_hicann_v2',
+        'pywrap'
     ]
     bld.shlib(
         target          = 'halbe_handle',
