@@ -143,7 +143,7 @@ def build(bld):
             export_includes = ['.'],
         )
 
-        uses = [ 'halbe_container', 'halbe_handle_inc', 'hmf_calibration', 'ncsc_model', 'systemsim', 'ESS_inc','logger_obj', 'euter_inc']
+        uses = [ 'halbe_container', 'halbe_handle_inc', 'hmf_calibration', 'ncsc_model', 'systemsim', 'ESS_inc','logger_obj', 'euter']
         srcs = bld.path.ant_glob('ESS/*.cpp')
         bld.shlib(
             target          = 'ESS',
@@ -156,7 +156,7 @@ def build(bld):
         bld.objects(
             target          = 'halbe_ess_obj',
             source          = bld.path.ant_glob('hal/Handle/**/*Ess.cpp'),
-            use             = ['ESS', 'halbe_handle_inc', 'euter_inc'],
+            use             = ['ESS', 'halbe_handle_inc', 'euter'],
             includes        = ['.'],
             export_defines  = ['HAVE_ESS=1'],
             cxxflags=cxxflags + ['-fPIC']
