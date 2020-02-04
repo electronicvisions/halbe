@@ -194,7 +194,7 @@ class ADCHardwareTest(HWTest):
         drv[bottom].set_syn_in(left, exc)
         drv[bottom].set_syn_in(right, inh)
 
-        HICANN.set_synapse_driver(self.h, driver, drv)
+        HICANN.set_synapse_driver(self.h, HICANN.SynapseController(), driver, drv)
 
         decoders = HICANN.DecoderDoubleRow()
         weights = HICANN.WeightRow()

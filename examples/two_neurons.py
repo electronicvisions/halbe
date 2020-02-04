@@ -119,7 +119,7 @@ def main(args):
         rconfig.set_syn_in(LEFT, 1)
         driver[TOP] = driver[BOTTOM] = rconfig
 
-        set_synapse_driver(hicann, row.toSynapseDriverOnHICANN(), driver);
+        set_synapse_driver(hicann, SynapseController(), row.toSynapseDriverOnHICANN(), driver);
 
         # Synapses
 

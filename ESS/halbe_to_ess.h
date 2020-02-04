@@ -128,8 +128,13 @@ public:
 	void set_decoder_double_row(std::vector<boost::shared_ptr<Handle::HICANN> > handles, std::vector<HICANN::SynapseController> const&, halco::hicann::v2::SynapseDriverOnHICANN const& syndrv, std::vector<HICANN::DecoderDoubleRow> const& data);
 	HICANN::DecoderDoubleRow get_decoder_double_row(Handle::HICANN const& h, HICANN::SynapseController const&, halco::hicann::v2::SynapseDriverOnHICANN const& s);
 
-	void set_synapse_driver(Handle::HICANN const& h, halco::hicann::v2::SynapseDriverOnHICANN const& s, HICANN::SynapseDriver const& drv_row);
-	HICANN::SynapseDriver get_synapse_driver(Handle::HICANN const& h, halco::hicann::v2::SynapseDriverOnHICANN const& s);
+	void set_synapse_driver(Handle::HICANN const& h,
+	                        HICANN::SynapseController const&,
+	                        halco::hicann::v2::SynapseDriverOnHICANN const& s,
+	                        HICANN::SynapseDriver const& drv_row);
+	HICANN::SynapseDriver get_synapse_driver(Handle::HICANN const& h,
+	                                         HICANN::SynapseController const&,
+	                                         halco::hicann::v2::SynapseDriverOnHICANN const& s);
 
 	//Setting the Neurons
 	void set_denmem_quad(Handle::HICANN const& h, halco::hicann::v2::QuadOnHICANN qb, HICANN::NeuronQuad const& nquad);

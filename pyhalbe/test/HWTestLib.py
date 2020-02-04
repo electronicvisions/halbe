@@ -369,7 +369,10 @@ def ConfigLeftDriver(h, drvnumber, mirror, listen, gmaxdiv, topex, topin, botex,
             driver[yy].set_gmax(0)
 
     # set_synapse_driver includes toggling the drivers DLL
-    HICANN.set_synapse_driver(h, Coordinate.SynapseDriverOnHICANN(Coordinate.Y(drvnumber), Coordinate.left), driver)
+    HICANN.set_synapse_driver(h,
+                              HICANN.SynapseController(),
+                              Coordinate.SynapseDriverOnHICANN(Coordinate.Y(drvnumber), Coordinate.left),
+                              driver)
     HICANN.flush(h) #flush to hardware
 
 

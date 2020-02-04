@@ -335,6 +335,7 @@ HALBE_GETTER(DecoderDoubleRow, get_decoder_double_row,
 HALBE_SETTER_GUARDED(EventSetupL1,
 	set_synapse_driver,
 	Handle::HICANN &, h,
+	SynapseController const&, synapse_controller,
 	SynapseDriverOnHICANN const&, s,
 	SynapseDriver const&, driver)
 {
@@ -408,27 +409,33 @@ HALBE_SETTER_GUARDED(EventSetupL1,
 		}
 	}
 
+	auto wait_dummy_write = [&h, &s, &synapse_controller]() {
+		wait_by_dummy(
+		    h, s.toSynapseArrayOnHICANN(), synapse_controller.cnfg_reg,
+		    synapse_controller.syndrv_timings.cycles_write());
+	};
+
 	//write gmax divisors
-	while(sc.driverbusy()) {}
 	sc.write_data(facets::SynapseControl::sc_engmax+addr[BOT], gmaxfrac[BOT].to_ulong());
-	while(sc.driverbusy()) {}
+	wait_dummy_write();
 	sc.write_data(facets::SynapseControl::sc_engmax+addr[TOP], gmaxfrac[TOP].to_ulong());
+	wait_dummy_write();
 	//write preouts
-	while(sc.driverbusy()) {}
 	sc.write_data(facets::SynapseControl::sc_endrv+addr[BOT], preouts[bottom].to_ulong());
-	while(sc.driverbusy()) {}
+	wait_dummy_write();
 	sc.write_data(facets::SynapseControl::sc_endrv+addr[TOP], preouts[top].to_ulong());
+	wait_dummy_write();
 	//write driver configuration registers
-	while(sc.driverbusy()) {}
 	sc.write_data(facets::SynapseControl::sc_encfg+addr[BOT], hwconfig[BOT].to_ulong());
-	while(sc.driverbusy()) {}
+	wait_dummy_write();
 	sc.write_data(facets::SynapseControl::sc_encfg+addr[TOP], hwconfig[TOP].to_ulong());
-	while (sc.driverbusy()) {}
+	wait_dummy_write();
 }
 
 
 HALBE_GETTER(SynapseDriver, get_synapse_driver,
 	Handle::HICANN &, h,
+	SynapseController const&, synapse_controller,
 	SynapseDriverOnHICANN const&, s)
 {
 	ReticleControl& reticle = *h.get_reticle();
@@ -457,14 +464,25 @@ HALBE_GETTER(SynapseDriver, get_synapse_driver,
 		throw std::runtime_error("get_synapse_driver: synapse controller must not be busy");
 	}
 
+	auto wait_dummy_read = [&h, &s, &synapse_controller]() {
+		wait_by_dummy(
+		    h, s.toSynapseArrayOnHICANN(), synapse_controller.cnfg_reg,
+		    synapse_controller.syndrv_timings.cycles_read());
+	};
+
 	//read out the hardware registers
 	std::array<std::bitset<16>, 2> cnfg, pdrv, gmax;
 	for (size_t i = std::min(TOP, BOT); i <= std::max(TOP, BOT); i++) { //TOP/BOT
 		sc.read_data(facets::SynapseControl::sc_encfg+addr[i]);           // trigger read cycle
+		wait_dummy_read();
 		cnfg[i] = sc.read_data(facets::SynapseControl::sc_encfg+addr[i]); // retrieve read data
+
 		sc.read_data(facets::SynapseControl::sc_endrv+addr[i]);           // trigger
+		wait_dummy_read();
 		pdrv[i] = sc.read_data(facets::SynapseControl::sc_endrv+addr[i]); // retrieve
+
 		sc.read_data(facets::SynapseControl::sc_engmax+addr[i]);          // trigger
+		wait_dummy_read();
 		gmax[i] = sc.read_data(facets::SynapseControl::sc_engmax+addr[i]); // retrieve
 	}
 

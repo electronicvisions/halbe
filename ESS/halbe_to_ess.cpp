@@ -537,7 +537,10 @@ HICANN::DecoderDoubleRow HAL2ESS::get_decoder_double_row(Handle::HICANN const& h
 }
 
 //sets a synapse-row -> synapse driver and the two corresponding rows
-void HAL2ESS::set_synapse_driver(Handle::HICANN const& h, halco::hicann::v2::SynapseDriverOnHICANN const& s, HICANN::SynapseDriver const& drv_row)
+void HAL2ESS::set_synapse_driver(Handle::HICANN const& h,
+                                 HICANN::SynapseController const&,
+                                 halco::hicann::v2::SynapseDriverOnHICANN const& s,
+                                 HICANN::SynapseDriver const& drv_row)
 {
 	//Calculate the hicann coordinate
 	auto e = h.coordinate().toHICANNOnWafer().toEnum();
@@ -676,7 +679,9 @@ void HAL2ESS::set_synapse_driver(Handle::HICANN const& h, halco::hicann::v2::Syn
 
 
 //gets the configuration of a synapse driver and the two corresponding synrows
-HICANN::SynapseDriver HAL2ESS::get_synapse_driver(Handle::HICANN const& h, halco::hicann::v2::SynapseDriverOnHICANN const& s)
+HICANN::SynapseDriver HAL2ESS::get_synapse_driver(Handle::HICANN const& h,
+                                                  HICANN::SynapseController const&,
+                                                  halco::hicann::v2::SynapseDriverOnHICANN const& s)
 {
 	//Calculate the hicann coordinate
 	auto e = h.coordinate().toHICANNOnWafer().toEnum();

@@ -132,8 +132,9 @@ DecoderDoubleRow get_decoder_double_row(
 /**
  * Configures a synapse driver.
  *
- * @param s       SynapseDriver address
- * @param drv_row config data
+ * @param synapse_controller  SynapseController of the corresponding synapse array
+ * @param s                   SynapseDriver address
+ * @param drv_row             config data
  *
  * @note  Two rows of synapse configurations are written to the hardware. Note that
  *        these rows are characterized as "top" and "bottom" from the geometrical
@@ -145,11 +146,13 @@ DecoderDoubleRow get_decoder_double_row(
  */
 void set_synapse_driver(
 	Handle::HICANN & h,
+	SynapseController const& synapse_controller,
 	halco::hicann::v2::SynapseDriverOnHICANN const& s,
 	SynapseDriver const& drv_row);
 
 SynapseDriver get_synapse_driver(
 	Handle::HICANN & h,
+	SynapseController const& synapse_controller,
 	halco::hicann::v2::SynapseDriverOnHICANN const& s);
 
 

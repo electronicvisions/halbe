@@ -136,6 +136,7 @@ TYPED_TEST(HICANNBackendTest, SynapseDriverHWTest) {
 	size_t const N = 2;
 	for (size_t iter=0; iter<N; ++iter)
 	{
+		HICANN::SynapseController synapse_controller;
 		for (size_t drv=0; drv<224; ++drv)
 		{
 			HICANN::SynapseDriver driver;
@@ -162,8 +163,13 @@ TYPED_TEST(HICANNBackendTest, SynapseDriverHWTest) {
 			driver.stp_mode             = rand() % 2;
 
 
-			HICANN::set_synapse_driver(this->h, SynapseDriverOnHICANN(Enum(drv)), driver);
-			auto ret = HICANN::get_synapse_driver(this->h, SynapseDriverOnHICANN(Enum(drv)));
+			HICANN::set_synapse_driver(this->h,
+			                           synapse_controller,
+			                           SynapseDriverOnHICANN(Enum(drv)),
+			                           driver);
+			auto ret = HICANN::get_synapse_driver(this->h,
+			                                      synapse_controller,
+			                                      SynapseDriverOnHICANN(Enum(drv)));
 			ASSERT_GETTER_EQ(driver, ret);
 		}
 	}
@@ -1052,8 +1058,16 @@ TYPED_TEST(HICANNBackendTest, WriteSynapseDriverHWTest) {
 	driver.stp_enable           = 0;
 	driver.stp_mode             = 1;
 
-	HICANN::set_synapse_driver(this->h, SynapseDriverOnHICANN(Y(25), halco::common::left), driver);
-	HICANN::set_synapse_driver(this->h, SynapseDriverOnHICANN(Y(121), halco::common::right), driver);
+	HICANN::SynapseController synapse_controller_top;
+	HICANN::SynapseController synapse_controller_bottom;
+	HICANN::set_synapse_driver(this->h,
+	                           synapse_controller_top,
+	                           SynapseDriverOnHICANN(Y(25), halco::common::left),
+	                           driver);
+	HICANN::set_synapse_driver(this->h,
+	                           synapse_controller_bottom,
+	                           SynapseDriverOnHICANN(Y(121), halco::common::right),
+	                           driver);
 
 	if (auto * reticle = this->get_reticle()) { // Test only for a real hardware test
 		RET->getSC(HCSYN::SYNAPSE_TOP).read_driver(172, cfgbot, pdrvbot, gmaxbot, cfgtop, pdrvtop, gmaxtop);
