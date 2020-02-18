@@ -32,7 +32,7 @@ namespace HMF {
 
 namespace FPGA {
 
-HALBE_SETTER_GUARDED(EventSystemStartup,
+HALBE_SETTER(
 	reset,
 	Handle::FPGA &, f)
 {
@@ -40,7 +40,7 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 }
 
 
-HALBE_SETTER_GUARDED(EventSystemStartup,
+HALBE_SETTER(
 	reset,
 	Handle::FPGA &, f,
 	Reset const&, r)
@@ -237,7 +237,7 @@ HALBE_SETTER_GUARDED(EventSystemStartup,
 	}
 }
 
-HALBE_SETTER_GUARDED(EventStartExperiment,
+HALBE_SETTER(
 	init,
 	Handle::FPGA &, f,
 	bool const, zero_synapses)
@@ -383,7 +383,7 @@ HALBE_SETTER(
 	}
 }
 
-HALBE_SETTER_GUARDED(EventSetupL2,
+HALBE_SETTER(
 	set_fpga_background_generator,
 	Handle::FPGA &, f,
 	halco::hicann::v2::DNCOnFPGA const, d,
@@ -400,7 +400,7 @@ HALBE_SETTER_GUARDED(EventSetupL2,
 }
 
 // TODO: uint16_t is ugly!
-HALBE_SETTER_GUARDED(EventSetupL2,
+HALBE_SETTER(
 	write_playback_program,
 	Handle::FPGA &, f,
 	PulseEventContainer const&, st,
@@ -741,7 +741,7 @@ HALBE_GETTER(PulseEventContainer::container_type, read_trace_pulses,
 }
 
 
-HALBE_SETTER_GUARDED(EventStartExperiment,
+HALBE_SETTER(
 	set_spinnaker_receive_port,
 	Handle::FPGA &, f,
     uint16_t, port) {
@@ -751,7 +751,7 @@ HALBE_SETTER_GUARDED(EventStartExperiment,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL2,
+HALBE_SETTER(
 	set_spinnaker_routing_table,
      Handle::FPGA &, f,
      SpinnRoutingTable const&, spinn_routing_table
@@ -765,7 +765,7 @@ HALBE_SETTER_GUARDED(EventSetupL2,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL2,
+HALBE_SETTER(
 	set_spinnaker_pulse_upsampler,
 	Handle::FPGA &, f,
 	size_t, upsample_count) {
@@ -775,7 +775,7 @@ HALBE_SETTER_GUARDED(EventSetupL2,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL2,
+HALBE_SETTER(
 	set_spinnaker_pulse_downsampler,
 	Handle::FPGA &, f,
 	size_t, downsample_count) {
@@ -785,7 +785,7 @@ HALBE_SETTER_GUARDED(EventSetupL2,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL2,
+HALBE_SETTER(
 	add_spinnaker_pulse,
 	Handle::FPGA &, f,
 	SpinnInputAddress_t const&, spinn_address) {
@@ -794,7 +794,7 @@ HALBE_SETTER_GUARDED(EventSetupL2,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL2,
+HALBE_SETTER(
 	send_spinnaker_pulses,
 	Handle::FPGA &, f) {
 	SpinnController & sc = f.get_spinn_controller();
@@ -812,7 +812,7 @@ HALBE_GETTER(SpinnOutputAddress_t, get_received_spinnaker_pulse,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL2,
+HALBE_SETTER(
 	set_spinnaker_sender_config,
 	Handle::FPGA &, f,
 	SpinnSenderConfig const&, cfg) {
@@ -822,7 +822,7 @@ HALBE_SETTER_GUARDED(EventSetupL2,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL2,
+HALBE_SETTER(
 	set_spinnaker_address_config,
 	Handle::FPGA &, f,
 	SpinnAddressConfig const&, cfg
@@ -839,7 +839,7 @@ HALBE_SETTER_GUARDED(EventSetupL2,
 }
 
 
-HALBE_SETTER_GUARDED(EventStartExperiment,
+HALBE_SETTER(
 	send_realtime_pulse,
 	Handle::FPGA &, f,
 	SpinnInputAddress_t, spinn_address
@@ -848,7 +848,7 @@ HALBE_SETTER_GUARDED(EventStartExperiment,
 }
 
 
-HALBE_SETTER_GUARDED(EventStartExperiment,
+HALBE_SETTER(
 	queue_spinnaker_realtime_pulse,
 	Handle::FPGA &, f,
 	Realtime::spike_h, s
@@ -859,7 +859,7 @@ HALBE_SETTER_GUARDED(EventStartExperiment,
 }
 
 
-HALBE_SETTER_GUARDED(EventStartExperiment,
+HALBE_SETTER(
 	send_spinnaker_realtime_pulse,
 	Handle::FPGA &, f,
 	Realtime::spike_h, s
@@ -870,7 +870,7 @@ HALBE_SETTER_GUARDED(EventStartExperiment,
 }
 
 
-HALBE_SETTER_GUARDED(EventStartExperiment,
+HALBE_SETTER(
 	send_custom_realtime_pulse,
 	Handle::FPGA &, f,
 	Realtime::spike, s

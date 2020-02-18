@@ -41,11 +41,10 @@ namespace HICANN {
 
 /* macro usage:
  * HALBE_SETTER( function name, type1, variable name1, type2, variable name2, ... ) { }
- * HALBE_SETTER_GUARDED( configuration state event, function name, type1, variable name1, ... ) { }
  * HALBE_GETTER( return type, function name, type1, variable name1, type2, variable name2, ... ) { }
  */
 
-HALBE_SETTER_GUARDED(EventSetupL1,
+HALBE_SETTER(
 	set_crossbar_switch_row,
 	Handle::HICANN & , h,
 	HLineOnHICANN const&, y,
@@ -98,7 +97,7 @@ HALBE_GETTER(HICANN::CrossbarRow, get_crossbar_switch_row,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL1,
+HALBE_SETTER(
 	set_syndriver_switch_row,
 	Handle::HICANN &, h,
 	SynapseSwitchRowOnHICANN const&, s,
@@ -164,7 +163,7 @@ HALBE_GETTER(SynapseSwitchRow, get_syndriver_switch_row,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupSynapses,
+HALBE_SETTER(
 	set_weights_row,
 	Handle::HICANN &, h,
 	SynapseController const&, synapse_controller,
@@ -174,7 +173,7 @@ HALBE_SETTER_GUARDED(EventSetupSynapses,
 	set_weights_row_impl(h, synapse_controller, s, weights);
 }
 
-HALBE_SETTER_GUARDED(EventSetupSynapses,
+HALBE_SETTER(
 	set_weights_row,
 	std::vector<boost::shared_ptr<Handle::HICANN> >, handles,
 	std::vector<SynapseController> const&, synapse_controllers,
@@ -245,7 +244,7 @@ HALBE_GETTER(WeightRow, get_weights_row,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupSynapses,
+HALBE_SETTER(
 	set_decoder_double_row,
 	Handle::HICANN &, h,
 	SynapseController const&, synapse_controller,
@@ -255,7 +254,7 @@ HALBE_SETTER_GUARDED(EventSetupSynapses,
 	set_decoder_double_row_impl(h, synapse_controller, s, data);
 }
 
-HALBE_SETTER_GUARDED(EventSetupSynapses,
+HALBE_SETTER(
 	set_decoder_double_row,
 	std::vector<boost::shared_ptr<Handle::HICANN> >, handles,
 	std::vector<SynapseController> const&, synapse_controllers,
@@ -332,7 +331,7 @@ HALBE_GETTER(DecoderDoubleRow, get_decoder_double_row,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL1,
+HALBE_SETTER(
 	set_synapse_driver,
 	Handle::HICANN &, h,
 	SynapseController const&, synapse_controller,
@@ -526,7 +525,7 @@ HALBE_GETTER(SynapseDriver, get_synapse_driver,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL1,
+HALBE_SETTER(
 	set_denmem_quad,
 	Handle::HICANN &, h,
 	QuadOnHICANN const&, qb,
@@ -575,7 +574,7 @@ HALBE_GETTER(NeuronQuad, get_denmem_quad,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL1,
+HALBE_SETTER(
 	set_neuron_config,
 	Handle::HICANN &, h,
 	NeuronConfig const&, nblock)
@@ -652,8 +651,7 @@ HALBE_GETTER(NeuronConfig, get_neuron_config,
 }
 
 
-HALBE_GETTER_GUARDED(HICANN::FGErrorResultRow,
-	EventSetupFG,
+HALBE_GETTER(HICANN::FGErrorResultRow,
 	wait_fg,
 	Handle::HICANN &, h,
 	FGBlockOnHICANN const&, b)
@@ -662,8 +660,7 @@ HALBE_GETTER_GUARDED(HICANN::FGErrorResultRow,
 }
 
 
-HALBE_GETTER_GUARDED(HICANN::FGErrorResultQuadRow,
-	EventSetupFG,
+HALBE_GETTER(HICANN::FGErrorResultQuadRow,
 	wait_fg,
 	Handle::HICANN &, h)
 {
@@ -671,7 +668,7 @@ HALBE_GETTER_GUARDED(HICANN::FGErrorResultQuadRow,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupFG,
+HALBE_SETTER(
 	set_fg_values,
 	Handle::HICANN &, h,
 	FGBlockOnHICANN const&, b,
@@ -701,7 +698,7 @@ HALBE_SETTER_GUARDED(EventSetupFG,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupFG,
+HALBE_SETTER(
 	set_fg_values,
 	Handle::HICANN &, h,
 	FGControl const&, fg)
@@ -750,8 +747,7 @@ HALBE_GETTER(FGBlock, get_fg_values,
 }
 
 
-HALBE_SETTER_GUARDED_RETURNS(HICANN::FGErrorResultQuadRow,
-	EventSetupFG,
+HALBE_GETTER(HICANN::FGErrorResultQuadRow,
 	set_fg_row_values,
 	Handle::HICANN &, h,
 	halco::hicann::v2::FGRowOnFGBlock, row,
@@ -797,8 +793,7 @@ HALBE_SETTER_GUARDED_RETURNS(HICANN::FGErrorResultQuadRow,
 	return HICANN::FGErrorResultQuadRow();
 }
 
-HALBE_SETTER_GUARDED_RETURNS(HICANN::FGErrorResultQuadRow,
-	EventSetupFG,
+HALBE_GETTER(HICANN::FGErrorResultQuadRow,
 	set_fg_row_values,
 	Handle::HICANN &, h,
 	const FGRowOnFGBlock4, rows,
@@ -831,8 +826,7 @@ HALBE_SETTER_GUARDED_RETURNS(HICANN::FGErrorResultQuadRow,
 	return HICANN::FGErrorResultQuadRow();
 }
 
-HALBE_SETTER_GUARDED_RETURNS(HICANN::FGErrorResultQuadRow,
-	EventSetupFG,
+HALBE_GETTER(HICANN::FGErrorResultQuadRow,
 	set_fg_row_values,
 	Handle::HICANN &, h,
 	halco::hicann::v2::FGBlockOnHICANN, block,
@@ -871,7 +865,7 @@ HALBE_SETTER_GUARDED_RETURNS(HICANN::FGErrorResultQuadRow,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupFG,
+HALBE_SETTER(
 	set_fg_config,
 	Handle::HICANN &, h,
 	halco::hicann::v2::FGBlockOnHICANN const &, block,
@@ -932,7 +926,7 @@ HALBE_GETTER(FGConfig, get_fg_config,
 	return config;
 }
 
-HALBE_SETTER_GUARDED(EventSetupFG,
+HALBE_SETTER(
 	set_fg_cell,
 	Handle::HICANN &, h,
 	NeuronOnHICANN const&, n,
@@ -952,7 +946,7 @@ HALBE_SETTER_GUARDED(EventSetupFG,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupFG,
+HALBE_SETTER(
 	set_fg_cell,
 	Handle::HICANN &, h,
 	FGBlockOnHICANN const&, b,
@@ -969,7 +963,7 @@ HALBE_SETTER_GUARDED(EventSetupFG,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupFG,
+HALBE_SETTER(
 	set_fg_cell,
 	Handle::HICANN &, h,
 	FGBlockOnHICANN const&, b,
@@ -982,7 +976,7 @@ HALBE_SETTER_GUARDED(EventSetupFG,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupFG,
+HALBE_SETTER(
 	set_current_stimulus,
 	Handle::HICANN &, h,
 	FGBlockOnHICANN const&, b,
@@ -1036,7 +1030,7 @@ HALBE_GETTER(FGStimulus, get_current_stimulus,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL1,
+HALBE_SETTER(
 	set_repeater,
 	Handle::HICANN &, h,
 	VRepeaterOnHICANN const&, r,
@@ -1058,7 +1052,7 @@ HALBE_GETTER(HICANN::VerticalRepeater, get_repeater,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL1,
+HALBE_SETTER(
 	set_repeater,
 	Handle::HICANN &, h,
 	HRepeaterOnHICANN const&, r,
@@ -1081,7 +1075,7 @@ HALBE_GETTER(HICANN::HorizontalRepeater, get_repeater,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL1,
+HALBE_SETTER(
 	set_repeater_block,
 	Handle::HICANN &, h,
 	RepeaterBlockOnHICANN const&, block,
@@ -1169,7 +1163,7 @@ HALBE_GETTER(HICANN::RepeaterBlock, get_repeater_block,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL1,
+HALBE_SETTER(
 	set_merger_tree,
 	Handle::HICANN &, h,
 	HICANN::MergerTree const&, m)
@@ -1224,7 +1218,7 @@ HALBE_GETTER(MergerTree, get_merger_tree,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL1,
+HALBE_SETTER(
 	set_dnc_merger,
 	Handle::HICANN &, h,
 	HICANN::DNCMergerLine const&, m)
@@ -1297,7 +1291,7 @@ HALBE_GETTER(DNCMergerLine, get_dnc_merger,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL1,
+HALBE_SETTER(
 	set_gbit_link,
 	Handle::HICANN &, h,
 	GbitLink const&, link)
@@ -1321,7 +1315,7 @@ HALBE_SETTER_GUARDED(EventSetupL1,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL1,
+HALBE_SETTER(
 	set_phase,
 	Handle::HICANN &, h,
 	Phase const, phase)
@@ -1357,7 +1351,7 @@ HALBE_GETTER(Phase, get_phase,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupL1BG,
+HALBE_SETTER(
 	set_background_generator,
 	Handle::HICANN &, h,
 	BackgroundGeneratorArray const&, bg)
@@ -1460,7 +1454,7 @@ HALBE_GETTER(BackgroundGeneratorArray, get_background_generator,
 }
 
 
-HALBE_SETTER_GUARDED(EventSetupAnalogReadout,
+HALBE_SETTER(
 	set_analog,
 	Handle::HICANN &, h,
 	Analog const&, a)
@@ -1495,7 +1489,8 @@ HALBE_GETTER(Analog, get_analog,
 	return returnvalue;
 }
 
-HALBE_SETTER_GUARDED(EventSetupSynapses, set_stdp_lut,
+HALBE_SETTER(
+	set_stdp_lut,
 	Handle::HICANN&, h,
 	SynapseArrayOnHICANN const&, synarray,
 	HICANN::STDPLUT const&, lut)
@@ -1548,7 +1543,8 @@ HALBE_GETTER(STDPLUT, get_stdp_lut,
 	return returnvalue;
 }
 
-HALBE_SETTER_GUARDED(EventSetupSynapses, set_syn_rst,
+HALBE_SETTER(
+	set_syn_rst,
 	Handle::HICANN&, h,
 	SynapseArrayOnHICANN const&, synarray,
 	HICANN::SynapseController::syn_rst_t const&, syn_rst)
@@ -1576,7 +1572,8 @@ HALBE_GETTER(HICANN::SynapseController::syn_rst_t, get_syn_rst,
 	return returnvalue;
 }
 
-HALBE_SETTER_GUARDED(EventSetupSynapses, set_syn_ctrl,
+HALBE_SETTER(
+	set_syn_ctrl,
 	Handle::HICANN&, h,
 	SynapseArrayOnHICANN const&, synarray,
 	HICANN::SynapseControlRegister const&, ctrl_reg)
@@ -1622,7 +1619,8 @@ HALBE_GETTER(HICANN::SynapseControlRegister, get_syn_ctrl,
 	return returnvalue;
 }
 
-HALBE_SETTER_GUARDED(EventSetupSynapses, set_syn_cnfg,
+HALBE_SETTER(
+	set_syn_cnfg,
 	Handle::HICANN&, h,
 	SynapseArrayOnHICANN const&, synarray,
 	HICANN::SynapseConfigurationRegister const&, cnfg_reg)
@@ -1696,7 +1694,8 @@ HALBE_GETTER(HICANN::SynapseStatusRegister, get_syn_status,
 	return returnvalue;
 }
 
-HALBE_SETTER_GUARDED(EventSetupL1, set_synapse_controller,
+HALBE_SETTER(
+	set_synapse_controller,
 	Handle::HICANN&, h,
 	SynapseArrayOnHICANN const&, synarray,
 	HICANN::SynapseController const&, synapse_controller)
@@ -1742,7 +1741,7 @@ HALBE_GETTER(SynapseController, get_synapse_controller,
 	return returnvalue;
 }
 
-HALBE_SETTER_GUARDED(EventResetCold,
+HALBE_SETTER(
 	reset,
 	Handle::HICANN &, hi,
 	uint8_t const, PLL_frequency
@@ -1772,7 +1771,7 @@ HALBE_SETTER(flush, Handle::HICANN&, h)
 }
 
 
-HALBE_SETTER_GUARDED(EventResetWarm,
+HALBE_SETTER(
 	init,
 	Handle::HICANN &, h,
 	bool const, zero_synapses)

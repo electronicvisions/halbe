@@ -264,39 +264,14 @@ auto do_use_hardware(F foo, HandleType& handle, Args... args)
 	} \
 	IMPL_FUNC_PROTO(ReturnType, name, __VA_ARGS__)
 
-#define IMPL_FUNC_WITH_SHERIFF(ExceptionType, ret, ReturnType, event, name, ...) \
-	IMPL_FUNC_PROTO(ReturnType, name, __VA_ARGS__); \
-	CREATE_ESS_DISPATCHER(ret, name, __VA_ARGS__, _) \
-	ReturnType name (EVERYTWO(__VA_ARGS__)) { \
-		IMPL_BODY_DISPATCH(ExceptionType, ret, ReturnType, name, __VA_ARGS__) \
-	} \
-	IMPL_FUNC_PROTO(ReturnType, name, __VA_ARGS__)
-
-
-
 #define HALBE_SETTER(name, ...) \
 	IMPL_FUNC(BOOST_PP_EMPTY(), BOOST_PP_EMPTY(), void, name, __VA_ARGS__)
 
 #define HALBE_SETTER_WITH_EXCEPTION_TRANSLATION(ExceptionType, name, ...) \
 	IMPL_FUNC(ExceptionType, BOOST_PP_EMPTY(), void, name, __VA_ARGS__)
 
-#define HALBE_SETTER_GUARDED(event, name, ...) \
-	IMPL_FUNC_WITH_SHERIFF(BOOST_PP_EMPTY(), BOOST_PP_EMPTY(), void, event, name, __VA_ARGS__)
-
-#define HALBE_SETTER_GUARDED_WITH_EXCEPTION_TRANSLATION(ExceptionType, event, name, ...) \
-	IMPL_FUNC_WITH_SHERIFF(ExceptionType, BOOST_PP_EMPTY(), void, event, name, __VA_ARGS__)
-
 #define HALBE_GETTER(ReturnType, name, ...) \
 	IMPL_FUNC(BOOST_PP_EMPTY(), return, ReturnType, name, __VA_ARGS__)
-
-// SETTER_GUARDED_RETURNS and GETTER_GUARDED are equivalent here and only differ
-// in the semantics of the function
-#define HALBE_SETTER_GUARDED_RETURNS(ReturnType, event, name, ...) \
-	IMPL_FUNC_WITH_SHERIFF(BOOST_PP_EMPTY(), return, ReturnType, event, name, __VA_ARGS__)
-
-#define HALBE_GETTER_GUARDED(...) \
-	HALBE_SETTER_GUARDED_RETURNS(__VA_ARGS__)
-
 
 #define HALBE_GETTER_WITH_EXCEPTION_TRANSLATION(ExceptionType, ReturnType, name, ...) \
 	IMPL_FUNC(ExceptionType, return, ReturnType, name, __VA_ARGS__)

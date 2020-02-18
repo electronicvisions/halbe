@@ -51,8 +51,7 @@ namespace {
 
 
 //***	configure adc board on startup
-HALBE_SETTER_GUARDED_WITH_EXCEPTION_TRANSLATION(flyspi::DeviceError,
-	EventSetupAnalogReadout,
+HALBE_SETTER_WITH_EXCEPTION_TRANSLATION(flyspi::DeviceError,
 	config,
 	Handle::ADC &, h,
 	Config, cfg
@@ -85,8 +84,7 @@ HALBE_SETTER_GUARDED_WITH_EXCEPTION_TRANSLATION(flyspi::DeviceError,
 }
 
 
-HALBE_SETTER_GUARDED_WITH_EXCEPTION_TRANSLATION(flyspi::DeviceError,
-	EventStartExperiment,
+HALBE_SETTER_WITH_EXCEPTION_TRANSLATION(flyspi::DeviceError,
 	prime,
 	Handle::ADC &, h
 ) {
@@ -96,8 +94,7 @@ HALBE_SETTER_GUARDED_WITH_EXCEPTION_TRANSLATION(flyspi::DeviceError,
 }
 
 
-HALBE_SETTER_GUARDED_WITH_EXCEPTION_TRANSLATION(flyspi::DeviceError,
-	EventStartExperiment,
+HALBE_SETTER_WITH_EXCEPTION_TRANSLATION(flyspi::DeviceError,
 	trigger_now,
 	Handle::ADC &, h
 ) {
