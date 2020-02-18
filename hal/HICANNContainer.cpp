@@ -273,7 +273,6 @@ std::ostream& operator<<(std::ostream& os, Repeater const& a)
 		case Repeater::FORWARDING: os << ", M: FORWARDING"; break;
 		case Repeater::IDLE      : os << ", M: IDLE      "; break;
 		case Repeater::INPUT     : os << ", M: INPUT     "; break;
-		case Repeater::INPUTONLY : os << ", M: INPUTONLY "; break;
 		case Repeater::OUTPUT    : os << ", M: OUTPUT    "; break;
 		case Repeater::LOOPBACK  : os << ", M: LOOPBACK  "; break;
 	}

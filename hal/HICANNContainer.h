@@ -483,7 +483,6 @@ public:
 		FORWARDING, // normal repeater activity
 		IDLE,       // off
 		INPUT,      // repeater writes to test ports while forwarding
-		INPUTONLY,  // repeater writes to test ports without forwarding
 		OUTPUT,     // repeater sends test/SPL1-events on L1 from test ports
 		LOOPBACK,    // repeater sends its testoutput to testinput of a repeaterblock
 	};
@@ -567,9 +566,6 @@ public:
 		setMode(FORWARDING);
 		mDirection = 0;
 		mDirection[d] = true; }
-	//!< recording input, without transmitting
-	void setInput() {
-		setMode(INPUTONLY); }
 	//!< recording input, while transmitting in certain direction
 	void setInput(halco::common::SideVertical d) {
 		setMode(INPUT);
@@ -660,9 +656,6 @@ public:
 		setMode(FORWARDING);
 		mDirection = 0;
 		mDirection[d] = true; }
-	//!< recording input, without transmitting
-	void setInput() {
-		setMode(INPUTONLY); }
 	//!< recording input, while transmitting in certain direction
 	void setInput(halco::common::SideHorizontal d) {
 		setMode(INPUT);

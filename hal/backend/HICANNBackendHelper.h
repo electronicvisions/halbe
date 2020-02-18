@@ -363,7 +363,6 @@ void set_repeater_helper(
 	//set the mode bits
 	if (rc.getMode() == Repeater::Mode::LOOPBACK && rc.getActiveTransmitters() == 0) { data[7]=true; data[6] = true; }
 	else if (rc.getMode() == Repeater::Mode::INPUT && rc.getActiveTransmitters() == 1) data[7]=true;  //enable TOUTNEN (!)
-	else if (rc.getMode() == Repeater::Mode::INPUTONLY && rc.getActiveTransmitters() == 0) data[7]=true;  //enable TOUTNEN (!)
 	else if (rc.getMode() == Repeater::Mode::OUTPUT && rc.getActiveTransmitters() != 0) data[6]=true; //enable TINTEN (!)
 	else if (rc.getMode() == Repeater::Mode::FORWARDING && rc.getActiveTransmitters() == 1) ; //do nothing, receiver always on!
 	else if (rc.getMode() == Repeater::Mode::IDLE && rc.getActiveTransmitters() == 0) ;       //do nothing
@@ -401,7 +400,6 @@ Repeater get_repeater_helper(
 
 	//decode mode bits
 	if      (data[7] && data[6] && !data[5] && !data[4]) returnvalue.setLoopback();
-	else if (data[7] && !data[4] && !data[5]) returnvalue.setInput();
 	else if (data[7] && (data[5] xor data[4])) returnvalue.setInput(get_repeater_direction(x, data));
 	else if (data[6] && (data[5] xor data[4])) returnvalue.setOutput(get_repeater_direction(x, data));
 	else if (data[6] && data[5] && data[4]) { //set output in both directions here
