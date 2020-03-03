@@ -4,7 +4,9 @@
 #include "halco/hicann/v2/format_helper.h"
 #include "hal/backend/HICANNBackendHelper.h"
 #include "hal/HICANN/FGInstruction.h"
+#include "hal/Handle/HICANN.h"
 #include "halco/common/iter_all.h"
+#include "halco/common/typed_array.h"
 
 // TODO: ugly includes from hicann-system!
 #include "fpga_control.h"          //FPGA control class
@@ -34,61 +36,48 @@ void set_decoder_double_row_impl(
 {
 	using namespace facets;
 
-	enum : size_t
-	{
-		TOP = 0,
-		BOT = 1
-	};                               // HARDWARE-coords!
-	size_t SWTOP = TOP, SWBOT = BOT; // temporary variables for switching between hardware and
-	                                 // software coords
-	uint32_t addr[2];
-	HicannCtrl::Synapse index;
+	ReticleControl& reticle = *h.get_reticle();
+	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(
+	    s.toSynapseArrayOnHICANN().isTop() ? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM);
 
-	// calculate the correct hardware address of the line and choose the synapse
-	// block instance
-	if (s.line() < 112) { // upper half of ANNCORE
-		addr[BOT] = 222 - (s.line() * 2);
-		addr[TOP] = 222 - (s.line() * 2) + 1;
-		index = HicannCtrl::SYNAPSE_TOP;
-	} else { // lower half of ANNCORE
-		addr[BOT] = (s.line() - 112) * 2;
-		addr[TOP] = (s.line() - 112) * 2 + 1;
-		SWTOP = BOT;
-		SWBOT = TOP;
-		index = HicannCtrl::SYNAPSE_BOTTOM;
+	typed_array<SynapseRowOnHICANN, RowOnSynapseDriver> rows;
+
+	// save decoder addresses in convenient format for hardware write
+	typed_array<std::array<std::bitset<32>, 32>, RowOnSynapseDriver> hwdata;
+
+	if (s.toSynapseArrayOnHICANN().isTop()) {
+		rows = {SynapseRowOnHICANN(s, RowOnSynapseDriver(top)), SynapseRowOnHICANN(s, RowOnSynapseDriver(bottom))};
+		hwdata = {top_to_decoder(data[top], data[bottom]), bot_to_decoder(data[top], data[bottom])};
+	} else {
+		rows = {SynapseRowOnHICANN(s, RowOnSynapseDriver(bottom)), SynapseRowOnHICANN(s, RowOnSynapseDriver(top))};
+		hwdata = {top_to_decoder(data[bottom], data[top]), bot_to_decoder(data[bottom], data[top])};
 	}
 
-	ReticleControl& reticle = *h.get_reticle();
-	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
-
-	// generate correctly formatted data for the hardware
-	std::array<std::array<std::bitset<32>, 32>, 2> hwdata;
-	hwdata[TOP] = top_to_decoder(data[SWTOP], data[SWBOT]);
-	hwdata[BOT] = bot_to_decoder(data[SWTOP], data[SWBOT]);
+	// put together a flush command for the controller
+	SynapseControlRegister flush_command = synapse_controller.ctrl_reg;
+	flush_command.newcmd = true;
+	flush_command.cmd = SynapseControllerCmd::WDEC;
 
 	// write the data to hardware
-	for (size_t ROW = TOP; ROW <= BOT; ROW++) { // loop over top/bottom rows. top = 0, bottom = 1
-		for (size_t colset = 0; colset < 8; colset++) { // loop over columnsets
-			for (size_t i = 0; i < 4; i++) {            // loop over single chunks in the columnset
+	for (auto row : iter_all<RowOnSynapseDriver>()) {
+
+		flush_command.row = rows[row].toSynapseRowOnArray();
+
+		for (size_t colset = SynapseSel::min; colset != SynapseSel::end; ++colset) { // loop over columnsets
+			for (size_t i = 0; i < 4; i++) { // loop over single chunks in the columnset
 				// write into buffer first
 				sc.write_data(
 				    static_cast<unsigned int>(facets::SynapseControl::sc_synin + i),
-				    static_cast<unsigned int>(hwdata[ROW][8 * i + colset].to_ulong()));
+				    static_cast<unsigned int>(hwdata[row][8 * i + colset].to_ulong()));
 			}
 
-			uint32_t const flush_command =
-			    facets::SynapseControl::sc_cmd_wdec | // put together a flush command
-			                                          // for the
-			                                          // controller
-			    (addr[ROW] << facets::SynapseControl::sc_adr_p) |
-			    (colset << facets::SynapseControl::sc_colset_p) |
-			    (1 << facets::SynapseControl::sc_newcmd_p);
+			flush_command.sel = SynapseSel(colset);
 
 			// flush the buffer
-			sc.write_data(SynapseControl::sc_ctrlreg, flush_command);
+			set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), flush_command);
 			wait_by_dummy(
 			    h, s.toSynapseArrayOnHICANN(), synapse_controller.cnfg_reg,
-			    synapse_controller.cycles_synarray(SynapseControllerCmd::WDEC));
+			    synapse_controller.cycles_synarray(flush_command.cmd));
 		}
 	}
 
@@ -104,6 +93,10 @@ void set_weights_row_impl(
 {
 	using namespace facets;
 
+	ReticleControl& reticle = *h.get_reticle();
+	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(
+	    s.toSynapseArrayOnHICANN().isTop() ? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM);
+
 	// generate correctly formatted data for the hardware
 	std::array<std::bitset<32>, 32> hwdata;
 
@@ -113,42 +106,26 @@ void set_weights_row_impl(
 		    weights[8 * i + 3].format(), weights[8 * i + 4].format(), weights[8 * i + 5].format(),
 		    weights[8 * i + 6].format(), weights[8 * i + 7].format());
 
-	// calculate the correct hardware address of the line and choose the synapse
-	// block instance
-	uint32_t addr = 0;
-	HicannCtrl::Synapse index;
-	const halco::hicann::v2::SynapseDriverOnHICANN drv = s.toSynapseDriverOnHICANN();
-
-	if (drv.line() < 112) { // upper half of ANNCORE
-		addr = 223 - (drv.line() * 2) - (s.toRowOnSynapseDriver() == halco::common::top ? 0 : 1);
-		index = HicannCtrl::SYNAPSE_TOP;
-	} else { // lower half of ANNCORE
-		addr = (drv.line() - 112) * 2 +
-		       (s.toRowOnSynapseDriver() == halco::common::top ? 0 : 1); /// top/bottom here is
-		                                                                   /// geometrical, not
-		                                                                   /// hardware!
-		index = HicannCtrl::SYNAPSE_BOTTOM;
-	}
-
-	ReticleControl& reticle = *h.get_reticle();
-	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
+	// put together a flush command for the controller
+	SynapseControlRegister flush_command = synapse_controller.ctrl_reg;
+	flush_command.newcmd = true;
+	flush_command.cmd = SynapseControllerCmd::WRITE;
+	flush_command.row = s.toSynapseRowOnArray();
 
 	// write the data to hardware: columnset-wise
-	for (size_t colset = 0; colset < 8; colset++) {
+	for (size_t colset = SynapseSel::min; colset != SynapseSel::end; ++colset) {
 		for (size_t i = 0; i < 4; i++) // single chunks in the columnset
 			sc.write_data(
 			    static_cast<unsigned int>(facets::SynapseControl::sc_synin + i),
 			    static_cast<unsigned int>(hwdata[8 * i + colset].to_ulong()));
 
-		// put together a flush command for the controller
-		uint32_t flush_command = facets::SynapseControl::sc_cmd_write |
-		                         (addr << facets::SynapseControl::sc_adr_p) |
-		                         (colset << facets::SynapseControl::sc_colset_p) |
-		                         (1 << facets::SynapseControl::sc_newcmd_p);
-		sc.write_data(SynapseControl::sc_ctrlreg, flush_command);
+		flush_command.sel = SynapseSel(colset);
+
+		// flush the buffer
+		set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), flush_command);
 		wait_by_dummy(
 		    h, s.toSynapseArrayOnHICANN(), synapse_controller.cnfg_reg,
-		    synapse_controller.cycles_synarray(SynapseControllerCmd::WRITE));
+		    synapse_controller.cycles_synarray(flush_command.cmd));
 	}
 
 	// restore initial state
