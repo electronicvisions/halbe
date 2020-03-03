@@ -295,73 +295,68 @@ HALBE_GETTER(DecoderDoubleRow, get_decoder_double_row,
 	SynapseDriverOnHICANN const&, s)
 {
 	ReticleControl& reticle = *h.get_reticle();
+	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(
+	    s.toSynapseArrayOnHICANN().isTop() ? HicannCtrl::SYNAPSE_TOP : HicannCtrl::SYNAPSE_BOTTOM);
 
-	enum : size_t {TOP = 0, BOT = 1}; //HARDWARE-coords!
-	uint32_t addr[2], open_row[2], close_row[2];
-	size_t SWTOP = TOP, SWBOT = BOT; //temporary variables for switching between hardware and software coords
-	HicannCtrl::Synapse index;
+	typed_array<SynapseRowOnHICANN, RowOnSynapseDriver> rows;
+	if (s.toSynapseArrayOnHICANN().isTop()) {
+		rows = {SynapseRowOnHICANN(s, RowOnSynapseDriver(top)), SynapseRowOnHICANN(s, RowOnSynapseDriver(bottom))};
+	} else {
+		rows = {SynapseRowOnHICANN(s, RowOnSynapseDriver(bottom)), SynapseRowOnHICANN(s, RowOnSynapseDriver(top))};
+	}
 
-	//calculate the correct hardware address of the line and choose the synapse block instance
-	if (s.line() < 112){ //upper half of ANNCORE
-		addr[BOT] = 222 - (s.line()*2);
-		addr[TOP] = 222 - (s.line()*2) + 1;
-		index = HicannCtrl::SYNAPSE_TOP;
-	}
-	else{ //lower half of ANNCORE
-		addr[BOT] = (s.line() - 112)*2;
-		addr[TOP] = (s.line() - 112)*2 + 1;
-		SWTOP = BOT;
-		SWBOT = TOP;
-		index = HicannCtrl::SYNAPSE_BOTTOM;
-	}
-	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
-
-	//put together "open row" and "close row" commands
-	for (size_t ROW = TOP; ROW <= BOT; ROW++) {
-		open_row[ROW] = facets::SynapseControl::sc_cmd_st_dec |
-				(1 << facets::SynapseControl::sc_newcmd_p) |
-				(addr[ROW] << facets::SynapseControl::sc_adr_p);
-		close_row[ROW] = facets::SynapseControl::sc_cmd_close |
-				(1 << facets::SynapseControl::sc_newcmd_p) |
-				(addr[ROW] << facets::SynapseControl::sc_adr_p);
-	}
+	SynapseControlRegister ctrl_reg = synapse_controller.ctrl_reg;
+	ctrl_reg.newcmd = true;
 
 	//read the data from hardware
 	std::array<std::array<std::bitset<32>, 32>, 2> hwdata; //temporary data read from hardware
-	for (size_t ROW = TOP; ROW <= BOT; ROW++){ //loop over top/bottom rows
-		sc.write_data(facets::SynapseControl::sc_ctrlreg, open_row[ROW]); //open row for reading
+	for (auto row : iter_all<RowOnSynapseDriver>()) {
+
+		// open row for decoder reading
+		ctrl_reg.cmd = SynapseControllerCmd::START_RDEC;
+		ctrl_reg.row = rows[row].toSynapseRowOnArray();
+
+		set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), ctrl_reg);
 		wait_by_dummy(h,
 		              s.toSynapseArrayOnHICANN(),
 		              synapse_controller.cnfg_reg,
-		              synapse_controller.cycles_synarray(SynapseControllerCmd::START_RDEC));
+		              synapse_controller.cycles_synarray(ctrl_reg.cmd));
 
-		for (size_t colset = 0; colset < 8; colset++){
-			uint32_t read_command = facets::SynapseControl::sc_cmd_rdec | //put together a read command
-								(colset << facets::SynapseControl::sc_colset_p) |
-								(1 << facets::SynapseControl::sc_newcmd_p) |
-								(addr[ROW] << facets::SynapseControl::sc_adr_p);
+		// issue read command for each columset and read result back from SYNOUT
+		ctrl_reg.cmd = SynapseControllerCmd::RDEC;
+		for (size_t colset = SynapseSel::min; colset != SynapseSel::end; ++colset) {
+			ctrl_reg.sel = SynapseSel(colset);
 
-			sc.write_data(facets::SynapseControl::sc_ctrlreg, read_command); //issue read command
+			set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), ctrl_reg);
 			wait_by_dummy(h,
 			              s.toSynapseArrayOnHICANN(),
 			              synapse_controller.cnfg_reg,
-			              synapse_controller.cycles_synarray(SynapseControllerCmd::RDEC));
+			              synapse_controller.cycles_synarray(ctrl_reg.cmd));
 
 			for (size_t i = 0; i < 4; i++) //save single chunks in the columnset to the temporary container
-				hwdata[ROW][8*i + colset] = sc.read_data(facets::SynapseControl::sc_synout+i);
+				hwdata[row][8*i + colset] = sc.read_data(facets::SynapseControl::sc_synout+i);
 		}
 
-		sc.write_data(facets::SynapseControl::sc_ctrlreg, close_row[ROW]); //close row
+		// close row after decoder reading
+		ctrl_reg.cmd = SynapseControllerCmd::CLOSE_ROW;
+		set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), ctrl_reg);
 		wait_by_dummy(h,
 		              s.toSynapseArrayOnHICANN(),
 		              synapse_controller.cnfg_reg,
-		              synapse_controller.cycles_synarray(SynapseControllerCmd::CLOSE_ROW));
+		              synapse_controller.cycles_synarray(ctrl_reg.cmd));
 	}
 
 	//"unwrap" the hardware data by swapping bits in the correct order
 	DecoderDoubleRow returnvalue;
-	returnvalue[SWTOP] = top_from_decoder(hwdata[TOP], hwdata[BOT]);
-	returnvalue[SWBOT] = bot_from_decoder(hwdata[TOP], hwdata[BOT]);
+	auto const swtop =    s.toSynapseArrayOnHICANN().isTop() ? top : bottom;
+	auto const swbottom = s.toSynapseArrayOnHICANN().isTop() ? bottom : top;
+
+	returnvalue[swtop]    = top_from_decoder(hwdata[top], hwdata[bottom]);
+	returnvalue[swbottom] = bot_from_decoder(hwdata[top], hwdata[bottom]);
+
+	//restore initial state
+	set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), synapse_controller.ctrl_reg);
+
 	return returnvalue;
 }
 
