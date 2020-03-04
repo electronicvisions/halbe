@@ -2,6 +2,7 @@
 #include "hal/backend/HICANNBackendHelper.h"
 
 #include <bitter/bitter.h>
+#include "pythonic/zip.h"
 
 #include "hal/backend/FPGABackend.h"
 #include "hal/HICANN/FGInstruction.h"
@@ -170,19 +171,7 @@ HALBE_SETTER_GUARDED(EventSetupSynapses,
 	SynapseRowOnHICANN const&, s,
 	WeightRow const&, weights)
 {
-	ReticleControl& reticle = *h.get_reticle();
-	auto& hicann = reticle.hicann[h.jtag_addr()];
-
-	set_weights_row_impl(s, weights, [&hicann, &h, &s, &synapse_controller](sc_write_data const& instr) {
-			SynapseControl& sc = hicann->getSC(instr.index);
-			sc.write_data(instr.addr, instr.data);
-			if (instr.type == sc_write_data::WRITEANDWAIT) {
-				wait_by_dummy(h,
-				              s.toSynapseArrayOnHICANN(),
-				              synapse_controller.cnfg_reg,
-				              synapse_controller.cycles_synarray(SynapseControllerCmd::WRITE));
-			}
-		});
+	set_weights_row_impl(h, synapse_controller, s, weights);
 }
 
 HALBE_SETTER_GUARDED(EventSetupSynapses,
@@ -197,30 +186,8 @@ HALBE_SETTER_GUARDED(EventSetupSynapses,
 		throw std::invalid_argument("set_weights_row: number of handles, "
 		                            "synapse controllers and data does not match");
 
-	// to buffer sc writes...
-	std::vector<sc_write_data_queue_t> per_hicann_queues(n_hicanns);
-
-	auto it_data = data.begin();
-	for (auto& queue : per_hicann_queues) {
-		set_weights_row_impl(s, *it_data, [&queue](sc_write_data const& instr) {
-			queue.push_back(instr);
-		});
-		++it_data;
-	}
-
-	// per-hicann indices of progress within "write queues" (start at 0th entry)
-	std::vector<size_t> idxs(n_hicanns, 0);
-
-	// as long as a single synapse controller hasn't finished...
-	for (bool all_done = false; !all_done;) {
-		all_done = true;
-		for (size_t i = 0; i < n_hicanns; ++i)
-			if (popexec_sc_write_data_queue(
-				    dynamic_cast<HMF::Handle::HICANNHw&>(*handles[i]),
-				    synapse_controllers[i],
-				    idxs[i],
-				    per_hicann_queues[i]))
-				all_done = false;
+	for (auto [h, sc, d] : pythonic::zip(handles, synapse_controllers, data)) {
+		set_weights_row(*h, sc, s, d);
 	}
 }
 
@@ -301,19 +268,7 @@ HALBE_SETTER_GUARDED(EventSetupSynapses,
 	SynapseDriverOnHICANN const&, s,
 	DecoderDoubleRow const&, data)
 {
-	ReticleControl& reticle = *h.get_reticle();
-	auto& hicann = reticle.hicann[h.jtag_addr()];
-
-	set_decoder_double_row_impl(s, data, [&hicann, &h, &s, &synapse_controller](sc_write_data const& instr) {
-			SynapseControl& sc = hicann->getSC(instr.index);
-			sc.write_data(instr.addr, instr.data);
-			if (instr.type == sc_write_data::WRITEANDWAIT) {
-				wait_by_dummy(h,
-				              s.toSynapseArrayOnHICANN(),
-				              synapse_controller.cnfg_reg,
-				              synapse_controller.cycles_synarray(SynapseControllerCmd::WDEC));
-			}
-		});
+	set_decoder_double_row_impl(h, synapse_controller, s, data);
 }
 
 HALBE_SETTER_GUARDED(EventSetupSynapses,
@@ -328,31 +283,10 @@ HALBE_SETTER_GUARDED(EventSetupSynapses,
 		throw std::invalid_argument("set_decoder_double_row: number of handles, "
 		                            "synapse controllers and data does not match");
 
-	// to buffer sc writes...
-	std::vector<sc_write_data_queue_t> per_hicann_queues(n_hicanns);
-
-	auto it_data = data.begin();
-	for (auto& queue : per_hicann_queues) {
-		set_decoder_double_row_impl(syndrv, *it_data, [&queue](sc_write_data const& instr) {
-			queue.push_back(instr);
-		});
-		++it_data;
+	for (auto [h, sc, d] : pythonic::zip(handles, synapse_controllers, data)) {
+		set_decoder_double_row(*h, sc, syndrv, d);
 	}
 
-	// per-hicann indices of progress within "write queues" (start at 0th entry)
-	std::vector<size_t> idxs(n_hicanns, 0);
-
-	// as long as a single synapse controller hasn't finished...
-	for (bool all_done = false; !all_done;) {
-		all_done = true;
-		for (size_t i = 0; i < n_hicanns; ++i)
-			if (popexec_sc_write_data_queue(
-				    dynamic_cast<HMF::Handle::HICANNHw&>(*handles[i]),
-				    synapse_controllers[i],
-				    idxs[i],
-				    per_hicann_queues[i]))
-				all_done = false;
-	}
 }
 
 HALBE_GETTER(DecoderDoubleRow, get_decoder_double_row,

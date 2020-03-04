@@ -27,8 +27,10 @@ namespace HMF {
 namespace HICANN {
 
 void set_decoder_double_row_impl(
-	halco::hicann::v2::SynapseDriverOnHICANN const& s, HMF::HICANN::DecoderDoubleRow const& data,
-	std::function<void(sc_write_data const&)> callback)
+    Handle::HICANNHw& h,
+    SynapseController const& synapse_controller,
+    halco::hicann::v2::SynapseDriverOnHICANN const& s,
+    HMF::HICANN::DecoderDoubleRow const& data)
 {
 	using namespace facets;
 
@@ -56,22 +58,22 @@ void set_decoder_double_row_impl(
 		index = HicannCtrl::SYNAPSE_BOTTOM;
 	}
 
+	ReticleControl& reticle = *h.get_reticle();
+	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
+
 	// generate correctly formatted data for the hardware
 	std::array<std::array<std::bitset<32>, 32>, 2> hwdata;
 	hwdata[TOP] = top_to_decoder(data[SWTOP], data[SWBOT]);
 	hwdata[BOT] = bot_to_decoder(data[SWTOP], data[SWBOT]);
-
-	sc_write_data_queue_t sc_write_data_queue;
 
 	// write the data to hardware
 	for (size_t ROW = TOP; ROW <= BOT; ROW++) { // loop over top/bottom rows. top = 0, bottom = 1
 		for (size_t colset = 0; colset < 8; colset++) { // loop over columnsets
 			for (size_t i = 0; i < 4; i++) {            // loop over single chunks in the columnset
 				// write into buffer first
-				callback({index, sc_write_data::WRITE,
-				          static_cast<unsigned int>(facets::SynapseControl::sc_synin + i),
-				          static_cast<unsigned int>(
-					          hwdata[ROW][8 * i + colset].to_ulong())});
+				sc.write_data(
+				    static_cast<unsigned int>(facets::SynapseControl::sc_synin + i),
+				    static_cast<unsigned int>(hwdata[ROW][8 * i + colset].to_ulong()));
 			}
 
 			uint32_t const flush_command =
@@ -83,15 +85,22 @@ void set_decoder_double_row_impl(
 			    (1 << facets::SynapseControl::sc_newcmd_p);
 
 			// flush the buffer
-			callback({index, sc_write_data::WRITEANDWAIT, SynapseControl::sc_ctrlreg,
-			          flush_command});
+			sc.write_data(SynapseControl::sc_ctrlreg, flush_command);
+			wait_by_dummy(
+			    h, s.toSynapseArrayOnHICANN(), synapse_controller.cnfg_reg,
+			    synapse_controller.cycles_synarray(SynapseControllerCmd::WDEC));
 		}
 	}
+
+	// restore initial state
+	set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), synapse_controller.ctrl_reg);
 }
 
 void set_weights_row_impl(
-	halco::hicann::v2::SynapseRowOnHICANN const& s, HMF::HICANN::WeightRow const& weights,
-	std::function<void(sc_write_data const&)> callback)
+    Handle::HICANNHw& h,
+    SynapseController const& synapse_controller,
+    halco::hicann::v2::SynapseRowOnHICANN const& s,
+    HMF::HICANN::WeightRow const& weights)
 {
 	using namespace facets;
 
@@ -121,23 +130,29 @@ void set_weights_row_impl(
 		index = HicannCtrl::SYNAPSE_BOTTOM;
 	}
 
+	ReticleControl& reticle = *h.get_reticle();
+	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
+
 	// write the data to hardware: columnset-wise
 	for (size_t colset = 0; colset < 8; colset++) {
 		for (size_t i = 0; i < 4; i++) // single chunks in the columnset
-			callback({index, sc_write_data::WRITE,
-			          static_cast<unsigned int>(facets::SynapseControl::sc_synin + i),
-			          static_cast<unsigned int>(
-			              hwdata[8 * i + colset].to_ulong())});
+			sc.write_data(
+			    static_cast<unsigned int>(facets::SynapseControl::sc_synin + i),
+			    static_cast<unsigned int>(hwdata[8 * i + colset].to_ulong()));
 
 		// put together a flush command for the controller
 		uint32_t flush_command = facets::SynapseControl::sc_cmd_write |
 		                         (addr << facets::SynapseControl::sc_adr_p) |
 		                         (colset << facets::SynapseControl::sc_colset_p) |
 		                         (1 << facets::SynapseControl::sc_newcmd_p);
-
-		callback({index, sc_write_data::WRITEANDWAIT, SynapseControl::sc_ctrlreg,
-		          flush_command});
+		sc.write_data(SynapseControl::sc_ctrlreg, flush_command);
+		wait_by_dummy(
+		    h, s.toSynapseArrayOnHICANN(), synapse_controller.cnfg_reg,
+		    synapse_controller.cycles_synarray(SynapseControllerCmd::WRITE));
 	}
+
+	// restore initial state
+	set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), synapse_controller.ctrl_reg);
 }
 
 void wait_by_dummy(
@@ -161,48 +176,6 @@ void wait_by_dummy(
 	for (size_t i = 0; i < num_dummys; ++i) {
 		set_syn_cnfg(h, synarray, cnfg_reg);
 	}
-}
-
-bool popexec_sc_write_data_queue(HMF::Handle::HICANNHw& h,
-                                 SynapseController const& synapse_controller,
-                                 size_t& idx,
-                                 sc_write_data_queue_t const& data)
-{
-	using namespace facets;
-
-	size_t const n_data = data.size();
-
-	if (idx >= n_data)
-		return false;
-
-	ReticleControl& reticle = *h.get_reticle();
-
-	// batch of writes to do...
-	if (data[idx].type == sc_write_data::WRITE) {
-		for (; idx < n_data; ++idx) {
-			SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(data[idx].index);
-			sc.write_data(data[idx].addr, data[idx].data);
-			// look-ahead and return if the next would be blocking...
-			if (data[idx].type == sc_write_data::WRITEANDWAIT)
-				// Do not increase index, the next call to this function will
-				// busy wait (and not write, see below).
-				break;
-		}
-	} else if (data[idx].type == sc_write_data::WRITEANDWAIT) {
-		// Just wait at this point. Data was already written in if-statement
-		wait_by_dummy(h,
-		              SynapseArrayOnHICANN(data[idx].index),
-		              synapse_controller.cnfg_reg,
-		              synapse_controller.cycles_synarray(SynapseControllerCmd::WRITE));
-		// TODO: Differentiate between WRITE (writing of weights) and WDEC (writing of decoder
-		//       addresses). For now it is ok to just use write since WRITE and WDEC have the
-		//       same waiting times.
-		idx++;
-	} else {
-		throw std::runtime_error("Cannot happen on " + short_format(h.coordinate()));
-	}
-
-	return true;
 }
 
 /** builds neuron builder configuration byte */

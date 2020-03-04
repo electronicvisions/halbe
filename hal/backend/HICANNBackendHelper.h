@@ -23,29 +23,17 @@
 namespace HMF {
 namespace HICANN {
 
-struct sc_write_data
-{
-	unsigned int index;
-	// TODO: Add WDECANDWAIT to be able to distinguish between writing of weights and decoder
-	//       addresses. This is relevant for the number of dummy waits performed.
-	//       For now it is ok to just use write since WRITE and WDEC have the same waiting times.
-	enum access_type
-	{
-		WRITE,
-		WRITEANDWAIT
-	} type;
-	unsigned int addr, data;
-};
-
-typedef std::vector<sc_write_data> sc_write_data_queue_t;
-
 void set_decoder_double_row_impl(
-	halco::hicann::v2::SynapseDriverOnHICANN const& s, HMF::HICANN::DecoderDoubleRow const& data,
-	std::function<void(sc_write_data const&)> callback);
+    Handle::HICANNHw& h,
+    SynapseController const& synapse_controller,
+    halco::hicann::v2::SynapseDriverOnHICANN const& s,
+    HMF::HICANN::DecoderDoubleRow const& data);
 
 void set_weights_row_impl(
-	halco::hicann::v2::SynapseRowOnHICANN const& s, HMF::HICANN::WeightRow const& weights,
-	std::function<void(sc_write_data const&)> callback);
+    Handle::HICANNHw& h,
+    SynapseController const& synapse_controller,
+    halco::hicann::v2::SynapseRowOnHICANN const& s,
+    HMF::HICANN::WeightRow const& weights);
 
 /**
  * Waits at least the number of cycles specified by num_cycles.
@@ -65,11 +53,6 @@ void wait_by_dummy(
 	halco::hicann::v2::SynapseArrayOnHICANN const& synarray,
 	HICANN::SynapseConfigurationRegister const& cnfg_reg,
 	size_t num_cycles);
-
-bool popexec_sc_write_data_queue(HMF::Handle::HICANNHw& h,
-                                 SynapseController const& synapse_controller,
-                                 size_t& idx,
-                                 sc_write_data_queue_t const& data);
 
 /** builds neuron builder configuration byte */
 std::bitset<25> nbdata(
