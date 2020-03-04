@@ -203,35 +203,28 @@ HALBE_GETTER(WeightRow, get_weights_row,
 
 	SynapseControl& sc = reticle.hicann[h.jtag_addr()]->getSC(index);
 
+	// use copy of controller in order to be able to change control register
+	SynapseController synapse_controller_copy = synapse_controller;
+
+	// use control register of synapse controller to control reading of weights
+	SynapseControlRegister& ctrl_reg = synapse_controller_copy.ctrl_reg;
+	ctrl_reg.row = s.toSynapseRowOnArray();
+	ctrl_reg.newcmd = true;
+
 	// open row
-	SynapseControlRegister open_row = synapse_controller.ctrl_reg;
-	open_row.newcmd = true;
-	open_row.row = s.toSynapseRowOnArray();
-	open_row.cmd = SynapseControllerCmd::START_READ;
+	ctrl_reg.cmd = SynapseControllerCmd::START_READ;
+	set_syn_ctrl_and_guard(h, s.toSynapseArrayOnHICANN(), synapse_controller_copy);
 
-	set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), open_row);
-	wait_by_dummy(h,
-	              s.toSynapseArrayOnHICANN(),
-	              synapse_controller.cnfg_reg,
-	              synapse_controller.cycles_synarray(open_row.cmd));
-
-	// put together a read command
-	SynapseControlRegister read_row = synapse_controller.ctrl_reg;
-	read_row.newcmd = true;
-	read_row.row = s.toSynapseRowOnArray();
-	read_row.cmd = SynapseControllerCmd::READ;
+	// start reading weights from hardware
+	ctrl_reg.cmd = SynapseControllerCmd::READ;
 
 	WeightRow returnvalue;
 
 	for (size_t colset = SynapseSel::min; colset != SynapseSel::end; ++colset) {
-		read_row.sel = SynapseSel(colset);
+		ctrl_reg.sel = SynapseSel(colset);
 
 		// issue read command
-		set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), read_row);
-		wait_by_dummy(h,
-		              s.toSynapseArrayOnHICANN(),
-		              synapse_controller.cnfg_reg,
-		              synapse_controller.cycles_synarray(read_row.cmd));
+		set_syn_ctrl_and_guard(h, s.toSynapseArrayOnHICANN(), synapse_controller_copy);
 
 		// read data back from SYNOUT
 		for (size_t i = 0; i < 4; i++){ //single chunks in the columnset
@@ -245,16 +238,11 @@ HALBE_GETTER(WeightRow, get_weights_row,
 	}
 
 	// close row
-	SynapseControlRegister close_row = open_row;
-	close_row.cmd = SynapseControllerCmd::CLOSE_ROW;
-
-	set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), close_row);
-	wait_by_dummy(h,
-	              s.toSynapseArrayOnHICANN(),
-	              synapse_controller.cnfg_reg,
-	              synapse_controller.cycles_synarray(close_row.cmd));
+	ctrl_reg.cmd = SynapseControllerCmd::CLOSE_ROW;
+	set_syn_ctrl_and_guard(h, s.toSynapseArrayOnHICANN(), synapse_controller_copy);
 
 	//restore initial state
+	// TODO: Remove after halbe-sthal-data are separated
 	set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), synapse_controller.ctrl_reg);
 
 	return returnvalue;
@@ -305,7 +293,11 @@ HALBE_GETTER(DecoderDoubleRow, get_decoder_double_row,
 		rows = {SynapseRowOnHICANN(s, RowOnSynapseDriver(bottom)), SynapseRowOnHICANN(s, RowOnSynapseDriver(top))};
 	}
 
-	SynapseControlRegister ctrl_reg = synapse_controller.ctrl_reg;
+	// use copy of controller in order to be able to change control register
+	SynapseController synapse_controller_copy = synapse_controller;
+
+	// use control register of synapse controller to control reading of decoder addresses
+	SynapseControlRegister& ctrl_reg = synapse_controller_copy.ctrl_reg;
 	ctrl_reg.newcmd = true;
 
 	//read the data from hardware
@@ -315,23 +307,13 @@ HALBE_GETTER(DecoderDoubleRow, get_decoder_double_row,
 		// open row for decoder reading
 		ctrl_reg.cmd = SynapseControllerCmd::START_RDEC;
 		ctrl_reg.row = rows[row].toSynapseRowOnArray();
-
-		set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), ctrl_reg);
-		wait_by_dummy(h,
-		              s.toSynapseArrayOnHICANN(),
-		              synapse_controller.cnfg_reg,
-		              synapse_controller.cycles_synarray(ctrl_reg.cmd));
+		set_syn_ctrl_and_guard(h, s.toSynapseArrayOnHICANN(), synapse_controller_copy);
 
 		// issue read command for each columset and read result back from SYNOUT
 		ctrl_reg.cmd = SynapseControllerCmd::RDEC;
 		for (size_t colset = SynapseSel::min; colset != SynapseSel::end; ++colset) {
 			ctrl_reg.sel = SynapseSel(colset);
-
-			set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), ctrl_reg);
-			wait_by_dummy(h,
-			              s.toSynapseArrayOnHICANN(),
-			              synapse_controller.cnfg_reg,
-			              synapse_controller.cycles_synarray(ctrl_reg.cmd));
+			set_syn_ctrl_and_guard(h, s.toSynapseArrayOnHICANN(), synapse_controller_copy);
 
 			for (size_t i = 0; i < 4; i++) //save single chunks in the columnset to the temporary container
 				hwdata[row][8*i + colset] = sc.read_data(facets::SynapseControl::sc_synout+i);
@@ -339,11 +321,7 @@ HALBE_GETTER(DecoderDoubleRow, get_decoder_double_row,
 
 		// close row after decoder reading
 		ctrl_reg.cmd = SynapseControllerCmd::CLOSE_ROW;
-		set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), ctrl_reg);
-		wait_by_dummy(h,
-		              s.toSynapseArrayOnHICANN(),
-		              synapse_controller.cnfg_reg,
-		              synapse_controller.cycles_synarray(ctrl_reg.cmd));
+		set_syn_ctrl_and_guard(h, s.toSynapseArrayOnHICANN(), synapse_controller_copy);
 	}
 
 	//"unwrap" the hardware data by swapping bits in the correct order
@@ -355,6 +333,7 @@ HALBE_GETTER(DecoderDoubleRow, get_decoder_double_row,
 	returnvalue[swbottom] = bot_from_decoder(hwdata[top], hwdata[bottom]);
 
 	//restore initial state
+	// TODO: Remove after halbe-sthal-data are separated
 	set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), synapse_controller.ctrl_reg);
 
 	return returnvalue;

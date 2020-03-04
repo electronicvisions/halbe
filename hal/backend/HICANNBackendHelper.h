@@ -36,6 +36,16 @@ void set_weights_row_impl(
     HMF::HICANN::WeightRow const& weights);
 
 /**
+ * Sets the synapse controller's control register and
+ * guards by sending dummy packets to ensure that the
+ * controller is not touched until the command is completed.
+ */
+void set_syn_ctrl_and_guard(
+    Handle::HICANN& h,
+    halco::hicann::v2::SynapseArrayOnHICANN const& synarray,
+    HICANN::SynapseController const& synapse_controller);
+
+/**
  * Waits at least the number of cycles specified by num_cycles.
  * The waiting is realized by writing to the configuration register
  * of the synapse controller. The number of cycles this writing takes

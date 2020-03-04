@@ -80,6 +80,11 @@ void set_weights_row(
 	std::vector<WeightRow> const& data);
 #endif // !PYPLUSPLUS
 
+/**
+ * Retrieves weights from the synapse array.
+ *
+ * @notice The function alters the content of the synapse control register for this purpose.
+ */
 WeightRow get_weights_row(
 	Handle::HICANN & h,
 	SynapseController const& synapse_controller,
@@ -113,6 +118,11 @@ void set_decoder_double_row(
 	std::vector<DecoderDoubleRow> const& data);
 #endif // !PYPLUSPLUS
 
+/**
+ * Retrieves decoder addresses from the synapse array.
+ *
+ * @notice The function alters the content of the synapse control register for this purpose.
+ */
 DecoderDoubleRow get_decoder_double_row(
 	Handle::HICANN & h,
 	SynapseController const& synapse_controller,

@@ -54,14 +54,14 @@ void set_decoder_double_row_impl(
 	}
 
 	// put together a flush command for the controller
-	SynapseControlRegister flush_command = synapse_controller.ctrl_reg;
-	flush_command.newcmd = true;
-	flush_command.cmd = SynapseControllerCmd::WDEC;
+	SynapseController flush_command = synapse_controller;
+	flush_command.ctrl_reg.newcmd = true;
+	flush_command.ctrl_reg.cmd = SynapseControllerCmd::WDEC;
 
 	// write the data to hardware
 	for (auto row : iter_all<RowOnSynapseDriver>()) {
 
-		flush_command.row = rows[row].toSynapseRowOnArray();
+		flush_command.ctrl_reg.row = rows[row].toSynapseRowOnArray();
 
 		for (size_t colset = SynapseSel::min; colset != SynapseSel::end; ++colset) { // loop over columnsets
 			for (size_t i = 0; i < 4; i++) { // loop over single chunks in the columnset
@@ -71,13 +71,10 @@ void set_decoder_double_row_impl(
 				    static_cast<unsigned int>(hwdata[row][8 * i + colset].to_ulong()));
 			}
 
-			flush_command.sel = SynapseSel(colset);
+			flush_command.ctrl_reg.sel = SynapseSel(colset);
 
 			// flush the buffer
-			set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), flush_command);
-			wait_by_dummy(
-			    h, s.toSynapseArrayOnHICANN(), synapse_controller.cnfg_reg,
-			    synapse_controller.cycles_synarray(flush_command.cmd));
+			set_syn_ctrl_and_guard(h, s.toSynapseArrayOnHICANN(), flush_command);
 		}
 	}
 
@@ -107,10 +104,10 @@ void set_weights_row_impl(
 		    weights[8 * i + 6].format(), weights[8 * i + 7].format());
 
 	// put together a flush command for the controller
-	SynapseControlRegister flush_command = synapse_controller.ctrl_reg;
-	flush_command.newcmd = true;
-	flush_command.cmd = SynapseControllerCmd::WRITE;
-	flush_command.row = s.toSynapseRowOnArray();
+	SynapseController flush_command = synapse_controller;
+	flush_command.ctrl_reg.newcmd = true;
+	flush_command.ctrl_reg.cmd = SynapseControllerCmd::WRITE;
+	flush_command.ctrl_reg.row = s.toSynapseRowOnArray();
 
 	// write the data to hardware: columnset-wise
 	for (size_t colset = SynapseSel::min; colset != SynapseSel::end; ++colset) {
@@ -119,17 +116,25 @@ void set_weights_row_impl(
 			    static_cast<unsigned int>(facets::SynapseControl::sc_synin + i),
 			    static_cast<unsigned int>(hwdata[8 * i + colset].to_ulong()));
 
-		flush_command.sel = SynapseSel(colset);
+		flush_command.ctrl_reg.sel = SynapseSel(colset);
 
 		// flush the buffer
-		set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), flush_command);
-		wait_by_dummy(
-		    h, s.toSynapseArrayOnHICANN(), synapse_controller.cnfg_reg,
-		    synapse_controller.cycles_synarray(flush_command.cmd));
+		set_syn_ctrl_and_guard(h, s.toSynapseArrayOnHICANN(), flush_command);
 	}
 
 	// restore initial state
 	set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), synapse_controller.ctrl_reg);
+}
+
+void set_syn_ctrl_and_guard(
+    Handle::HICANN& h,
+    halco::hicann::v2::SynapseArrayOnHICANN const& synarray,
+    HICANN::SynapseController const& synapse_controller)
+{
+	set_syn_ctrl(h, synarray, synapse_controller.ctrl_reg);
+	wait_by_dummy(
+	    h, synarray, synapse_controller.cnfg_reg,
+	    synapse_controller.cycles_synarray(synapse_controller.ctrl_reg.cmd));
 }
 
 void wait_by_dummy(
