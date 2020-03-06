@@ -1064,8 +1064,10 @@ void hicann_init(facets::HicannCtrl& hc, bool const zero_synapses)
 	sc_b.reset_drivers();
 
 	if (zero_synapses) {
-		sc_t.reset_all();
-		sc_b.reset_all();
+		sc_t.reset_weights();
+		sc_b.reset_weights();
+		sc_t.reset_decoders();
+		sc_b.reset_decoders();
 	}
 
 	// No FG controller resets needed:
