@@ -516,8 +516,9 @@ HALBE_GETTER(PulseEventContainer::container_type, read_trace_pulses,
 	}
 
 	PulseEventContainer::container_type pulse_events;
-	auto const receive_pulse_events = [trace_enabled, &pulse_events, &trace_overflow_count,
-	                                   &f](sctrltp::ARQStream<sctrltp::Parameters<>>* const arq_ptr)
+	auto const receive_pulse_events =
+	    [trace_enabled, &pulse_events, &trace_overflow_count,
+	     &f](sctrltp::ARQStream<sctrltp::ParametersFcpBss1>* const arq_ptr)
 	    -> std::tuple<bool, std::uint64_t> {
 		bool received_eot = false;
 		std::uint64_t received_pulse_events_count = 0;
@@ -672,7 +673,7 @@ HALBE_GETTER(PulseEventContainer::container_type, read_trace_pulses,
 	HostALController& host_al = f.getPowerBackend().get_host_al(f);
 	unsigned int sleep_duration_in_us = 500;
 
-	sctrltp::ARQStream<sctrltp::Parameters<>>* const arq_ptr = host_al.getARQStream();
+	sctrltp::ARQStream<sctrltp::ParametersFcpBss1>* const arq_ptr = host_al.getARQStream();
 
 	/* We read(receive) data until we see the end-of-trace marker packet.
 	 * However, as the connection might die at any time ("cable being pulled", whatever)
@@ -924,7 +925,7 @@ HALBE_GETTER(Realtime::spike_h, spin_and_get_next_realtime_pulse_as_spinnaker,
 
 HALBE_SETTER(flush, Handle::FPGA &, f)
 {
-	sctrltp::ARQStream<sctrltp::Parameters<>>* const arq_ptr =
+	sctrltp::ARQStream<sctrltp::ParametersFcpBss1>* const arq_ptr =
 	    f.getPowerBackend().get_host_al(f).getARQStream();
 
 	auto const start_of_flush = std::chrono::steady_clock::now();
