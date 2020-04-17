@@ -523,7 +523,7 @@ HALBE_GETTER(PulseEventContainer::container_type, read_trace_pulses,
 		bool received_eot = false;
 		std::uint64_t received_pulse_events_count = 0;
 		// FIXME@ECM: defined in hicann-system/…/ARQFrame.h (no namespace)
-		sctrltp::packet current_packet;
+		sctrltp::packet<sctrltp::ParametersFcpBss1> current_packet;
 		while ((!received_eot) && arq_ptr->receive(current_packet)) {
 			HALBE_RTP_TRACE("received hostARQ packet with " << current_packet.len << " entries");
 			if (BOOST_UNLIKELY(current_packet.pid !=
