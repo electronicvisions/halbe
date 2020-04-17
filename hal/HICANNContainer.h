@@ -368,11 +368,6 @@ public:
 	}
 
 private:
-	// Estimated factors for state transitions
-	PYPP_INLINE(static size_t const, additional_cycles_setup, 2);
-	PYPP_INLINE(static size_t const, additional_cycles_read, 2);
-	PYPP_INLINE(static size_t const, additional_cycles_write, 2);
-
 	friend class boost::serialization::access;
 	template <typename Archiver>
 	void serialize(Archiver& ar, const unsigned int) {
@@ -1103,13 +1098,6 @@ public:
 	bool operator!=(SynapseController const& s) const;
 
 private:
-	// Estimated factors accounting for state transitions
-	PYPP_INLINE(static size_t const, additional_cycles_synarray_rowopen, 4);
-	PYPP_INLINE(static size_t const, additional_cycles_synarray_read, 3);
-	PYPP_INLINE(static size_t const, additional_cycles_synarray_write, 4);
-	PYPP_INLINE(static size_t const, additional_cycles_synarray_rowclose, 3);
-	PYPP_INLINE(static size_t const, additional_cycles_synarray_rst_corr, 6);
-
 	friend class boost::serialization::access;
 	template <typename Archiver>
 	void serialize(Archiver& ar, unsigned const int);

@@ -441,20 +441,26 @@ std::ostream& operator<<(std::ostream& os, Status const& o)
 	return os;
 }
 
+namespace {
+	size_t const additional_cycles_syndrv_setup = 2;
+	size_t const additional_cycles_syndrv_read = 2;
+	size_t const additional_cycles_syndrv_write = 2;
+}
+
 size_t SRAMControllerTimings::cycles_read() const
 {
 	return setup_precharge +
-	       additional_cycles_setup +
+	       additional_cycles_syndrv_setup +
 	       read_delay +
-	       additional_cycles_read;
+	       additional_cycles_syndrv_read;
 }
 
 size_t SRAMControllerTimings::cycles_write() const
 {
 	return setup_precharge +
-	       additional_cycles_setup +
+	       additional_cycles_syndrv_setup +
 	       write_delay +
-	       additional_cycles_write;
+	       additional_cycles_syndrv_write;
 }
 
 std::ostream& operator<<(std::ostream& os, SRAMControllerTimings const& o)
@@ -649,6 +655,11 @@ void SynapseStatusRegister::serialize(Archiver& ar, unsigned const int)
 
 size_t SynapseController::cycles_synarray(SynapseControllerCmd const& cmd) const
 {
+	size_t const additional_cycles_synarray_rowopen = 4;
+	size_t const additional_cycles_synarray_read = 3;
+	size_t const additional_cycles_synarray_write = 4;
+	size_t const additional_cycles_synarray_rowclose = 3;
+	size_t const additional_cycles_synarray_rst_corr = 6;
 	switch(cmd)
 	{
 		case SynapseControllerCmd::IDLE:
