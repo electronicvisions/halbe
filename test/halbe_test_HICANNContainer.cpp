@@ -4,6 +4,7 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/filesystem.hpp>
 #include "hal/HICANNContainer.h"
+#include "halco/common/iter_all.h"
 
 using namespace halco::hicann::v2;
 using namespace HMF::HICANN;
@@ -197,6 +198,17 @@ TEST(SynapseControlRegister, Comparison)
 	ctrl_reg1.idle = false;
 	ASSERT_FALSE(ctrl_reg1 == ctrl_reg2);
 	ASSERT_FALSE(ctrl_reg1 == ctrl_reg3);
+}
+
+TEST(L1Address, Decoder)
+{
+	for (auto const& driver_decoder : halco::common::iter_all<DriverDecoder>()) {
+		for (auto const& synapse_decoder : halco::common::iter_all<SynapseDecoder>()) {
+			L1Address const addr(driver_decoder, synapse_decoder);
+			ASSERT_EQ(driver_decoder, addr.getDriverDecoderMask());
+			ASSERT_EQ(synapse_decoder, addr.getSynapseDecoderMask());
+		}
+	}
 }
 
 } // HMF

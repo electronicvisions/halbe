@@ -2,9 +2,16 @@
 #include "halco/hicann/v2/l1.h"
 
 #include <bitter/integral.h>
+#include "bitter/util.h"
 
 namespace HMF {
 namespace HICANN {
+
+L1Address::L1Address(DriverDecoder const& driver_decoder, SynapseDecoder const& synapse_decoder)
+    : rant_t(bit::concat(
+                 std::bitset<2>(driver_decoder.value()), std::bitset<4>(synapse_decoder.value()))
+                 .to_ulong())
+{}
 
 SynapseDecoder L1Address::getSynapseDecoderMask() const
 {

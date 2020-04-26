@@ -14,6 +14,8 @@ class L1Address :
 public:
 	PYPP_CONSTEXPR explicit L1Address(unsigned short val = 0) : rant_t(val) {}
 
+	explicit L1Address(DriverDecoder const& driver_decoder, SynapseDecoder const& synapse_decoder);
+
 	SynapseDecoder getSynapseDecoderMask() const;
 	DriverDecoder getDriverDecoderMask() const;
 };
