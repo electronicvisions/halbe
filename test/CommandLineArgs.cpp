@@ -1,5 +1,6 @@
 #include "CommandLineArgs.h"
 
+#include <iostream>
 #include <boost/program_options.hpp>
 #include "halco/common/iter_all.h"
 
