@@ -901,6 +901,8 @@ public:
 	explicit PYPP_CONSTEXPR SynapseGen(size_t val = 0) : rant_t(val) {}
 };
 
+// Disables DLL-reset of the synapse drivers. The left bit controls the drivers on the left
+// side the other bit the driver on the right side.
 class SynapseDllresetb : public halco::common::detail::RantWrapper<SynapseDllresetb, size_t, 3, 0>
 {
 public:
@@ -962,7 +964,6 @@ public:
                                  SynapseEnableDelay(0xf)
 		)
 	);
-	// Disables DLL-reset of the synapse drivers
 	PYPP_INIT(SynapseDllresetb dllresetb, SynapseDllresetb(SynapseDllresetb::min));
 	PYPP_INIT(SynapseGen gen, SynapseGen(0));	// TODO: add description
 	STDPEvaluationPattern pattern0; // Evaluation pattern to be used for first evaluation
