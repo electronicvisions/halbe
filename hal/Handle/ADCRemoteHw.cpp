@@ -6,7 +6,7 @@ namespace Handle {
 
 ADCRemoteHw::ADCRemoteHw(halco::hicann::v2::IPv4 const& host, halco::hicann::v2::TCPPort const& port, HMF::ADC::USBSerial const& adc)
     : ADC(adc),
-      rcfInit(new RCF::RcfInitDeinit),
+      rcfInit(new RCF::RcfInit),
       adc_client(new RcfClient<I_HALbeADC>(RCF::TcpEndpoint(host.to_string(), port))),
       m_host(host),
       m_port(port)
@@ -14,12 +14,12 @@ ADCRemoteHw::ADCRemoteHw(halco::hicann::v2::IPv4 const& host, halco::hicann::v2:
 	// use boost::serialization for marshalling
 	adc_client->getClientStub().setSerializationProtocol(RCF::Sp_BsBinary);
 	// 256MB seems to be the AnaRM buffer limit => 512MiB is safe :)
-	adc_client->getClientStub().getTransport().setMaxMessageLength(512*1024*1024);
+	adc_client->getClientStub().getTransport().setMaxIncomingMessageLength(512*1024*1024);
 	// enforce connection NOW
 	adc_client->getClientStub().connect();
 }
 
-ADCRemoteHw::ADCRemoteHw() : rcfInit(new RCF::RcfInitDeinit) {}
+ADCRemoteHw::ADCRemoteHw() : rcfInit(new RCF::RcfInit) {}
 
 ADCRemoteHw::~ADCRemoteHw() {}
 

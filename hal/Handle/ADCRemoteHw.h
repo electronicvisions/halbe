@@ -16,7 +16,7 @@ template <>
 struct RcfClient<I_HALbeADC>;
 
 namespace RCF {
-struct RcfInitDeinit;
+struct RcfInit;
 }
 
 
@@ -48,7 +48,7 @@ struct ADCRemoteHw : public ADC {
 
 #ifndef PYPLUSPLUS
 private:
-	std::unique_ptr<RCF::RcfInitDeinit> rcfInit;
+	std::unique_ptr<RCF::RcfInit> rcfInit;
 
 public:
 	std::unique_ptr<RcfClient<I_HALbeADC> > adc_client;

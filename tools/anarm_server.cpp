@@ -121,7 +121,7 @@ int main(int argc, const char *argv[]) {
 	ADCBackend_Helper servant{HMF::ADC::USBSerial(usb_serial)};
 
 	// Fire up RCF...
-	RCF::RcfInitDeinit rcfInit;
+	RCF::RcfInit rcfInit;
 	//RCF::RcfServer server;
 	//RCF::ServerTransport& tcpTransport = server.addEndpoint(RCF::TcpEndpoint(ip, port));
 
@@ -132,7 +132,7 @@ int main(int argc, const char *argv[]) {
 	RCF::RcfServer server(RCF::TcpEndpoint(ip, port));
 
 	// Set max message length to 512 MiB.
-	server.getServerTransport().setMaxMessageLength(512*1024*1024);
+	server.getServerTransport().setMaxIncomingMessageLength(512*1024*1024);
 
 	// pass usb_serial to thing...
 	server.bind<I_HALbeADC>(servant);
