@@ -1,4 +1,5 @@
 #include "hal/HICANN/FGConfig.h"
+#include <ostream>
 #include <bitter/bitter.h>
 
 namespace HMF {

@@ -1,4 +1,5 @@
 #include "hal/HICANN/FGInstruction.h"
+#include <ostream>
 #include <stdexcept>
 #include <bitter/bitter.h>
 

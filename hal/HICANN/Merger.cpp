@@ -1,4 +1,5 @@
 #include "hal/HICANN/Merger.h"
+#include <ostream>
 
 namespace HMF {
 namespace HICANN {
