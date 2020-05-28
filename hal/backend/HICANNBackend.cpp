@@ -241,10 +241,6 @@ HALBE_GETTER(WeightRow, get_weights_row,
 	ctrl_reg.cmd = SynapseControllerCmd::CLOSE_ROW;
 	set_syn_ctrl_and_guard(h, s.toSynapseArrayOnHICANN(), synapse_controller_copy);
 
-	//restore initial state
-	// TODO: Remove after halbe-sthal-data are separated
-	set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), synapse_controller.ctrl_reg);
-
 	return returnvalue;
 }
 
@@ -331,10 +327,6 @@ HALBE_GETTER(DecoderDoubleRow, get_decoder_double_row,
 
 	returnvalue[swtop]    = top_from_decoder(hwdata[top], hwdata[bottom]);
 	returnvalue[swbottom] = bot_from_decoder(hwdata[top], hwdata[bottom]);
-
-	//restore initial state
-	// TODO: Remove after halbe-sthal-data are separated
-	set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), synapse_controller.ctrl_reg);
 
 	return returnvalue;
 }

@@ -77,9 +77,6 @@ void set_decoder_double_row_impl(
 			set_syn_ctrl_and_guard(h, s.toSynapseArrayOnHICANN(), flush_command);
 		}
 	}
-
-	// restore initial state
-	set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), synapse_controller.ctrl_reg);
 }
 
 void set_weights_row_impl(
@@ -121,9 +118,6 @@ void set_weights_row_impl(
 		// flush the buffer
 		set_syn_ctrl_and_guard(h, s.toSynapseArrayOnHICANN(), flush_command);
 	}
-
-	// restore initial state
-	set_syn_ctrl(h, s.toSynapseArrayOnHICANN(), synapse_controller.ctrl_reg);
 }
 
 void set_syn_ctrl_and_guard(
