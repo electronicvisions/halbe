@@ -9,7 +9,7 @@ import argparse
 import sys
 import pyhalco_hicann_v2 as Coordinate
 import pylogging
-from pyhalco_common import X, Y, Enum
+from pyhalco_common import X, Y, Enum, iter_all
 
 WAFER = Coordinate.Wafer(10) # Show some new wafer as default
 
