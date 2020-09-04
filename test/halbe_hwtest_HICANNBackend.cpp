@@ -41,7 +41,7 @@ protected:
 	void FIFOtest(bool loop);
 	size_t L1TransmissionTest(RepeaterBlockOnHICANN block);
 };
-TYPED_TEST_CASE(HICANNBackendTest, HandleTypes);
+TYPED_TEST_SUITE(HICANNBackendTest, HandleTypes);
 
 
 TYPED_TEST(HICANNBackendTest, CreateReticleHWTest) {

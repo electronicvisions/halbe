@@ -26,7 +26,7 @@ typedef ::testing::Types<
 	// TODO add more
 > RangedTypes;
 
-TYPED_TEST_CASE(RangedTest, RangedTypes);
+TYPED_TEST_SUITE(RangedTest, RangedTypes);
 
 TYPED_TEST(RangedTest, isAssignable)
 {
