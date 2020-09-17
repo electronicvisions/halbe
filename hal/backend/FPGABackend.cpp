@@ -285,6 +285,13 @@ HALBE_GETTER(Status, get_fpga_status,
 	returnvalue.set_pb_release_error(reticle.fc->get_pb_release_error());
 	returnvalue.set_pb2arq_fifo_overflow(reticle.fc->get_pb2arq_fifo_overflow());
 
+	for (auto hicann : halco::common::iter_all<halco::hicann::v2::HICANNOnDNC>()) {
+		reticle.jtag->K7FPGA_set_hicannif(hicann.toHighspeedLinkOnDNC().toEnum());
+		uint64_t hicannif_status;
+		reticle.jtag->K7FPGA_get_hicannif_status(hicannif_status);
+		returnvalue.set_hicann_dropped_pulses_at_fpga_tx_fifo(hicann, ((hicannif_status>>52) & 0xfff));
+	}
+
 	return returnvalue;
 }
 

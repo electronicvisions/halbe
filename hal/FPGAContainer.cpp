@@ -134,6 +134,17 @@ void Status::set_pb2arq_fifo_overflow(bool const flag)
 	m_pb2arq_fifo_overflow = flag;
 }
 
+halco::common::typed_array<uint16_t,  ::halco::hicann::v2::HICANNOnDNC>
+	Status::get_hicann_dropped_pulses_at_fpga_tx_fifo() const
+{
+	return m_hicann_dropped_pulses_at_fpga_tx_fifo;
+}
+
+void Status::set_hicann_dropped_pulses_at_fpga_tx_fifo(halco::hicann::v2::HICANNOnDNC const hicann,
+							uint16_t const count)
+{
+	m_hicann_dropped_pulses_at_fpga_tx_fifo[hicann] = count;
+}
 
 void Status::check(){
 	if (getHardwareId() != 0x1c56c007)
@@ -151,7 +162,8 @@ bool Status::operator==(const Status &other) const
 	    && m_hicann_arq_uplink_rx_counter == other.m_hicann_arq_uplink_rx_counter
 	    && m_hicann_arq_uplink_tx_counter == other.m_hicann_arq_uplink_tx_counter
 	    && m_pb_release_error == other.m_pb_release_error
-	    && m_pb2arq_fifo_overflow == other.m_pb2arq_fifo_overflow;
+	    && m_pb2arq_fifo_overflow == other.m_pb2arq_fifo_overflow
+	    && m_hicann_dropped_pulses_at_fpga_tx_fifo == other.m_hicann_dropped_pulses_at_fpga_tx_fifo;
 }
 
 bool Status::operator!=(const Status &other) const

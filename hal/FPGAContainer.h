@@ -2,6 +2,7 @@
 
 #include "HMFCommon.h"
 #include "halco/hicann/v2/fwd.h"
+#include "halco/common/typed_array.h"
 
 #include <bitset>
 #include <vector>
@@ -166,7 +167,8 @@ public:
 		  m_hicann_arq_uplink_rx_counter(0),
 		  m_hicann_arq_uplink_tx_counter(0),
 		  m_pb_release_error(true),
-		  m_pb2arq_fifo_overflow(true)
+		  m_pb2arq_fifo_overflow(true),
+		  m_hicann_dropped_pulses_at_fpga_tx_fifo()
 	{}
 
 	uint32_t get_git_hash() const;
@@ -199,6 +201,11 @@ public:
 	bool get_pb2arq_fifo_overflow() const;
 	void set_pb2arq_fifo_overflow(bool const);
 
+	halco::common::typed_array<uint16_t,::halco::hicann::v2::HICANNOnDNC>
+		get_hicann_dropped_pulses_at_fpga_tx_fifo() const;
+	void set_hicann_dropped_pulses_at_fpga_tx_fifo(halco::hicann::v2::HICANNOnDNC const,
+							uint16_t const);
+
 	void check();
 
 	bool operator==(const Status & other) const;
@@ -218,10 +225,12 @@ private:
 	size_t m_hicann_arq_uplink_tx_counter;
 	bool m_pb_release_error;
 	bool m_pb2arq_fifo_overflow;
+	halco::common::typed_array<uint16_t, ::halco::hicann::v2::HICANNOnDNC>
+		m_hicann_dropped_pulses_at_fpga_tx_fifo;
 
 	friend class boost::serialization::access;
 	template<typename Archiver>
-	void serialize(Archiver& ar, const unsigned int)
+	void serialize(Archiver& ar, unsigned int const version)
 	{
 		ar & boost::serialization::make_nvp("git_hash", m_git_hash)
 		   & boost::serialization::make_nvp("git_dirty_flag", m_git_dirty_flag)
@@ -233,6 +242,10 @@ private:
 		   & boost::serialization::make_nvp("hicann_arq_uplink_tx_counter", m_hicann_arq_uplink_tx_counter)
 		   & boost::serialization::make_nvp("pb_release_error", m_pb_release_error)
 		   & boost::serialization::make_nvp("pb2arq_fifo_overflow", m_pb2arq_fifo_overflow);
+		if(version > 0) {
+			ar & boost::serialization::make_nvp("hicann_dropped_pulses_at_fpga_tx_fifo",
+								m_hicann_dropped_pulses_at_fpga_tx_fifo);
+		}
 	}
 };
 
@@ -543,3 +556,5 @@ namespace boost { namespace serialization {
 	}
 }} // namespace::serialization
 #endif
+
+BOOST_CLASS_VERSION(::HMF::FPGA::Status, 1)
