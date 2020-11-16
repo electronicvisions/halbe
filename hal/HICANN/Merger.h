@@ -23,7 +23,8 @@ public:
 			   MERGE      = 0x1 << enable_bit | 0x0 << select_bit
 	;
 
-	std::bitset<2> config; //!< configures merging or exclusive behaviour
+	typedef std::bitset<2> config_t;
+	config_t config; //!< configures merging or exclusive behaviour
 	bool slow;             //!< has to be enabled for DNC Merger connecting to SPL1 HICANN::Repeater
 
 	PYPP_CONSTEXPR Merger(size_t config = MERGE, bool slow = false) :
