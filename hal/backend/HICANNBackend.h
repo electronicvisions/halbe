@@ -217,6 +217,29 @@ void set_fg_values(Handle::HICANN & h, FGControl const& fg);
 FGBlock get_fg_values(Handle::HICANN & h, halco::hicann::v2::FGBlockOnHICANN const& b);
 
 /**
+ * Sets a row of FG values for the floating gate controller without triggering the controller to
+ * write to the floating gate itself; i.e. this is a register access only.
+ *
+ * @param h HICANN handle
+ * @param b FGBlock where controller is located
+ * @param fgr Row of FG values
+ * @note Only the first of the two available FG value registers is written
+ */
+void set_fg_ram_values(
+    Handle::HICANN& h, halco::hicann::v2::FGBlockOnHICANN const& b, FGRow const& fgr);
+
+/**
+ * Reads a row of FG values for the floating gate controller without triggering the controller to
+ * read the floating gate itself; i.e. this is a register access only.
+ *
+ * @param h HICANN handle
+ * @param b FGBlock where controller is located
+ * @note Only the first of the two available FG value registers is read
+ * @return Read row of FG values transformed into FGRow struct
+ */
+FGRow get_fg_ram_values(Handle::HICANN& h, halco::hicann::v2::FGBlockOnHICANN const& b);
+
+/**
  * Writes floating gate values for a row on all blocks in parallel
  *
  * @param row Row of the FGBlocks to configure

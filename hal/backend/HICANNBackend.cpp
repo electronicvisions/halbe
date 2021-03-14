@@ -697,6 +697,22 @@ HALBE_SETTER(
 	}
 }
 
+HALBE_SETTER(
+	set_fg_ram_values,
+	Handle::HICANN&, h,
+	FGBlockOnHICANN const&, b,
+	FGRow const&, fgr)
+{
+	ReticleControl& reticle = *h.get_reticle();
+	auto& fc = reticle.hicann[h.jtag_addr()]->getFC(b.toEnum());
+
+	auto const data = fgr.set_formatter();
+
+	for (size_t cnt = 0; auto const& val : data) {
+		fc.write_data(cnt++, val.to_ulong());
+	}
+}
+
 
 HALBE_SETTER(
 	set_fg_values,
@@ -746,6 +762,38 @@ HALBE_GETTER(FGBlock, get_fg_values,
     throw std::runtime_error("Not possible on real hardware :P");
 }
 
+HALBE_GETTER(FGRow, get_fg_ram_values,
+	Handle::HICANN &, h,
+	FGBlockOnHICANN const&, b)
+{
+	ReticleControl& reticle = *h.get_reticle();
+	auto& fc = reticle.hicann[h.jtag_addr()]->getFC(b.toEnum());
+	FGRow fgr;
+	// FG values only stored on bank 0
+	// Second bank could be used to write the controller values in parallel to programming the
+	// floating gates. This feature is not implemented, therefore the second bank is never used.
+	uint32_t bank = 0;
+	for (size_t col = 0; col < (FGRow::fg_columns + 1) / 2; col++) {
+		uint16_t addr;
+		uint32_t data;
+		fc.read_ram(bank, col);
+		fc.get_read_data_ram(addr, data);
+		if (addr != col) {
+			throw std::runtime_error("get_fg_ram_values: fgvalue address mismatch");
+		}
+		// First column contains shared parameter and first neuron
+		if (col == 0) {
+			fgr.setShared(data % 1024);
+		} else {
+			fgr.setNeuron(NeuronOnFGBlock(2 * col - 1), data % 1024);
+		}
+		// Last column contains only one neuron
+		if (col != FGRow::fg_columns / 2) {
+			fgr.setNeuron(NeuronOnFGBlock(2 * col), data / 1024);
+		}
+	}
+	return fgr;
+}
 
 HALBE_GETTER(HICANN::FGErrorResultQuadRow,
 	set_fg_row_values,
