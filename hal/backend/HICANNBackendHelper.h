@@ -39,6 +39,10 @@ void set_weights_row_impl(
  * Sets the synapse controller's control register and
  * guards by sending dummy packets to ensure that the
  * controller is not touched until the command is completed.
+ * Caution, by sending dummy packets, the configuration register
+ * is written with the values of the SynapseController.
+ * Make sure it contains the same values that are already present on the
+ * hardware, else they are changed while setting the control register!
  */
 void set_syn_ctrl_and_guard(
     Handle::HICANN& h,
