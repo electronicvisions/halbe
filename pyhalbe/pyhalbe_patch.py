@@ -22,5 +22,8 @@ def patch(module):
                 try:
                     obj.__module__ = submodule.__name__
                     obj.__name__ = name
+                    # necessary in python3
+                    obj.__qualname__ = name
+
                 except AttributeError:
                     pass

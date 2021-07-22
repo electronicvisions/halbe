@@ -129,7 +129,7 @@ c.include_files.append('pywrap/print_helper.hpp')
 c.add_registration_code('def(pywrap::PrintNice())')
 classes.add_pickle_suite(c)
 
-c = mb.typedef('::HMF::HICANN::STDPLUT::LUT').type.declaration
+c = mb.typedef('::HMF::HICANN::STDPLUT::LUT').decl_type.declaration
 c.include()
 
 # HMF::Handle stuff & special handling (ECM)
