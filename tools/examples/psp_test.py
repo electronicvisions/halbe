@@ -231,7 +231,7 @@ for t in spikes_raw:
 
 hicann.sendSpikes(sending_link, spikes)
 
-print hicann
+print(hicann)
 
 # Connect to hardware
 connection_db = pysthal.MagicHardwareDatabase()
@@ -288,15 +288,15 @@ except:
     pass
 
 # Write voltage trace
-np.savetxt(os.path.join(outdir_str,"voltages.csv"), zip(recorder0.getTimestamps(),recorder0.trace()))
+np.savetxt(os.path.join(outdir_str,"voltages.csv"), list(zip(recorder0.getTimestamps(),recorder0.trace())))
 
 try:
     # … and spikes
     spikes = hicann.receivedSpikes(receiving_link)
     times = [a.time for a in spikes]
     addrs = [a.addr.value() for a in spikes]
-    np.savetxt(os.path.join(outdir_str,"spikes.csv"), zip(times, addrs))
+    np.savetxt(os.path.join(outdir_str,"spikes.csv"), list(zip(times, addrs)))
 except Exception as e:
-    print e
+    print(e)
 
 wafer.dump("wafer.xml",True)

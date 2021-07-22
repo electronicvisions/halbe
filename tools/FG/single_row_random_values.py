@@ -31,7 +31,7 @@ class FGRandomTest(HWTest,FGTest):
         zeitwerte = [] 
 
         for i in range(100):
-                print "Run No. "+str(i)
+                print("Run No. "+str(i))
 
                 v = random.randint(0,1023)
                 Digital.append(v)
@@ -85,7 +85,7 @@ class FGRandomTest(HWTest,FGTest):
                     Analog.append(value)
                         
         z = np.mean(zeitwerte)
-        print z, 'Sekunden'
+        print(z, 'Sekunden')
         plot_fg_random_row.plot(Digital, Analog, z, self.IP, self.DNC, self.HICANN, fg_block_num, row_number, True)
 
 if __name__ == '__main__':

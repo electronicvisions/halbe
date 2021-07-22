@@ -17,7 +17,7 @@ def patch(module):
 
         # Fix object names and module
         # pyhalbe._HICANN_FGBlock -> pyhalbe.HICANN.FGBlock
-        for name, obj in submodule.__dict__.iteritems():
+        for name, obj in submodule.__dict__.items():
             if getattr(obj, '__name__', '').endswith("_" + name):
                 try:
                     obj.__module__ = submodule.__name__

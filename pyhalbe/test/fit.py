@@ -114,7 +114,7 @@ def fit_psp_simple(time, value):
 
     debug_plot = False
     if debug_plot:
-        print result[-2]
+        print(result[-2])
         p.figure()
         p.title(result[-2])
         p.plot(time, value)
@@ -143,7 +143,7 @@ def fit_psp(time, value, tau_m_estimate):
 
     debug_plot = False
     if debug_plot:
-        print result[-2]
+        print(result[-2])
         p.figure()
         p.title(result[-2])
         p.plot(time, value)

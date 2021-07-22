@@ -120,12 +120,12 @@ class Test_PyhalbeBindings(PyhalbeTest):
         r = Random(2321)
 
         # Test from list constructor
-        a = Inner(range(ilen))
+        a = Inner(list(range(ilen)))
         for ii in range(ilen):
             self.assertEqual(a[ii], value_type(ii))
 
         # Test from numpy constructor
-        a = Inner(np.array(range(ilen), dtype=value_type))
+        a = Inner(np.array(list(range(ilen)), dtype=value_type))
         for ii in range(ilen):
             self.assertEqual(a[ii], value_type(ii))
 
@@ -171,8 +171,8 @@ class Test_PyhalbeBindings(PyhalbeTest):
     def test_enum_compare(self):
         from pyhalbe import HICANN
 
-        sp = [k for k in HICANN.shared_parameter.values.itervalues()]
-        np = [k for k in HICANN.neuron_parameter.values.itervalues()]
+        sp = [k for k in HICANN.shared_parameter.values.values()]
+        np = [k for k in HICANN.neuron_parameter.values.values()]
 
         for a, b in zip(np + sp, np + sp):
             self.assertEqual(a, b)
@@ -199,12 +199,12 @@ class Test_PyhalbeBindings(PyhalbeTest):
     @parametrize(['shared_parameter', 'neuron_parameter'])
     def test_enum_pickling(self, param):
         from pyhalbe import HICANN
-        import cPickle
+        import pickle
         enum = getattr(HICANN, param)
 
-        values = [k for k in enum.values.itervalues()]
+        values = [k for k in enum.values.values()]
         for v in values:
-            loaded = cPickle.loads(cPickle.dumps(v))
+            loaded = pickle.loads(pickle.dumps(v))
             self.assertIs(loaded, v)
 
     @parametrize(['shared_parameter', 'neuron_parameter'])
@@ -212,7 +212,7 @@ class Test_PyhalbeBindings(PyhalbeTest):
         from pyhalbe import HICANN
         enum = getattr(HICANN, param)
 
-        for name, parameter in enum.names.iteritems():
+        for name, parameter in enum.names.items():
             if '__' not in name:
                 self.assertEqual(name,
                                  HICANN.to_string(parameter))

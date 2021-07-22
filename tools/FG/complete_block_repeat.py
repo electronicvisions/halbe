@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 import pylab
-import cPickle as pickle
+import pickle as pickle
 import pycalibtic
 from FGTest import FGTest
 from plot_fg_block import plot_fg_block
@@ -25,15 +25,15 @@ class FloatingGateTest(HWTest,FGTest):
             for j in range(0,128):
                 fgblock.setNeuronRaw(j, i, target_value_volt if i%2 else target_value_curr)
             fgblock.setSharedRaw(i, target_value_volt if i%2 else target_value_curr)
-        print "set floating gates for {}, to ({}, {})".format(
-                block, target_value_volt, target_value_curr)
+        print("set floating gates for {}, to ({}, {})".format(
+                block, target_value_volt, target_value_curr))
         assert config == fgblock.getConfig()
-        print fgblock.getConfig().maxcycle
-        print fgblock.getConfig().readtime
-        print fgblock.getConfig().acceleratorstep
-        print fgblock.getConfig().voltagewritetime
-        print fgblock.getConfig().currentwritetime
-        print fgblock.getConfig().pulselength
+        print(fgblock.getConfig().maxcycle)
+        print(fgblock.getConfig().readtime)
+        print(fgblock.getConfig().acceleratorstep)
+        print(fgblock.getConfig().voltagewritetime)
+        print(fgblock.getConfig().currentwritetime)
+        print(fgblock.getConfig().pulselength)
         ph.HICANN.set_fg_values(self.h, block, fgblock)
         ph.HICANN.flush(self.h)
 
@@ -101,21 +101,21 @@ class FloatingGateTest(HWTest,FGTest):
             self.write_fg_twice(fg_block_coord, 0, 0)
 
         if not reprogram:
-            print "programming floating gates..."
+            print("programming floating gates...")
             self.write_fg_twice(fg_block_coord, target_value_volt, target_value_curr)
 
         self.init_fg_measurement(fg_block_num)
         # measure
         m = []
         for i in range(3):
-            print "Run No. "+str(i)
+            print("Run No. "+str(i))
             # (re-) configure ADC and output MUX
             # this also pulls reset
             #self.init_fg_measurement(fg_block_num)
 
             # Write FG
             if reprogram:
-                print "programming floating gates..."
+                print("programming floating gates...")
                 self.write_fg_twice(fg_block_coord, target_value_volt, target_value_curr)
 
             for a in range(0,24):
@@ -149,7 +149,7 @@ class FloatingGateTest(HWTest,FGTest):
             name += '_zero'
         name += '.pkl'
 
-        print "Pickle to '{}'".format(name)
+        print("Pickle to '{}'".format(name))
         with open(name, 'wb') as out:
             pickle.dump(m, out, pickle.HIGHEST_PROTOCOL)
 

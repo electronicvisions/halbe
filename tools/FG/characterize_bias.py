@@ -6,7 +6,7 @@ from HWTest import HWTest
 import pyhalbe as ph
 import pycalibtic
 from FGTest import FGTest
-import cPickle
+import pickle
 
 class FloatingGateBias(HWTest,FGTest):
     '''Write a single row (as determined by self.row_coord) to maximum
@@ -27,7 +27,7 @@ class FloatingGateBias(HWTest,FGTest):
         fg_conf_fast.fg_bias = 0
         fg_conf_fast.fg_biasn = 3
 
-        print "Clear floating_gates"
+        print("Clear floating_gates")
         # instantiate FG stuff
         fgc = ph.HICANN.FGControl()
         fgb = fgc.getBlock(self.fg_coord)
@@ -45,11 +45,11 @@ class FloatingGateBias(HWTest,FGTest):
         ph.HICANN.set_fg_values(self.h, self.fg_coord, fgb)
         ph.HICANN.set_fg_values(self.h, self.fg_coord, fgb)
         ph.HICANN.flush(self.h)
-        print np.mean(self.read_fg_cell(1,int(self.row_coord)))
+        print(np.mean(self.read_fg_cell(1,int(self.row_coord))))
 
         data = []
         for bias in (0, 1, 2, 3, 4, 8, 12, 15):
-            print "Meassure for bias {}".format(bias)
+            print("Meassure for bias {}".format(bias))
             cfg = ph.HICANN.FGConfig()
             cfg.fg_biasn = bias
             ph.HICANN.set_fg_config(self.h, self.fg_coord, cfg)
@@ -78,7 +78,7 @@ class FloatingGateBias(HWTest,FGTest):
                     result.append((fg_value, bias, rep, data))
 
             with open(filename, 'wb') as output:
-                cPickle.dump(result, output, cPickle.HIGHEST_PROTOCOL)
+                pickle.dump(result, output, pickle.HIGHEST_PROTOCOL)
 
 if __name__ == '__main__':
     HWTest.main()

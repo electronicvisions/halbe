@@ -38,8 +38,8 @@ def hicanns_on_dnc(dnc):
     h0 = C.HICANNOnDNC(Enum(0)).toHICANNOnWafer(dnc)
     h1 = C.HICANNOnDNC(Enum(per_dnc / 2)).toHICANNOnWafer(dnc)
 
-    top = range(h0.toEnum().value(), h0.toEnum().value() + offset + 1)
-    bot = range(h1.toEnum().value(), h1.toEnum().value() + offset + 1)
+    top = list(range(h0.toEnum().value(), h0.toEnum().value() + offset + 1))
+    bot = list(range(h1.toEnum().value(), h1.toEnum().value() + offset + 1))
     return top + bot
 
 def main():
@@ -59,7 +59,7 @@ def main():
     if not values:
         parser.error("No HICANNs found, not enough arguments passed.")
     for value in values:
-        print value
+        print(value)
 
 if __name__ == '__main__':
 

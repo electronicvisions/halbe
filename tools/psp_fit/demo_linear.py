@@ -44,15 +44,15 @@ def plott():
     tval = p.arange(25, 35, 1)
     p.plot(tval, [chi2(t) for t in tval], '-')
 
-print "original parameters:         ", theta_0
-print "mean fit values:             ", p.mean([estimate()[0] for _ in xrange(rep)], axis=0)
-print
-print "mean fit parameter deviation:", p.std([estimate()[0] for _ in xrange(rep)], axis=0)
-print
-print "mean deviation estimate:     ", p.mean([p.sqrt(p.diag(estimate()[1])) for _ in xrange(rep)], axis=0)
-print
-print "fit parameter covariances:"
-print p.cov([estimate()[0] for _ in xrange(rep)], rowvar=0)
-print
-print "mean covariance matrix:      "
-print p.mean([estimate()[1] for _ in xrange(rep)], axis=0)
+print("original parameters:         ", theta_0)
+print("mean fit values:             ", p.mean([estimate()[0] for _ in range(rep)], axis=0))
+print()
+print("mean fit parameter deviation:", p.std([estimate()[0] for _ in range(rep)], axis=0))
+print()
+print("mean deviation estimate:     ", p.mean([p.sqrt(p.diag(estimate()[1])) for _ in range(rep)], axis=0))
+print()
+print("fit parameter covariances:")
+print(p.cov([estimate()[0] for _ in range(rep)], rowvar=0))
+print()
+print("mean covariance matrix:      ")
+print(p.mean([estimate()[1] for _ in range(rep)], axis=0))

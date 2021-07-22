@@ -127,7 +127,7 @@ def main():
     if args.values:
         for (value, ) in args.values:
             if value:
-                print value
+                print(value)
     else:
         parser.print_usage()
 

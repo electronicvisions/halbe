@@ -257,7 +257,7 @@ class HALbeXML2Sim2Denmem(object):
         self.extract_playback_pulses()
         self.extract_synapse_weights()
         for elem in ['fg_shared', 'fg_neuron', 'denmem_quad', 'neuron_config']:
-            if not elem in self.out.keys():
+            if not elem in list(self.out.keys()):
                 raise Exception("Data missing: %s" % elem)
         self.extracted = True
 
@@ -277,7 +277,7 @@ class HALbeXML2Sim2Denmem(object):
         # filter out extranous <TAG><value>X</value></TAG> things
         if len(element.getchildren()) == 1 and element.getchildren()[0].tag == 'value':
             return element.tag, element.getchildren()[0].text
-        return element.tag, dict(map(self.recursive_dict_iter, element)) or element.text
+        return element.tag, dict(list(map(self.recursive_dict_iter, element))) or element.text
 
 
     def recursive_dict(self, element):
@@ -295,9 +295,9 @@ class HALbeXML2Sim2Denmem(object):
 
     def values_to_int(self, d):
         if isinstance(d, dict):
-            return dict(map(lambda x: (x[0], int(x[1])), d.items()))
+            return dict([(x[0], int(x[1])) for x in list(d.items())])
         # else try plain list-style
-        return map(int, d)
+        return list(map(int, d))
 
 
     def get_all_functions(self, foo, fpga=False):
@@ -309,8 +309,8 @@ class HALbeXML2Sim2Denmem(object):
             else:
                 hc = HICANNGlobal(Enum(self.values_to_int(self.recursive_dict(hicann))['wafer'])) #or 'value'
             if self.coordinate.hicann() != hc and not fpga:
-                print "ignore non-matching hicanns..."
-                print "ignoring HICANN", hc, "(looking for", self.coordinate.hicann(), ")"
+                print("ignore non-matching hicanns...")
+                print("ignoring HICANN", hc, "(looking for", self.coordinate.hicann(), ")")
                 continue
             else:
                 yield hicann, parameters
@@ -323,7 +323,7 @@ class HALbeXML2Sim2Denmem(object):
             return const * int(x)
         try:
             iter(v)
-            ret = map(conv, v)
+            ret = list(map(conv, v))
         except TypeError:
             ret = conv(v)
         return ret
@@ -340,7 +340,7 @@ class HALbeXML2Sim2Denmem(object):
     def extract_fg_values(self):
         ncolumns = 24
         nrows = 128
-        if not self.out.has_key('fg_shared'):
+        if 'fg_shared' not in self.out:
             self.out['fg_shared'] = [None, None]
 
         for hicann, parameters in self.get_all_functions('set_fg_values'):
@@ -385,7 +385,7 @@ class HALbeXML2Sim2Denmem(object):
         mydictupdates = copy.deepcopy(emptyjson)
 
         # translate shared FG parameters
-        for key, data in fg_name_lut['shared'].items():
+        for key, data in list(fg_name_lut['shared'].items()):
             HALbeType   = data[0]
             leftOrRight = data[1]
             sectionName = data[2]
@@ -402,7 +402,7 @@ class HALbeXML2Sim2Denmem(object):
                 }
 
         # translate neuron FG parameters
-        for key, data in fg_name_lut['neuron'].items():
+        for key, data in list(fg_name_lut['neuron'].items()):
             HALbeType   = data[0]
             sectionName = data[1]
             valueWidth  = data[2]
@@ -418,11 +418,11 @@ class HALbeXML2Sim2Denmem(object):
                 #print mydictupdates
 
         # convert FG DAC values to voltages/currents
-        for k, v in mydictupdates['voltages'].items():
-            for k2, v2 in v.items():
+        for k, v in list(mydictupdates['voltages'].items()):
+            for k2, v2 in list(v.items()):
                 v2['values'] = self.dac_to_volt(v2['values'])
-        for k, v in mydictupdates['currents'].items():
-            for k2, v2 in v.items():
+        for k, v in list(mydictupdates['currents'].items()):
+            for k2, v2 in list(v.items()):
                 v2['values'] = self.dac_to_current(v2['values'])
 
         #print 'zzz', mydictupdates
@@ -506,7 +506,7 @@ class HALbeXML2Sim2Denmem(object):
             assert len(parameters) == 1
             neuron_config_list = []
             # only "top" used by simulation => higher bit => 1
-            for (k,v) in self.recursive_dict(parameters[0]).items():
+            for (k,v) in list(self.recursive_dict(parameters[0]).items()):
                 try:
                     neuron_config_list.append([k, bits_to_value[v['bits'][1]]])
                 except TypeError:
@@ -533,12 +533,12 @@ class HALbeXML2Sim2Denmem(object):
         self.out['stimulus'] = [0.0, 0.0] # set defaults
         for hicann, parameters in self.get_all_functions('set_current_stimulus'):
             assert len(parameters) == 2
-            values = map(int, parameters[1].xpath('current/elems/item/text()'))
+            values = list(map(int, parameters[1].xpath('current/elems/item/text()')))
             pulselength = int(parameters[1].xpath('pulselength/value/text()')[0])
             continuous = int(parameters[1].xpath('continuous/text()')[0])
 
             compress = lambda l: list(chain(*[[pulselength*len(list(g)), v] for v, g in groupby(l)]))
-            values = compress(map(self.dac_to_current, values))
+            values = compress(list(map(self.dac_to_current, values)))
             values = [wait_cycles, 0.0] + values # wait some clock cycles until simulator has reached E_l
 
             if int(self.out['denmem_quad']['cfg'][int(left)]['enable_current_input']) != 0:
@@ -571,8 +571,8 @@ class HALbeXML2Sim2Denmem(object):
         for fpga, parameters in self.get_all_functions('write_playback_pulses', True):
             assert len(parameters) == 2
             pulse_count = int(parameters[0].xpath('pulses/count/text()')[0])
-            pulse_time = map(int, parameters[0].xpath('pulses/item/time/text()'))
-            pulse_address = map(int, parameters[0].xpath('pulses/item/pulse_address/label/text()'))
+            pulse_time = list(map(int, parameters[0].xpath('pulses/item/time/text()')))
+            pulse_address = list(map(int, parameters[0].xpath('pulses/item/pulse_address/label/text()')))
             delay = int(parameters[1].xpath('text()')[0]) + pulse_time[0]
             pulse_length = 1
             
@@ -618,7 +618,7 @@ class HALbeXML2Sim2Denmem(object):
             run += 2
             syn_address = int(parameters[0].xpath('value/text()')[0])
             rows_count = int(parameters[1].xpath('elems/count/text()')[0])
-            weight_row = map(int, parameters[1].xpath('elems/item/value/text()'))
+            weight_row = list(map(int, parameters[1].xpath('elems/item/value/text()')))
 
             for i in range (2):
                 weights = [

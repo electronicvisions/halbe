@@ -58,7 +58,7 @@ def loadEnvironBool(env, defaultsTo = False):
             return True
 
     #else..
-    raise(RuntimeError('%s environment variable could not be parsed:\n\t%s is neither true nor false.' % (env, v)))
+    raise RuntimeError('%s environment variable could not be parsed:\n\t%s is neither true nor false.' % (env, v))
 
 
 
@@ -111,7 +111,7 @@ def __getBoostPythonArgumentError():
     try:
         # The following call should always throw a Boost.Python.ArgumentError
         p.Debug.getHalbeGitVersion("a stupid and wrong parameter", 1, 2, 3, 4, 5, 6, 7, 8, 9)
-    except Exception, e:
+    except Exception as e:
         assert type(e).__module__   == ARGUMENT_ERROR_MODULE
         assert type(e).__name__     == ARGUMENT_ERROR_NAME
         if not ( ARGUMENT_ERROR_MSG_PART in e.message.split('\n') ): # foreign
@@ -206,10 +206,10 @@ def __wrap_pyhalbe():
 
 
         def list_collection(self):
-            print ('Listing all members of %s of type %s' % (self.module.__name__, self.search_type))
+            print(('Listing all members of %s of type %s' % (self.module.__name__, self.search_type)))
             for a in self.members:
-                print a
-            print
+                print(a)
+            print()
                 
 
     # A helper class to Boost.Python.functions
@@ -219,10 +219,10 @@ def __wrap_pyhalbe():
 
         def __init__(self, attr_desc): # , wrap_before, wrap_after):
             self.func_module    = attr_desc.module
-            self.func_name      = attr_desc.name
+            self.__name__      = attr_desc.name
             self.orig_function  = attr_desc.attribute
-            self.func_fqn       = '%s.%s' % (self.func_module.__name__, self.func_name) # fqn=fully-qualified-name
-            setattr(self.func_module, self.func_name, self.wrap_function)
+            self.func_fqn       = '%s.%s' % (self.func_module.__name__, self.__name__) # fqn=fully-qualified-name
+            setattr(self.func_module, self.__name__, self.wrap_function)
 
 
         def wrap_function(self, *args, **kwargs):
@@ -235,13 +235,13 @@ def __wrap_pyhalbe():
 
             try:
                 return self.orig_function(*args, **kwargs)
-            except RuntimeError, e:
+            except RuntimeError as e:
                 logger.warn('Runtime error ignored: %s' % self.func_fqn)
                 logger.warn(e)
-            except BoostPythonArgumentError, e:
+            except BoostPythonArgumentError as e:
                 logger.error('Argument/Signature error found!')
                 raise(e)
-            except Exception, e:
+            except Exception as e:
                 logger.warn('Unknown error ignored: %s' % e.message)
 
     # the function (__wrap_pyhalbe)
@@ -278,6 +278,7 @@ def __wrap_pyhalbe():
 
 # Prepare logging
 import logging
+from functools import reduce
 logging.debug('LOADING module pyhalbe_apicheck_extension') # kh: if this is missing logging does not take place ? why? needed for initialization of logging module?
 logging.addLevelName(5, "DEBUG0") # for esp. recursive output
 logger = logging.getLogger(__name__)

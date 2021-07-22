@@ -50,41 +50,41 @@ class HWTestLibExamples(HWTest):
     def test_MembraneTimeConstants(self):
         for i in range(1):
             tc = GetMembraneTimeConstant(self.h, i)
-            print "Neuron " + str(i) + " has a membrane time constant of " + str(tc) + " microseconds"
+            print("Neuron " + str(i) + " has a membrane time constant of " + str(tc) + " microseconds")
 
     def test_SynapticTimeConstants(self):
         for i in range(1):
             tc = GetSynapticTimeConstant(self.h, i, False)
-            print "Neuron " + str(i) + " has a synaptic time constant of " + str(tc) + " microseconds"
+            print("Neuron " + str(i) + " has a synaptic time constant of " + str(tc) + " microseconds")
 
     def test_RestPotential(self):
         for i in range(1):
             p = GetMembraneRestPotential(self.h, i)
-            print "Neuron " + str(i) + " has rest potential at " + str(p) + " Volts"
+            print("Neuron " + str(i) + " has rest potential at " + str(p) + " Volts")
 
     def test_ResetPotential(self):
         fgc = LoadResetFGParameters()
         ProgramFG(self.h, fgc)
         for i in range(1):
             r = GetResetPotential(self.h, i)
-            print "Neuron " + str(i) + " has reset potential at " + str(r) + " Volts"
+            print("Neuron " + str(i) + " has reset potential at " + str(r) + " Volts")
 
     def test_Threshold(self):
         for i in range(1):
             th = GetFiringThreshold(self.h, i)
-            print "Neuron " + str(i) + " has firing threshold at " + str(th) + " Volts"
+            print("Neuron " + str(i) + " has firing threshold at " + str(th) + " Volts")
 
     def test_RefractoryPeriod(self):
         fgc = LoadResetFGParameters()
         ProgramFG(self.h, fgc)
         for i in range(1):
             r = GetRefractoryPeriod(self.h, i)
-            print "Neuron " + str(i) + " has refractory period of " + str(r) + " microseconds"
+            print("Neuron " + str(i) + " has refractory period of " + str(r) + " microseconds")
 
     def test_LinearityOfSynapticInput(self):
         for n in range(1):
             ints = TakeLinearityCurve(self.h, n, False, 3, 1000)
-            pylab.plot(range(1,16), ints[1:])
+            pylab.plot(list(range(1,16)), ints[1:])
             pylab.show()
 
     def test_FitPSP(self):
@@ -224,10 +224,10 @@ class HWTestLibExamples(HWTest):
 
         for i in range(15):
             times, addresses = L1Receive(self.h, repblock, repnr)
-            print "From repeater " + str(repnr) + " received: "
-            print "Neuron number " + str(addresses[0]) + " at time " + str(times[0])
-            print "Neuron number " + str(addresses[1]) + " at time " + str(times[1])
-            print "Neuron number " + str(addresses[2]) + " at time " + str(times[2]) + "\n"
+            print("From repeater " + str(repnr) + " received: ")
+            print("Neuron number " + str(addresses[0]) + " at time " + str(times[0]))
+            print("Neuron number " + str(addresses[1]) + " at time " + str(times[1]))
+            print("Neuron number " + str(addresses[2]) + " at time " + str(times[2]) + "\n")
             
 
         StopFPGABEG(self.h, self.fpga.dnc(self.dnc), self.fpga)

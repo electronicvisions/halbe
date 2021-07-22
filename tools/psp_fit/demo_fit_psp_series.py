@@ -3,11 +3,11 @@ Generate a voltage trace with several PSPs and fit individual PSPs,
 calculating the parameters and the integral with an error estimate.
 """
 
-from test_fit import noisy_psp
+from .test_fit import noisy_psp
 import pylab as p
-from segment_psp_trace import segment
-from fit import fit
-from psp_shapes import AlphaPSP
+from .segment_psp_trace import segment
+from .fit import fit
+from .psp_shapes import AlphaPSP
 
 
 dt = .1
@@ -26,7 +26,7 @@ def build_rep_trace(noise=1., seed_val=2931):
     repetitions = 100
 
     result = p.empty(repetitions * len(times))
-    for i in xrange(repetitions):
+    for i in range(repetitions):
         v = noisy_psp(height, tau_1, tau_2, start, offset, times, noise)
         result[i * len(times):
                (i + 1) * len(times)] = v
@@ -47,6 +47,6 @@ if __name__ == '__main__':
         r = fit(psp, times, shape, noise_est,
                 fail_on_negative_cov=[True, True, True, False, False])
         a, b = psp.integral(times, r[0], r[1])
-        print "fit succeeded:", r[-1]
-        print "fit result:", r[0]
-        print "integral:", a, "+/-", b
+        print("fit succeeded:", r[-1])
+        print("fit result:", r[0])
+        print("integral:", a, "+/-", b)

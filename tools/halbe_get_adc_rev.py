@@ -18,4 +18,4 @@ if __name__ == "__main__":
     parser.add_argument("--adc", action="store", type=str, required=True,
                         help="ADC identifier")
     args = parser.parse_args()
-    print("ADC FPGA design revision: {}".format(get_rev(args.adc)))
+    print(("ADC FPGA design revision: {}".format(get_rev(args.adc))))

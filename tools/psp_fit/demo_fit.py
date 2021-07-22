@@ -5,9 +5,9 @@ errors) are shown in two separate plots.
 """
 
 import pylab as p
-from psp_shapes import AlphaPSP
-from test_psp_shapes import noisy_psp
-from fit import fit
+from .psp_shapes import AlphaPSP
+from .test_psp_shapes import noisy_psp
+from .fit import fit
 
 
 def fit_quality(time, parameters, noise, repetitions):
@@ -22,7 +22,7 @@ def fit_quality(time, parameters, noise, repetitions):
 
     alpha_psp = AlphaPSP()
 
-    for _ in xrange(repetitions):
+    for _ in range(repetitions):
         seed()
 
         value = noisy_psp(time=time, noise=noise, **parameters)
@@ -31,12 +31,12 @@ def fit_quality(time, parameters, noise, repetitions):
         if fit_result is not None:
             result, error, chi2, success = fit_result
             if chi2 < 1.5 and success:
-                print chi2, result
+                print(chi2, result)
                 results.append(result)
                 errors.append(error)
         else:
-            print "fit failed:",
-            print fit_result
+            print("fit failed:", end=' ')
+            print(fit_result)
 
     keys = alpha_psp.parameter_names()
 
@@ -51,7 +51,7 @@ def fit_quality(time, parameters, noise, repetitions):
         for r, key in zip(p.diag(error), keys):
             error_dict[key].append(p.sqrt(r))
             if p.isnan(p.sqrt(r)):
-                print "+++++++", r
+                print("+++++++", r)
 
     return ([p.mean(result_dict[key]) for key in keys],
             [p.std(result_dict[key]) for key in keys],
@@ -77,7 +77,7 @@ def evaluate_fit_quality(time, par, noise_values, trials, debug_plot=True):
         success_count.append(success)
         allvals.append(a)
         errors.append(errs)
-        print p.any(p.isnan(errs))
+        print(p.any(p.isnan(errs)))
 
     mean_fit = p.array(mean_fit)
     std_fit = p.array(std_fit)
@@ -118,7 +118,7 @@ def evaluate_fit_quality(time, par, noise_values, trials, debug_plot=True):
             for n, a, e in zip(noise_values, allvals, errors):
                 rmsvals = p.sqrt(p.mean(((p.array(a[i]) - par[keys[i]]) / p.array(e[i])) ** 2))
                 p.plot([n], rmsvals, "go")
-                print "rmsvals for noise={0}, param={1}:".format(n, keys[i]), rmsvals, p.array(e[i])
+                print("rmsvals for noise={0}, param={1}:".format(n, keys[i]), rmsvals, p.array(e[i]))
             p.ylim(0, None)
             p.ylabel(keys[i])
 

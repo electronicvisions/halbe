@@ -49,7 +49,7 @@ class ADCHardwareTest(HWTest):
         # All other neurons keep the default values
         nactive = nquad[neuron.toNeuronOnQuad()]
 
-        for key, value in kwargs.iteritems():
+        for key, value in kwargs.items():
             getattr(nactive, key)(value)
 
         HICANN.set_denmem_quad(self.h, neuron.toQuadrantOnHICANN(), nquad)

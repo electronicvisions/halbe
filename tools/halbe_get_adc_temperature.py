@@ -18,4 +18,4 @@ if __name__ == "__main__":
     parser.add_argument("--adc", action="store", type=str, required=True,
                         help="ADC identifier")
     args = parser.parse_args()
-    print("ADC temperature: {:.2f} deg C".format(get_temperature(args.adc)))
+    print(("ADC temperature: {:.2f} deg C".format(get_temperature(args.adc))))

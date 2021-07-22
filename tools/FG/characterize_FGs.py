@@ -80,20 +80,20 @@ class FloatingGateCharacterization(HWTest,FGTest):
             fgb.setConfig(fg_conf_fast)
             self.set_block(fgb,1023)
 
-            print "Programming FGs completely up."
+            print("Programming FGs completely up.")
             ph.HICANN.set_fg_values(self.h,self.fg_coord,fgb)
             ph.HICANN.set_fg_values(self.h,self.fg_coord,fgb)
             ph.HICANN.flush(self.h)
-            print np.mean(self.read_fg_cell(1,int(self.row_coord)))
+            print(np.mean(self.read_fg_cell(1,int(self.row_coord))))
             # set fgb to program row down slowly
             self.set_block(fgb,0)
             fgb.setConfig(fg_conf_slow_down)
             fgc.setBlock(self.fg_coord,fgb)
 
-            print "Running",num_runs," programming steps down."
+            print("Running",num_runs," programming steps down.")
             for run in range(num_runs):
                 if not run%10:
-                    print run
+                    print(run)
                 for i in range(33):
                     calibrated_trace = self.read_fg_cell(i,int(self.row_coord))
                     cells['data'][i][run] = np.mean(calibrated_trace)
@@ -106,20 +106,20 @@ class FloatingGateCharacterization(HWTest,FGTest):
             self.set_block(fgb,0)
             fgb.setConfig(fg_conf_fast)
 
-            print "Programming FGs completely down."
+            print("Programming FGs completely down.")
             ph.HICANN.set_fg_values(self.h,self.fg_coord,fgb)
             ph.HICANN.set_fg_values(self.h,self.fg_coord,fgb)
             ph.HICANN.flush(self.h)
-            print np.mean(self.read_fg_cell(1,int(self.row_coord)))
+            print(np.mean(self.read_fg_cell(1,int(self.row_coord))))
             # program row up slowly
             self.set_block(fgb,1023)
             fgb.setConfig(fg_conf_slow_up)
             fgc.setBlock(self.fg_coord,fgb)
 
-            print "Running",num_runs," programming steps up."
+            print("Running",num_runs," programming steps up.")
             for run in range(num_runs):
                 if not run%10:
-                    print run
+                    print(run)
                 for i in range(33):
                     calibrated_trace = self.read_fg_cell(i,int(self.row_coord))
                     cells['data'][i][run+num_runs] = np.mean(calibrated_trace)

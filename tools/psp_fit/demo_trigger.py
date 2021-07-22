@@ -4,7 +4,7 @@ the resulting mean psp shape
 """
 
 import pylab as p
-from test_psp_shapes import noisy_psp
+from .test_psp_shapes import noisy_psp
 
 
 if __name__ == '__main__':
@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
     psp_voltage = []
 
-    for i in xrange(repetitions):
+    for i in range(repetitions):
         phase = p.random() * p.pi * 2
         voltage = noisy_psp(height, tau_1, tau_2, start, offset, time, noise) \
             + sin_amplitude * p.sin(sin_omega * time + phase)

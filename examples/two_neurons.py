@@ -77,7 +77,7 @@ def main(args):
     # L1 Topology
 
     dncmerger = DNCMergerLine()
-    for mm in map(DNCMergerOnHICANN, range(8)):
+    for mm in map(DNCMergerOnHICANN, list(range(8))):
         dncmerger[mm].config = DNCMerger.RIGHT_ONLY
     set_dnc_merger(hicann, dncmerger)
 
@@ -85,7 +85,7 @@ def main(args):
     set_phase(hicann, 0)
 
     # write default RepeatBlocks
-    for ii in map(RepeaterBlockOnHICANN, map(Enum, range(6))):
+    for ii in map(RepeaterBlockOnHICANN, list(map(Enum, list(range(6))))):
         set_repeater_block(hicann, ii, RepeaterBlock())
 
     cb = Crossbar()
@@ -176,4 +176,4 @@ if __name__ == '__main__':
 
     main(args)
 
-    print "experiment id: %d" % pyo.experiment.id
+    print("experiment id: %d" % pyo.experiment.id)

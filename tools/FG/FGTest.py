@@ -56,7 +56,7 @@ class FGTest:
         self.adc_channel = pyhalco_hicann_v2.ChannelOnADC(adc_channel)
         self.adc_board = pyhalco_hicann_v2.ADC(adc)
 
-        print "Trying to get ADC Handle."
+        print("Trying to get ADC Handle.")
         self.adc = ph.Handle.ADCHw(self.adc_board)
 
         #configure ADC
@@ -66,7 +66,7 @@ class FGTest:
         adc_conf  = ph.ADC.Config(5000, self.adc_channel, trig)
         ph.ADC.config(self.adc, adc_conf)
 
-        print "ADC set up."
+        print("ADC set up.")
 
     def init_fg_measurement(self,block):
         if isinstance(block, pyhalco_hicann_v2.FGBlockOnHICANN):
@@ -74,12 +74,12 @@ class FGTest:
         else:
             self.fg_coord = pyhalco_hicann_v2.FGBlockOnHICANN(Enum(block))
 
-        print "Trying FPGA reset."
+        print("Trying FPGA reset.")
         ph.FPGA.reset(self.fpga)
-        print "Trying HICANN init."
+        print("Trying HICANN init.")
         ph.HICANN.init(self.h, False)
 
-        print "Reset and init finished."
+        print("Reset and init finished.")
 
         # set ANALOG
         ac = ph.HICANN.Analog()
@@ -87,6 +87,6 @@ class FGTest:
         ac.set_fg_left(pyhalco_hicann_v2.AnalogOnHICANN(1))
         ph.HICANN.set_analog(self.h, ac)
 
-        print "Analog output configured."
+        print("Analog output configured.")
 
 

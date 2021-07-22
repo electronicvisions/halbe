@@ -18,4 +18,4 @@ if __name__ == "__main__":
     handle = pyhalbe.Handle.FPGAHw(pyhalbe.Coordinate.FPGAGlobal(args.fpga), ip, pyhalbe.Coordinate.DNCOnFPGA(args.dnc))
     status = pyhalbe.FPGA.get_fpga_status(handle)
 
-    print("FPGA design revision: {}".format(status.design_version))
+    print(("FPGA design revision: {}".format(status.design_version)))

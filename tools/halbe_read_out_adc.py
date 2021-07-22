@@ -32,7 +32,7 @@ def measure(adc, ip, port, channel, samples):
 
 def dump(data):
     for t, v in data.T:
-        print "{}\t{}".format(t,v)
+        print("{}\t{}".format(t,v))
 
 def plot(data):
     from matplotlib import pyplot as plt

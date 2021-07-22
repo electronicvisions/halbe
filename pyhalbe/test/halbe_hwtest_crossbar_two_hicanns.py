@@ -26,9 +26,9 @@ class TwoHicannTest(unittest.TestCase):
         init(h2)
         import numpy.random as rd
         def create_pattern():
-            return [[ bool(i < 0.5) for i in rd.randint(2, size=4)] for n in xrange(64)]
-        patterns_left = [ create_pattern() for n in xrange(2) ]
-        patterns_right = [ create_pattern() for n in xrange(2) ]
+            return [[ bool(i < 0.5) for i in rd.randint(2, size=4)] for n in range(64)]
+        patterns_left = [ create_pattern() for n in range(2) ]
+        patterns_right = [ create_pattern() for n in range(2) ]
 
         # UGLY!
         read_pattern = [[True]*4]*64

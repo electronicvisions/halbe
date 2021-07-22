@@ -23,7 +23,7 @@ def segment(data, dt, interval):
     result = p.empty((n_segments, segment_len))
 
     # "fuzzy reshape"
-    for i in xrange(n_segments):
+    for i in range(n_segments):
         offset = int(p.around(i * interval / dt))
         result[i, :] = data[offset:offset + segment_len]
 

@@ -22,7 +22,7 @@ def jacobian(func, p0, epsilon=1e-8):
         return result
 
     return (p.array([func(p0 + ith_epsilon(i))
-                     for i in xrange(len(p0))]) - func(p0)) / epsilon
+                     for i in range(len(p0))]) - func(p0)) / epsilon
 
 
 class PSPShape(object):
@@ -51,7 +51,7 @@ class PSPShape(object):
         return inspect.getargspec(self.__call__).args[2:]
 
     def parameter_dict(self, parameters):
-        return dict(zip(self.parameter_names, parameters))
+        return dict(list(zip(self.parameter_names, parameters)))
 
     def __call__(self):
         raise NotImplementedError

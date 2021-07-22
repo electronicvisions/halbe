@@ -318,7 +318,7 @@ class PlaybackTraceHWTest(HWTest):
             # CDF: cumulative distribution function of negative exponential distr.
             allowed_loss = (1 - np.exp(-min_isi*1./isi))**2
             rel_loss = (pc.size() - received_data.size())*1./pc.size()
-            print allowed_loss, rel_loss
+            print(allowed_loss, rel_loss)
             self.assertLess(rel_loss,allowed_loss)
 
     @unittest.expectedFailure
@@ -425,13 +425,13 @@ class PlaybackTraceHWTest(HWTest):
         pc = FPGA.PulseEventContainer(pulse_events)
         received_data = self.runExperiment(pc)
 
-        print "Sent pulses"
+        print("Sent pulses")
         for i in range(pc.size()):
-            print pc[i]
+            print(pc[i])
 
-        print "Received pulses"
+        print("Received pulses")
         for i in range(received_data.size()):
-            print received_data[i]
+            print(received_data[i])
 
         pulses_this_hicann =  filter_events_from_hicann(pc,self.h.to_HICANNOnDNC())
 

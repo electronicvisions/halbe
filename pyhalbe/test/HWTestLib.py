@@ -161,7 +161,7 @@ def HistogrammizeTrace(voltage):
 
 # smoothes the signal
 def Smooth(signal, radius = 10, sigma = 3):
-    r = range(-int(radius/2), int(radius/2)+1)
+    r = list(range(-int(radius/2), int(radius/2)+1))
     gauss = [1/(sigma*np.sqrt(2*np.pi)) * np.exp(-float(x)**2/(2*sigma**2)) for x in r]
     smsig=np.convolve(signal, gauss, 'same')
     return smsig
@@ -169,7 +169,7 @@ def Smooth(signal, radius = 10, sigma = 3):
 
 # smoothes the signal
 def SmoothSignal(signal, time = [], radius = 15, sigma = 2):
-    r = range(-int(radius/2), int(radius/2)+1)
+    r = list(range(-int(radius/2), int(radius/2)+1))
     gauss = [1/(sigma*np.sqrt(2*np.pi)) * np.exp(-float(x)**2/(2*sigma**2)) for x in r]
     smsig=np.convolve(signal, gauss)
     return (smsig[radius:len(signal)-radius], time[radius:len(signal)-radius])
@@ -235,7 +235,7 @@ def ReadoutFIFO(h, channel, readtime, iterations, silent):
     for i in range(iterations):
         rec_pulses[i] = FPGA.receive(h.fpga(), h.to_DNCOnFPGA(), readtime)
         if (not silent):
-            print "Iteration " + str(i) + ": Received " + str(rec_pulses[i].size()) + " pulses\n"
+            print("Iteration " + str(i) + ": Received " + str(rec_pulses[i].size()) + " pulses\n")
 
     gl.dirs[0] = HICANN.GbitLink.Direction.OFF
     gr[0] = gl
@@ -598,14 +598,14 @@ def RecordActivationCurve(h, stimbegin, stimend, period, neuron, program_fg, fgc
         spikes = ReadoutFIFO(h, 0, readtimes, iterations, True)
         for i in range(iterations):
             spikenumbers[stim-stimbegin] += spikes[i].size()
-        print "Stimulus " + str(stim) + ": " + str(spikenumbers[stim-stimbegin])
+        print("Stimulus " + str(stim) + ": " + str(spikenumbers[stim-stimbegin]))
 
     # Plot the curve and save it
     fig = pylab.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.set_position([0.15, 0.15, 0.7, 0.7])
 
-    ax.plot(range(stimbegin, stimend), spikenumbers, label='Neuron ' + str(neuron), linewidth=2)
+    ax.plot(list(range(stimbegin, stimend)), spikenumbers, label='Neuron ' + str(neuron), linewidth=2)
 
     ax.set_xlabel('Mean Membrane Potential, [mV]', size=16)
     ax.set_ylabel('Spike Frequency, [kHz]', size=16)
@@ -777,7 +777,7 @@ def GetSynapticTimeConstant(h, neuron, true_if_inh):
 
     #old fitting routine
     fitpar = fit_psp(time, voltage, taumem)
-    print fitpar
+    print(fitpar)
     pylab.plot(time, ideal_psp_fixmem(fitpar, taumem, pylab.array(time)))
 
     def tmax_func(taus):
@@ -797,7 +797,7 @@ def GetSynapticTimeConstant(h, neuron, true_if_inh):
         #~ psp[i] = max(voltage) - mean_estimate)/(1./4.) * (np.exp(-time[i] / tausyn) - np.exp(-time[i] / taumem)) + min(voltage)
     #~ print "T_max = " + str(t_max) + " microseconds"
     #~ print "Tau_mem = " + str(taumem) + " microseconds"
-    print "Tau_syn = " + str(tausyn) + " microseconds"
+    print("Tau_syn = " + str(tausyn) + " microseconds")
     #~ print "PSP begins at " + str(t_begin) + " microseconds"
     pylab.plot(time, alpha_psp((max(voltage)-offset)*0.9, tausyn, taumem, t_begin, offset, pylab.array(time)))
     pylab.plot(time, [offset] * len(time))
@@ -1009,7 +1009,7 @@ def SetL1Voltages(h, vol, voh):
 # uses FPGA BEG to send events into L1 network
 def L1Send(h, d, f, period, hline_number, neuron_number):
     if (not(hline_number == 62) and not(hline_number == 54) and not(hline_number == 46) and not(hline_number == 38) and not(hline_number == 30) and not(hline_number == 22) and not(hline_number == 14) and not(hline_number == 6)):
-        print "There is no sending repeater on this line!"
+        print("There is no sending repeater on this line!")
     lockperiod = 3000
     channel = 8 - (hline_number + 2)/8
 
@@ -1227,7 +1227,7 @@ def L1ReceiveHor(h, hline_number):
 # connects senderline (6, 14, 22, 30, 38, 46, 54, 62) to receiver possibility (0-7) on a HICANN and returns according repeater/VLine number
 def SetL1Crossbar(h, senderline, receiver):
     if (not(senderline == 62) and not(senderline == 54) and not(senderline == 46) and not(senderline == 38) and not(senderline == 30) and not(senderline == 22) and not(senderline == 14) and not(senderline == 6)):
-        print "There is no sending repeater on this line!"
+        print("There is no sending repeater on this line!")
     repblock = 4
     repnr = 0
 

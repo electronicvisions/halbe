@@ -88,7 +88,7 @@ class HICANNBackendHWTests(HWTest):
 
         rec_pulses = FPGA.receive(self.fpga, self.dnc, 10000); # 10 ms
 
-        print str(rec_pulses.size()) + " packets received"
+        print(str(rec_pulses.size()) + " packets received")
         self.assertGreater(rec_pulses.size(), 0)
 
         # Check for correct addrss of spikes
@@ -204,7 +204,7 @@ class HICANNBackendHWTests(HWTest):
         data.clear()
         data = FPGA.receive(self.fpga, self.dnc, 50000) #0,05 seconds
 
-        print str(data.size()) + " packets received"
+        print(str(data.size()) + " packets received")
         self.assertNotEqual(0, data.size())
 
         number_count = 0
@@ -286,7 +286,7 @@ class HICANNBackendHWTests(HWTest):
         DNC.set_hicann_directions(self.fpga, self.dnc, gbit)
         HICANN.flush(self.h) #flush to hardware
 
-        print len(sent_data), " packets sent, ", received_data.size(), " received"
+        print(len(sent_data), " packets sent, ", received_data.size(), " received")
         self.assertEqual(len(sent_data), received_data.size())
 
 

@@ -4,7 +4,7 @@ the reshape interval by minimizing the standard deviation of the overlap.
 """
 
 import pylab as p
-from segment_psp_trace import segment, optimize_segment
+from .segment_psp_trace import segment, optimize_segment
 
 
 if __name__ == '__main__':
@@ -18,15 +18,15 @@ if __name__ == '__main__':
             axis=0))
 
     shift_values = p.arange(3841, 3842, .01)
-    p.plot(shift_values, map(m, shift_values), 'x')
+    p.plot(shift_values, list(map(m, shift_values)), 'x')
     p.show()
 
     r = optimize_segment(data, 1., 3840)
-    print r
+    print(r)
 
     p.figure()
     seg = segment(data, 1., r)
-    print len(seg)
+    print(len(seg))
     mean = p.mean(seg, axis=0)
     std = p.std(seg, axis=0)
     dt = 1.

@@ -3,11 +3,11 @@ matplotlib.use("agg")
 
 import unittest
 import pylab as p
-print p.matplotlib.get_backend()
+print(p.matplotlib.get_backend())
 from numpy.random import seed
-from psp_shapes import AlphaPSP
-from test_psp_shapes import noisy_psp
-from fit import fit
+from .psp_shapes import AlphaPSP
+from .test_psp_shapes import noisy_psp
+from .fit import fit
 
 
 class TestFit(unittest.TestCase):
@@ -54,11 +54,11 @@ class TestFit(unittest.TestCase):
             p.title("fit result")
             fname = "/tmp/fit_quality_plot_{0}.pdf".format(seed_val)
             p.savefig(fname)
-            print "Plot saved to:", fname
+            print("Plot saved to:", fname)
 
         err = p.sqrt(p.diag(cov))
 
-        print "seed:", seed_val
+        print("seed:", seed_val)
 
         self.assertTrue(success)
         self.assertLess(abs(fitres[0] - height),
@@ -73,7 +73,7 @@ class TestFit(unittest.TestCase):
         #                 max_dev * err[4])
 
         self.assertLess(red_chi2, 1.5)
-        print red_chi2, abs(fitres[1] - tau_1) / err[1], abs(fitres[2] - tau_2) / err[2]
+        print(red_chi2, abs(fitres[1] - tau_1) / err[1], abs(fitres[2] - tau_2) / err[2])
 
     def test_fit_quality_fixed_seeds(self):
         """
@@ -128,7 +128,7 @@ class TestFit(unittest.TestCase):
             p.title("initial parameter estimate")
             fname = "/tmp/test_param_estimate.pdf"
             p.savefig(fname)
-            print "plot saved to:", fname
+            print("plot saved to:", fname)
 
 
 if __name__ == '__main__':

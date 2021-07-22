@@ -1,6 +1,6 @@
 import unittest
 import pylab as p
-from psp_shapes import AlphaPSP, jacobian
+from .psp_shapes import AlphaPSP, jacobian
 import scipy
 from numpy.testing import assert_array_almost_equal
 
@@ -21,7 +21,7 @@ class TestJacobian(unittest.TestCase):
 
         repetitions = 100
 
-        for i in xrange(repetitions):
+        for i in range(repetitions):
             x = p.random(n) * size
             assert_array_almost_equal(2 * x, jacobian(f, x), decimal=4)
 

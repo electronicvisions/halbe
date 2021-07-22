@@ -6,7 +6,7 @@ from Test import PyhalbeTest, parametrize
 
 class HWTest(PyhalbeTest):
     def setUp(self):
-        if 'nose' in sys.modules.keys():
+        if 'nose' in list(sys.modules.keys()):
             # ugly hack to support nose-based execution...
             self.FPGA_IP = '0.0.0.0'
             self.PMU_IP = '0.0.0.0'
