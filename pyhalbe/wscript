@@ -49,10 +49,11 @@ def build(bld):
         install_path='${PREFIX}/lib'
     )
 
-    bld.install_files(
-            '${PREFIX}/lib',
-            [ 'test/HWTest.py', 'test/Test.py'],
-            relative_trick=False
+    bld(
+        name            = "pyhalbe_test_dep",
+        source          = ['test/HWTest.py', 'test/Test.py'],
+        features        = 'py',
+        install_path    = '${PREFIX}/lib',
     )
 
     bld(
