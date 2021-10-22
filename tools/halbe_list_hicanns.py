@@ -33,10 +33,10 @@ def f_reticle(coord):
 
 def hicanns_on_dnc(dnc):
     per_dnc = C.HICANNOnDNC.enum_type.size
-    offset = (per_dnc / 2 - 1)
+    offset = (per_dnc // 2 - 1)
 
     h0 = C.HICANNOnDNC(Enum(0)).toHICANNOnWafer(dnc)
-    h1 = C.HICANNOnDNC(Enum(per_dnc / 2)).toHICANNOnWafer(dnc)
+    h1 = C.HICANNOnDNC(Enum(per_dnc // 2)).toHICANNOnWafer(dnc)
 
     top = list(range(h0.toEnum().value(), h0.toEnum().value() + offset + 1))
     bot = list(range(h1.toEnum().value(), h1.toEnum().value() + offset + 1))
