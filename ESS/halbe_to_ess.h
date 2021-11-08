@@ -159,16 +159,17 @@ public:
 	HICANN::FGErrorResultQuadRow set_fg_row_values(Handle::HICANN & h, halco::hicann::v2::FGBlockOnHICANN block, halco::hicann::v2::FGRowOnFGBlock row,
 	HICANN::FGRow const& fg, bool const writeDown, bool const blocking = true);
 	void set_fg_ram_values(
-	    Handle::HICANN const& h,
-	    halco::hicann::v2::FGBlockOnHICANN const& b,
-	    HICANN::FGRow const& fgr)
+	    Handle::HICANN const& /*h*/,
+	    halco::hicann::v2::FGBlockOnHICANN const& /*b*/,
+	    HICANN::FGRow const& /*fgr*/)
 	{
 		ESS_NOT_IMPLEMENTED();
 	}
 	HICANN::FGRow get_fg_ram_values(
-	    Handle::HICANN const& h, halco::hicann::v2::FGBlockOnHICANN const& b)
+	    Handle::HICANN const& /*h*/, halco::hicann::v2::FGBlockOnHICANN const& /*b*/)
 	{
 		ESS_NOT_IMPLEMENTED();
+		return HICANN::FGRow{};
 	}
 
 	void set_fg_config(Handle::HICANN & h, halco::hicann::v2::FGBlockOnHICANN const& block, const HICANN::FGConfig & config);
