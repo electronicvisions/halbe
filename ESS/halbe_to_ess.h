@@ -163,12 +163,12 @@ public:
 	    halco::hicann::v2::FGBlockOnHICANN const& /*b*/,
 	    HICANN::FGRow const& /*fgr*/)
 	{
-		ESS_NOT_IMPLEMENTED();
+		ESS_DUMMY();
 	}
 	HICANN::FGRow get_fg_ram_values(
 	    Handle::HICANN const& /*h*/, halco::hicann::v2::FGBlockOnHICANN const& /*b*/)
 	{
-		ESS_NOT_IMPLEMENTED();
+		ESS_DUMMY();
 		return HICANN::FGRow{};
 	}
 
