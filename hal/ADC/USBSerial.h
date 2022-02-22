@@ -1,8 +1,4 @@
 #pragma once
-// GCCXML has problems with atomics -> removed before boost serialization is included
-#ifdef PYPLUSPLUS
-#undef _GLIBCXX_ATOMIC_BUILTINS
-#endif // PYPLUSPLUS
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/nvp.hpp>
 #include "halco/common/geometry.h"
