@@ -162,7 +162,7 @@ HALBE_GETTER_WITH_EXCEPTION_TRANSLATION(flyspi::DeviceError,
 		const uint32_t size = std::min(num_words - chunk, max_size);
 
 		LOG4CXX_TRACE(logger, "read chunk from  " << chunk << " to "
-				<< (chunk + size) << " (" << size << " words).")
+				<< (chunk + size) << " (" << size << " words).");
 		Vbufuint_p data = h.mem().readBlock(startaddr + chunk, size);
 
 		const size_t raw_offset = chunk * 2;
