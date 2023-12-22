@@ -1,5 +1,7 @@
 #pragma once
 
+#include <set>
+
 #include "hal/Handle/HICANNHw.h"
 #include "hal/Handle/FPGA.h"
 #include "halco/hicann/v2/fwd.h"
