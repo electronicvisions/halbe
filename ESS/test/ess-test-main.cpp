@@ -1,8 +1,8 @@
 #include <boost/program_options.hpp>
 #include <gtest/gtest.h>
-#include "logging_ctrl.h"
+#include "logger/log4cxx/logging_ctrl.h"
 
-#include "logger.h"
+#include "logger/log4cxx/logger.h"
 
 #include "ess-test-util.h"
 

@@ -486,13 +486,17 @@ void HAL2ESS::set_decoder_double_row(Handle::HICANN const& h, HICANN::SynapseCon
 	auto &hica = mhal_access->wafer().hicanns[hic_id];
 	for(size_t i = 0; i < data[halco::common::top].size(); ++i)
 	{
-        if (data[halco::common::top][i].value() != 1) // 1 = mapping blocking value TODO shouldnt be a magic number here
-            LOG4CXX_DEBUG(_logger, "set_decoder_double_row: top row decoder set to " << (int)data[halco::common::top][i].value() << " in column " << i );
-	    std::bitset<4> addr_top(data[halco::common::top][i].value());
+		if (data[halco::common::top][i].value() !=
+		    1) { // 1 = mapping blocking value TODO shouldnt be a magic number here
+			LOG4CXX_DEBUG(_logger, "set_decoder_double_row: top row decoder set to " << (int)data[halco::common::top][i].value() << " in column " << i );
+		}
+		std::bitset<4> addr_top(data[halco::common::top][i].value());
         hica.set_syn_address(addr_top, top, i);
-        if (data[halco::common::bottom][i].value() != 1) // 1 = mapping blocking value TODO shouldnt be a magic number here
-            LOG4CXX_DEBUG(_logger, "set_decoder_double_row: bottom row decoder set to " << (int)data[halco::common::bottom][i].value() << " in column " << i );
-        std::bitset<4> addr_bot(data[halco::common::bottom][i].value());
+		if (data[halco::common::bottom][i].value() !=
+		    1) { // 1 = mapping blocking value TODO shouldnt be a magic number here
+			LOG4CXX_DEBUG(_logger, "set_decoder_double_row: bottom row decoder set to " << (int)data[halco::common::bottom][i].value() << " in column " << i );
+		}
+		std::bitset<4> addr_bot(data[halco::common::bottom][i].value());
         hica.set_syn_address(addr_bot, bot, i);
 	}
 }

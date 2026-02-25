@@ -4,7 +4,7 @@
 #include <boost/program_options.hpp>
 #include "halco/common/iter_all.h"
 
-#include "logger.h"
+#include "logger/log4cxx/logger.h"
 
 CommandLineArgs g_conn;
 

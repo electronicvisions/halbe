@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "hal/macro_HALbe.h"
-#include "logger.h"
+#include "logger/log4cxx/logger.h"
 #include "git_version.h"
 #include "halbe_git_version.h"
 

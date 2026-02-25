@@ -5,7 +5,7 @@
 
 #include <boost/program_options.hpp>
 
-#include "logger.h"
+#include "logger/log4cxx/logger.h"
 
 #include "hal/Handle/ADCHw.h"
 #include "hal/Handle/ADCRemoteHw.h"

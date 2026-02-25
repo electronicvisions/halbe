@@ -3,7 +3,7 @@
 #include "hwtest.h"
 #include "CommandLineArgs.h"
 
-#include "logging_ctrl.h"
+#include "logger/log4cxx/logging_ctrl.h"
 
 class HICANNBackendTestEnvironment : public ::testing::Environment {
 public:

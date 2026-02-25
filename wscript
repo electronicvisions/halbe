@@ -132,7 +132,7 @@ def build(bld):
             export_includes = ['.'],
         )
 
-        uses = [ 'halbe_container', 'halbe_handle_inc', 'hmf_calibration', 'ncsc_model', 'systemsim', 'ESS_inc','logger_obj', 'euter']
+        uses = [ 'halbe_container', 'halbe_handle_inc', 'hmf_calibration', 'ncsc_model', 'systemsim', 'ESS_inc','logger', 'euter']
         srcs = bld.path.ant_glob('ESS/*.cpp')
         bld.shlib(
             target          = 'ESS',

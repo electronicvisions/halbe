@@ -1,7 +1,7 @@
 #include <boost/program_options.hpp>
 #include <gtest/gtest.h>
 
-#include "logger.h"
+#include "logger/log4cxx/logger.h"
 
 #include "halco/hicann/v2/fwd.h"
 #include "hal/Handle/FPGAEss.h"
